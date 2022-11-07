@@ -3,7 +3,10 @@
 import * as tasksData from './tasks-data.mjs'
 import * as usersData from './users-data.mjs'
 
-export async function getTasks() {
+
+export async function getTasks(userToken) {
+    let user = await usersData.getUser(userToken)
+
     return tasksData.getTasks()
 }
 
@@ -36,6 +39,8 @@ export async function updateTask(taskId, newTask) {
 
 
 // Auxiliary functions
+
 function isAString(value) {
     return typeof value == 'string' && value != ""
+
 }
