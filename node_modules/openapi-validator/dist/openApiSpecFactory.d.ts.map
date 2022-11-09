@@ -1,0 +1,1 @@
+{"version":3,"file":"openApiSpecFactory.d.ts","sourceRoot":"","sources":["../lib/openApiSpecFactory.ts"],"names":[],"mappings":"AAGA,OAAO,KAAK,EAAE,OAAO,EAAwB,MAAM,eAAe,CAAC;AAGnE,OAAO,YAAY,MAAM,wBAAwB,CAAC;AAClD,OAAO,YAAY,MAAM,wBAAwB,CAAC;AAQlD,MAAM,CAAC,OAAO,UAAU,WAAW,CACjC,gBAAgB,EAAE,MAAM,GAAG,OAAO,CAAC,QAAQ,GAC1C,YAAY,GAAG,YAAY,CAQ7B"}

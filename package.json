@@ -1,0 +1,32 @@
+{
+  "name": "cmdb-ipw-leic2223i-ipw31d-g06",
+  "version": "1.0.0",
+  "description": "This repo will serve to store and update the software of the WebAPI project.",
+  "main": "Part 1 - WebAPI/cmdb-server.mjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/isel-leic-ipw/cmdb-ipw-leic2223i-ipw31d-g06.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/isel-leic-ipw/cmdb-ipw-leic2223i-ipw31d-g06/issues"
+  },
+  "homepage": "https://github.com/isel-leic-ipw/cmdb-ipw-leic2223i-ipw31d-g06#readme",
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "mocha": "^10.1.0"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "jest-openapi": "^0.14.2",
+    "node-fetch": "^3.2.10",
+    "nodemon": "^2.0.20",
+    "yamljs": "^0.3.0"
+  }
+}
