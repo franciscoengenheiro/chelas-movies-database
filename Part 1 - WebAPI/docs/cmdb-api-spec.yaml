@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
-  title: Tasks API
-  description: This is a simple Tasks API
+  title: CMDB API
+  description: This is Chelas Movies Database API
   contact:
     email: you@your-company.com
   license:
@@ -13,7 +13,7 @@ servers:
     url: http://localhost:1904/
 
 tags:
-- name: Tasks
+- name: Movies
 - name: Users
 
 paths:
@@ -48,20 +48,20 @@ paths:
           description: Invalid input, object invalid
           content: {}
       x-codegen-request-body-name: user
-  /tasks:
+  /movies:
     get:
       tags:
-      - Tasks
-      summary: get Tasks
+      - Movies
+      summary: get Movies
       description: By passing in the appropriate options, you can search for available
-        Tasks
-      operationId: getTasks
+        Movies
+      operationId: getMovies
       security:
         - bearerAuth: []
       parameters:
       - name: Authorization
         in: header
-        required: false
+        required: true
         schema:
           type: string
           format: uuid
@@ -91,19 +91,25 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Task'
+                  $ref: '#/components/schemas/Movie'
         400:
           description: bad input parameter
           content: 
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidRequest'
+        404:
+          description: input parameter not found
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestNotFound'
     post:
       tags:
-      - Tasks
-      summary: adds a task
-      description: Adds a task to the system
-      operationId: addTask
+      - Movies
+      summary: adds a movie
+      description: Adds a movie to the system
+      operationId: addMovie
       security:
         - bearerAuth: []
       parameters:
@@ -114,40 +120,44 @@ paths:
           type: string
           format: uuid
       requestBody:
-        description: Task to add
+        description: Movie to add
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewTask'
-        required: false
+              $ref: '#/components/schemas/NewMovie'
+        required: true
       responses:
         201:
-          description: Task created
+          description: Movie created
           content: 
             application/json:
               schema:
-                $ref: '#/components/schemas/NewTaskCreated'
+                $ref: '#/components/schemas/NewMovieCreated'
         400:
           description: Invalid input, object invalid
-          content: {}
-  /tasks/{taskId}:
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequest'
+  /movies/{movieId}:
     get:
       tags:
-      - Tasks
-      summary: Get a task given its id
-      description: Get a task given its id
-      operationId: getTaskById
+      - Movies
+      summary: Get a movie given its id
+      description: Get a movie given its id
+      operationId: getMovieById
       security:
         - bearerAuth: []
       parameters:
       - name: Authorization
         in: header
+        required: true
         schema:
           type: string
           format: uuid
-      - name: taskId
+      - name: movieId
         in: path
-        description: ID of task that to be fetched
+        description: ID of movie to be fetched
         required: true
         schema:
           type: integer
@@ -158,7 +168,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Task'
+                $ref: '#/components/schemas/Movie'
         400:
           description: Invalid ID supplied
           content: 
@@ -167,18 +177,18 @@ paths:
                 $ref: '#/components/schemas/InvalidRequest'
                 example: Invalid ID supplied
         404:
-          description: Task not found
+          description: Movie not found
           content: 
             application/json:
               schema: 
-                $ref: '#/components/schemas/InvalidRequest'
-                example: Task Not found
+                $ref: '#/components/schemas/RequestNotFound'
+                example: Movie Not found
     put:
       tags:
-      - Tasks
-      summary: updates a task
-      description: Updates a Task in the system
-      operationId: updateTask
+      - Movies
+      summary: updates or create a new movie
+      description: Updates a Movie in the system
+      operationId: updateMovie
       security:
         - bearerAuth: []
       parameters:
@@ -188,58 +198,83 @@ paths:
         schema:
           type: string
           format: uuid
-      - name: taskId
+      - name: movieId
         in: path
-        description: ID of the task to be deleted
+        description: ID of the movie to be updated
         required: true
         schema:
           type: integer
       requestBody:
-        description: Task to add
+        description: Movie to update
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewTask'
-        required: false
+              $ref: '#/components/schemas/NewMovie'
+        required: true
       responses:
+        200:
+          description: movie updated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewMovie'
         201:
-          description: task updated
-          content: {}
-        404:
+          description: movie created
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewMovieCreated'
+        404: #ask teacher if 404 in put is valid
           description: Task not found
-          content: {}
+          content: 
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/RequestNotFound'
+                example: Movie Not found
     delete:
       tags:
-      - Tasks
-      summary: Delete a task by ID
-      description: Delete a task by ID
-      operationId: deleteTask
+      - Movies
+      summary: Delete a movie by ID
+      description: Delete a movie by ID
+      operationId: deleteMovie
       security:
         - bearerAuth: []
       parameters:
-      - name: taskId
+      - name: movieId
         in: path
-        description: ID of the task to be deleted
+        description: ID of the movie to be deleted
         required: true
         schema:
           type: integer
       responses:
+        200:
+          description: Movie deleted with success
+          content: {} #which content schema to use?
         400:
           description: Invalid ID supplied
-          content: {}
+          content: 
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/InvalidRequest'
+                example: Invalid movie ID
         404:
-          description: Task not found
-          content: {}
+          description: Movie not found
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/RequestNotFound'
+                example: Movie Not found
 components:
   securitySchemes:
-    bearerAuth:            # arbitrary name for the security scheme
+    bearerAuth:
       type: http
       scheme: bearer
   schemas:
-    Task:
+    Movie:
       required:
       - id
-      - title
+      - name
+      - description
       - userId
       
       type: object
@@ -247,29 +282,45 @@ components:
         id:
           type: integer
           example: 1
-        title:
+        name:
           type: string
-          example: Study HTTP
+          example: Jurassic Park
         description:
           type: string
-          example: Task description
+          example: Movie description
         userId:
           type: integer
-    NewTask:
+    NewMovie:
       required:
-      - title
+      - id
+      - name
       - description
       - userId
+
       type: object
       properties:
-        title:
+        id:
+          type: integer
+          example: 1
+        name:
           type: string
-          example: Study Http
+          example: Jurassic Park
         description:
           type: string
-          example: Task description
+          example: Movie description
         userId:
           type: integer
+    NewMovieCreated:
+      required:
+      - status
+      - task
+      type: object
+      properties:
+        status:
+          type: string
+          example: Task with id 123 created with success
+        task:
+          $ref: '#/components/schemas/Movie'
     NewUser:
       required:
       - userName
@@ -284,14 +335,9 @@ components:
         error:
           type: string
           example: "Missing required parameter"
-    NewTaskCreated:
-      required:
-      - status
-      - task
+    RequestNotFound:
       type: object
       properties:
-        status:
+        error:
           type: string
-          example: Task with id 123 created with success
-        task:
-          $ref: '#/components/schemas/Task'
+          example: "Request not found"
