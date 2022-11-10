@@ -14,13 +14,14 @@ servers:
 
 tags:
 - name: Movies
+- name: Group
 - name: Users
 
 paths:
   /users:
     post:
       tags:
-      - users
+      - Users
       summary: adds a user
       description: Adds a user to the system
       operationId: addUser
@@ -30,7 +31,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/NewUser'
-        required: false
+        required: true
       responses:
         201:
           description: user created
@@ -46,7 +47,10 @@ paths:
                     format: uuid
         400:
           description: Invalid input, object invalid
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequest'
       x-codegen-request-body-name: user
   /movies:
     get:
@@ -65,22 +69,11 @@ paths:
         schema:
           type: string
           format: uuid
-      - name: q
-        in: query
-        description: pass an optional search string for looking up Tasks with that  text
-        schema:
-          type: string
-      - name: skip
-        in: query
-        description: number of records to skip for pagination
-        schema:
-          minimum: 0
-          type: integer
       - name: limit
         in: query
-        description: maximum number of records to return
+        description: maximum number of movies to return
         schema:
-          maximum: 50
+          maximum: 250
           minimum: 0
           type: integer
       responses:
@@ -139,13 +132,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidRequest'
-  /movies/{movieId}:
+  /groups:
     get:
       tags:
-      - Movies
-      summary: Get a movie given its id
-      description: Get a movie given its id
-      operationId: getMovieById
+      - Group
+      summary: List all groups
+      description: List all groups
+      operationId: getAllGroups
       security:
         - bearerAuth: []
       parameters:
@@ -155,27 +148,19 @@ paths:
         schema:
           type: string
           format: uuid
-      - name: movieId
-        in: path
-        description: ID of movie to be fetched
-        required: true
-        schema:
-          type: integer
-          minimum: 0
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Movie'
+                $ref: '#/components/schemas/Group'
         400:
-          description: Invalid ID supplied
+          description: Invalid input
           content: 
             application/json:
-              schema: 
+              schema:
                 $ref: '#/components/schemas/InvalidRequest'
-                example: Invalid ID supplied
         404:
           description: Movie not found
           content: 
@@ -183,12 +168,12 @@ paths:
               schema: 
                 $ref: '#/components/schemas/RequestNotFound'
                 example: Movie Not found
-    put:
+    post:
       tags:
-      - Movies
-      summary: updates or create a new movie
-      description: Updates a Movie in the system
-      operationId: updateMovie
+      - Group
+      summary: adds a new group
+      description: adds a new group
+      operationId: addGroup
       security:
         - bearerAuth: []
       parameters:
@@ -198,137 +183,370 @@ paths:
         schema:
           type: string
           format: uuid
-      - name: movieId
-        in: path
-        description: ID of the movie to be updated
+      requestBody:
+        description: Group to add
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewGroup'
+        required: true
+      responses:
+        201:
+          description: Group created
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewGroupCreated'
+        400:
+          description: Invalid input, object invalid
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequest'
+  /groups/{groupName}:
+    get:
+      tags:
+      - Movies
+      - Group
+      summary: Get all movies in a group
+      description: Get all movies in a group
+      operationId: getGroupDetails
+      security:
+        - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
         required: true
         schema:
-          type: integer
+          type: string
+          format: uuid
+      - name: groupName
+        in: path
+        description: Group of movies
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        400:
+          description: Invalid Name supplied
+          content: 
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/InvalidRequest'
+                example: Invalid Name supplied
+        404:
+          description: Group not found
+          content: 
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/RequestNotFound'
+                example: Group Not found
+    put:
+      tags:
+      - Group
+      summary: updates a group
+      description: Updates a Group in the system
+      operationId: updateGroup
+      security:
+        - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: groupName
+        in: path
+        description: Group to be updated
+        required: true
+        schema:
+          type: string
       requestBody:
-        description: Movie to update
+        description: Group to be updated
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewGroup'
+        required: true
+      responses:
+        200:
+          description: Group updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewGroup'
+        400:
+          description: Invalid input, object invalid
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequest'
+        404:
+          description: Group not found
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/RequestNotFound'
+                example: Group Not found
+    delete:
+      tags:
+      - Group
+      summary: Remove a group by name
+      description: Remove a group by name
+      operationId: removeGroup
+      security:
+        - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: groupName
+        in: path
+        description: Group of movies
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Group removed with success
+          content: 
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ValidObjectRemoved'
+        400:
+          description: Invalid Name supplied
+          content: 
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/InvalidRequest'
+                example: Invalid movie name
+        404:
+          description: Group not found
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/RequestNotFound'
+                example: Group Not found
+
+  /groups/{groupName}/movies:
+    post:
+      tags:
+      - Movies
+      summary: add a new movie name to the group given
+      description: add a new movie name to the group given
+      operationId: addMovie
+      security:
+        - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: groupName
+        in: path
+        description: Group of movies
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: Movie to add
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/NewMovie'
         required: true
       responses:
-        200:
-          description: movie updated
-          content: 
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NewMovie'
         201:
-          description: movie created
+          description: movie added
           content: 
             application/json:
               schema:
                 $ref: '#/components/schemas/NewMovieCreated'
-        404: #ask teacher if 404 in put is valid
-          description: Task not found
-          content: 
-            application/json:
-              schema: 
-                $ref: '#/components/schemas/RequestNotFound'
-                example: Movie Not found
-    delete:
-      tags:
-      - Movies
-      summary: Delete a movie by ID
-      description: Delete a movie by ID
-      operationId: deleteMovie
-      security:
-        - bearerAuth: []
-      parameters:
-      - name: movieId
-        in: path
-        description: ID of the movie to be deleted
-        required: true
-        schema:
-          type: integer
-      responses:
-        200:
-          description: Movie deleted with success
-          content: {} #which content schema to use?
         400:
-          description: Invalid ID supplied
+          description: Invalid Name supplied
           content: 
             application/json:
               schema: 
                 $ref: '#/components/schemas/InvalidRequest'
-                example: Invalid movie ID
+                example: Invalid movie name
+  /groups/{groupName}/movies/{movieName}:
+    delete:
+      tags:
+      - Movies
+      summary: Remove a movie by name in the group given
+      description: Remove a movie by name in the group given
+      operationId: removeMovie
+      security:
+        - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: groupName
+        in: path
+        description: Group of movies
+        required: true
+        schema:
+          type: string
+      - name: movieName
+        in: path
+        description: Name of movie
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Movie removed with success
+          content: 
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ValidObjectRemoved'
+        400:
+          description: Invalid Name supplied
+          content: 
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/InvalidRequest'
+                example: Invalid movie name
         404:
-          description: Movie not found
+          description: Movie or Group not found
           content:
             application/json:
               schema: 
                 $ref: '#/components/schemas/RequestNotFound'
-                example: Movie Not found
+                example: Movie or Group Not found            
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
   schemas:
-    Movie:
+    Group:
       required:
-      - id
       - name
       - description
+      - movies
       - userId
       
       type: object
       properties:
-        id:
-          type: integer
-          example: 1
         name:
           type: string
-          example: Jurassic Park
+          example: Favourite Movies
         description:
           type: string
-          example: Movie description
+          example: Group description
+        movies:
+          type: object
         userId:
           type: integer
-    NewMovie:
+    NewGroup:
       required:
-      - id
       - name
       - description
+      - movies
       - userId
-
+      
       type: object
       properties:
-        id:
-          type: integer
-          example: 1
         name:
           type: string
-          example: Jurassic Park
+          example: Favourite Movies
         description:
           type: string
-          example: Movie description
+          example: Group description
+        movies:
+          type: object
         userId:
           type: integer
-    NewMovieCreated:
+    NewGroupCreated:
       required:
       - status
-      - task
+      - group
+
       type: object
       properties:
         status:
           type: string
-          example: Task with id 123 created with success
-        task:
+          example: Group with name "Favourite Movies" created with success
+        group:
+          $ref: '#/components/schemas/Group'
+    Movie:
+      required:
+      - name
+      - description
+      - duration
+      
+      type: object
+      properties:
+        name:
+          type: string
+          example: Jurassic Park
+        description:
+          type: string
+          example: Movie description
+        duration:
+          type: integer
+          example: 180
+    NewMovie:
+      required:
+      - name
+      - description
+      - duration
+      
+      type: object
+      properties:
+        name:
+          type: string
+          example: Jurassic Park
+        description:
+          type: string
+          example: Movie description
+        duration:
+          type: integer
+          example: 180
+    NewMovieCreated:
+      required:
+      - status
+      - movie
+
+      type: object
+      properties:
+        status:
+          type: string
+          example: Movie with name "Jurassic Park" created with success
+        movie:
           $ref: '#/components/schemas/Movie'
     NewUser:
       required:
       - userName
+
       type: object
       properties:
         userName:
           type: string
           example: joao
+    ValidObjectRemoved:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Removed with success"
     InvalidRequest:
       type: object
       properties:
