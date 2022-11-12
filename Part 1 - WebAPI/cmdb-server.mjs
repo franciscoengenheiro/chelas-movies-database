@@ -12,7 +12,7 @@ import swaggerUi from 'swagger-ui-express'
 import yaml from 'yamljs' // Yaml is similar to JSON but uses indentation to infer object and properties.
 
 // Constants
-const PORT = 1904 
+const PORT = 1904
 
 console.log("-------------- Start setting up server --------------")
 
@@ -20,7 +20,7 @@ let app = express() // Instance of the HTTP application
  
 app.use(express.json()) // Middleware that parses incoming requests with JSON payloads 
                         // and is based on body-parser.
-// app.use(cors()) // CORS (Cross Origin Resource Sharing) is an HTTP-header based mechanism that
+app.use(cors()) // CORS (Cross Origin Resource Sharing) is an HTTP-header based mechanism that
                 // allows a server to indicate any origins other than its own from which a browser
                 // should permit loading resources. 
                 // New HTTP-header: Access-Control-Allow-Origin: *
@@ -33,11 +33,14 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 // URI paths and respective HTTP methods supported:
 // The API functions are only called, by the Express module, when the client makes 
 // the respective request.
-app.get('/tasks', api.getTasks)
-app.get('/tasks/:id', api.getTask) 
-app.delete('/tasks/:id', api.deleteTask)
-app.post('/tasks', api.createTask)
-app.put('/tasks/:id', api.updateTask)
+app.get('/movies', api.getPopularMovies)
+app.get('/groups', api.getGroups)
+app.post('/groups', api.createGroup)
+app.get('/groups/:groupId', api.getGroupDetails)
+app.put('/groups/:groupId', api.editGroup)
+app.delete('/groups/:groupId', api.deleteGroup)
+app.put('/groups/:groupId/movies/:movieId', api.addMovieInGroup)
+app.delete('/groups/:groupId/movies/:movieId', api.removeMovieInGroup)
 
 // Sets the server to listen in a specified port.
 app.listen(PORT, () => console.log(`Server listening in http://localhost:${PORT}`))

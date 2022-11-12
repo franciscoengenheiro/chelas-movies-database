@@ -8,7 +8,7 @@
 //  - Invoque the corresponding operation on services
 //  - Generate the response
 
-import * as tasksServices from './cmdb-services.mjs'
+import * as cmdbServices from './cmdb-services.mjs'
 
 // Functions to export:
 export const getTasks = verifyAuthentication(getTasksInternal)
@@ -17,8 +17,20 @@ export const deleteTask = verifyAuthentication(deleteTaskInternal)
 export const updateTask = verifyAuthentication(updateTaskInternal )
 export const createTask = verifyAuthentication(createTaskInternal )
 
+/*
+app.get('/movies', api.getPopularMovies)
+app.get('/groups', api.getGroups)
+app.post('/groups', api.createGroup)
+app.get('/groups/:groupId', api.getGroupDetails)
+app.put('/groups/:groupId', api.editGroup)
+app.delete('/groups/:groupId', api.deleteGroup)
+app.put('/groups/:groupId/movies/:movieId', api.addMovieInGroup)
+app.delete('/groups/:groupId/movies/:movieId', api.removeMovieInGroup)
+
+*/
+
 async function getTasksInternal(req, rsp) {
-    const tasks = await tasksServices.getTasks(req.token)
+    const tasks = await cmdbServices.getTasks(req.token)
     rsp.json(tasks)
 }
 
@@ -28,7 +40,7 @@ async function getTaskInternal(req, rsp) {
 
 async function deleteTaskInternal(req, rsp) {
     const taskId = req.params.id
-    const deleted = await tasksServices.deleteTask(taskId)
+    const deleted = await cmdbServices.deleteTask(taskId)
     if (deleted) {
         rsp.json({status: `Task with id ${taskId} deleted with success`})
     } else {
@@ -38,7 +50,7 @@ async function deleteTaskInternal(req, rsp) {
 
 async function createTaskInternal(req, rsp) {
     try {
-        let newTask = await tasksServices.createTask(req.body)
+        let newTask = await cmdbServices.createTask(req.body)
         rsp
             .status(201)
             .json({
@@ -62,8 +74,10 @@ async function updateTaskInternal(req, rsp) {
     }
 }
 
+
+
 async function getTaskAndAct(taskId, rsp, action) {
-    const task = await tasksServices.getTask(taskId)
+    const task = await cmdbServices.getTask(taskId)
     if(task != undefined) {
         action(task)
     } else {

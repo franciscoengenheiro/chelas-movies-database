@@ -13,16 +13,17 @@ servers:
     url: http://localhost:1904/
 
 tags:
+- name: Users
 - name: Movies
 - name: Group
-- name: Users
+- name: Movies in a Group
 
 paths:
   /users:
     post:
       tags:
       - Users
-      summary: adds a user
+      summary: Adds a user to the system
       description: Adds a user to the system
       operationId: addUser
       requestBody:
@@ -56,9 +57,8 @@ paths:
     get:
       tags:
       - Movies
-      summary: get Movies
-      description: By passing in the appropriate options, you can search for available
-        Movies
+      summary: Get most popular Movies
+      description: By passing in the appropriate options, you can search for the most popular Movies
       operationId: getMovies
       security:
         - bearerAuth: []
@@ -69,6 +69,11 @@ paths:
         schema:
           type: string
           format: uuid
+      - name: name
+        in: query
+        description: name of the movie(s) to get
+        schema:
+          type: string
       - name: limit
         in: query
         description: maximum number of movies to return
@@ -97,41 +102,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RequestNotFound'
-    post:
-      tags:
-      - Movies
-      summary: adds a movie
-      description: Adds a movie to the system
-      operationId: addMovie
-      security:
-        - bearerAuth: []
-      parameters:
-      - name: Authorization
-        in: header
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        description: Movie to add
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/NewMovie'
-        required: true
-      responses:
-        201:
-          description: Movie created
-          content: 
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NewMovieCreated'
-        400:
-          description: Invalid input, object invalid
-          content: 
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InvalidRequest'
   /groups:
     get:
       tags:
@@ -171,7 +141,7 @@ paths:
     post:
       tags:
       - Group
-      summary: adds a new group
+      summary: Adds a new group
       description: adds a new group
       operationId: addGroup
       security:
@@ -179,7 +149,7 @@ paths:
       parameters:
       - name: Authorization
         in: header
-        required: true
+        required: false
         schema:
           type: string
           format: uuid
@@ -203,12 +173,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidRequest'
-  /groups/{groupName}:
+  /groups/{groupId}:
     get:
       tags:
-      - Movies
       - Group
-      summary: Get all movies in a group
+      summary: List the group details
       description: Get all movies in a group
       operationId: getGroupDetails
       security:
@@ -220,12 +189,12 @@ paths:
         schema:
           type: string
           format: uuid
-      - name: groupName
+      - name: groupId
         in: path
         description: Group of movies
         required: true
         schema:
-          type: string
+          type: integer
       responses:
         200:
           description: successful operation
@@ -234,12 +203,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Group'
         400:
-          description: Invalid Name supplied
+          description: Invalid ID supplied
           content: 
             application/json:
               schema: 
                 $ref: '#/components/schemas/InvalidRequest'
-                example: Invalid Name supplied
+                example: Invalid ID supplied
         404:
           description: Group not found
           content: 
@@ -250,7 +219,7 @@ paths:
     put:
       tags:
       - Group
-      summary: updates a group
+      summary: Updates a group
       description: Updates a Group in the system
       operationId: updateGroup
       security:
@@ -262,12 +231,12 @@ paths:
         schema:
           type: string
           format: uuid
-      - name: groupName
+      - name: groupId
         in: path
         description: Group to be updated
         required: true
         schema:
-          type: string
+          type: integer
       requestBody:
         description: Group to be updated
         content:
@@ -281,13 +250,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NewGroup'
+                $ref: '#/components/schemas/Group'
         400:
-          description: Invalid input, object invalid
+          description: Invalid ID supplied
           content: 
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidRequest'
+                example: Invalid ID supplied
         404:
           description: Group not found
           content:
@@ -298,8 +268,8 @@ paths:
     delete:
       tags:
       - Group
-      summary: Remove a group by name
-      description: Remove a group by name
+      summary: Remove a group
+      description: Remove a group by ID
       operationId: removeGroup
       security:
         - bearerAuth: []
@@ -310,12 +280,12 @@ paths:
         schema:
           type: string
           format: uuid
-      - name: groupName
+      - name: groupId
         in: path
         description: Group of movies
         required: true
         schema:
-          type: string
+          type: integer
       responses:
         200:
           description: Group removed with success
@@ -324,12 +294,12 @@ paths:
               schema: 
                 $ref: '#/components/schemas/ValidObjectRemoved'
         400:
-          description: Invalid Name supplied
+          description: Invalid ID supplied
           content: 
             application/json:
               schema: 
                 $ref: '#/components/schemas/InvalidRequest'
-                example: Invalid movie name
+                example: Invalid movie ID
         404:
           description: Group not found
           content:
@@ -337,13 +307,12 @@ paths:
               schema: 
                 $ref: '#/components/schemas/RequestNotFound'
                 example: Group Not found
-
-  /groups/{groupName}/movies:
-    post:
+  /groups/{groupId}/movies/{movieId}:
+    put:
       tags:
-      - Movies
-      summary: add a new movie name to the group given
-      description: add a new movie name to the group given
+      - Movies in a Group
+      summary: Add a new movie to the group given
+      description: add a new movie to the group given
       operationId: addMovie
       security:
         - bearerAuth: []
@@ -354,12 +323,18 @@ paths:
         schema:
           type: string
           format: uuid
-      - name: groupName
+      - name: groupId
         in: path
         description: Group of movies
         required: true
         schema:
-          type: string
+          type: integer
+      - name: movieId
+        in: path
+        description: A single Movie
+        required: true
+        schema:
+          type: integer
       requestBody:
         description: Movie to add
         content:
@@ -381,12 +356,18 @@ paths:
               schema: 
                 $ref: '#/components/schemas/InvalidRequest'
                 example: Invalid movie name
-  /groups/{groupName}/movies/{movieName}:
+        404:
+          description: Movie not found
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/RequestNotFound'
+                example: Movie Not found
     delete:
       tags:
-      - Movies
-      summary: Remove a movie by name in the group given
-      description: Remove a movie by name in the group given
+      - Movies in a Group
+      summary: Remove a movie in the group given
+      description: Remove a movie in the group given
       operationId: removeMovie
       security:
         - bearerAuth: []
@@ -397,18 +378,18 @@ paths:
         schema:
           type: string
           format: uuid
-      - name: groupName
+      - name: groupId
         in: path
         description: Group of movies
         required: true
         schema:
-          type: string
-      - name: movieName
+          type: integer
+      - name: movieId
         in: path
-        description: Name of movie
+        description: A single Movie
         required: true
         schema:
-          type: string
+          type: integer
       responses:
         200:
           description: Movie removed with success
@@ -417,12 +398,12 @@ paths:
               schema: 
                 $ref: '#/components/schemas/ValidObjectRemoved'
         400:
-          description: Invalid Name supplied
+          description: Invalid ID supplied
           content: 
             application/json:
               schema: 
                 $ref: '#/components/schemas/InvalidRequest'
-                example: Invalid movie name
+                example: Invalid movie ID
         404:
           description: Movie or Group not found
           content:
@@ -438,6 +419,7 @@ components:
   schemas:
     Group:
       required:
+      - id
       - name
       - description
       - movies
@@ -445,6 +427,10 @@ components:
       
       type: object
       properties:
+        id:
+          type: integer
+          minimum: 0
+          example: 111222333
         name:
           type: string
           example: Favourite Movies
@@ -452,14 +438,15 @@ components:
           type: string
           example: Group description
         movies:
-          type: object
+          type: array
+          items: 
+            $ref: '#/components/schemas/Movie'
         userId:
           type: integer
     NewGroup:
       required:
       - name
       - description
-      - movies
       - userId
       
       type: object
@@ -470,8 +457,6 @@ components:
         description:
           type: string
           example: Group description
-        movies:
-          type: object
         userId:
           type: integer
     NewGroupCreated:
@@ -483,17 +468,22 @@ components:
       properties:
         status:
           type: string
-          example: Group with name "Favourite Movies" created with success
+          example: Group 1 created with success
         group:
           $ref: '#/components/schemas/Group'
     Movie:
       required:
+      - id
       - name
       - description
       - duration
       
       type: object
       properties:
+        id:
+          type: integer
+          minimum: 0
+          example: 123456789
         name:
           type: string
           example: Jurassic Park
@@ -502,6 +492,7 @@ components:
           example: Movie description
         duration:
           type: integer
+          minimum: 0
           example: 180
     NewMovie:
       required:
@@ -519,6 +510,7 @@ components:
           example: Movie description
         duration:
           type: integer
+          minimum: 0
           example: 180
     NewMovieCreated:
       required:
