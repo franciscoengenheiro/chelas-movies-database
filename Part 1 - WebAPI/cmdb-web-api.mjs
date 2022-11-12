@@ -9,80 +9,81 @@
 //  - Generate the response
 
 import * as cmdbServices from './cmdb-services.mjs'
+import {readFile, writeFile} from 'node:fs/promises'
 
 // Functions to export:
-export const getTasks = verifyAuthentication(getTasksInternal)
-export const getTask = verifyAuthentication(getTaskInternal)
-export const deleteTask = verifyAuthentication(deleteTaskInternal)
-export const updateTask = verifyAuthentication(updateTaskInternal )
-export const createTask = verifyAuthentication(createTaskInternal )
 
+export const getPopularMovies = verifyAuthentication(getPopularMoviesInternal)
+export const createGroup = verifyAuthentication(createGroupInternal)
 /*
-app.get('/movies', api.getPopularMovies)
-app.get('/groups', api.getGroups)
-app.post('/groups', api.createGroup)
-app.get('/groups/:groupId', api.getGroupDetails)
-app.put('/groups/:groupId', api.editGroup)
-app.delete('/groups/:groupId', api.deleteGroup)
-app.put('/groups/:groupId/movies/:movieId', api.addMovieInGroup)
-app.delete('/groups/:groupId/movies/:movieId', api.removeMovieInGroup)
-
+export const getGroups = verifyAuthentication(getGroupsInternal)
+export const getGroupDetails = verifyAuthentication(getGroupDetailsInternal)
+export const editGroup = verifyAuthentication(editGroupInternal)
+export const deleteGroup = verifyAuthentication(deleteGroupInternal)
+export const addMovieInGroup = verifyAuthentication(addMovieInGroupInternal)
+export const removeMovieInGroup = verifyAuthentication(removeMovieInGroupInternal)
 */
 
-async function getTasksInternal(req, rsp) {
-    const tasks = await cmdbServices.getTasks(req.token)
-    rsp.json(tasks)
-}
+const MOVIES_FILE = './local_data/movies.json'
+const GROUP_FILE = './local_data/groups.json'
+let maxId = 1
 
-async function getTaskInternal(req, rsp) {
-    getTaskAndAct(req.params.id, rsp, task => rsp.json(task))
-}
+async function getPopularMoviesInternal(req, rsp) {
+    let fileContents = await readFile(MOVIES_FILE)
+    let moviesObj = JSON.parse(fileContents)
 
-async function deleteTaskInternal(req, rsp) {
-    const taskId = req.params.id
-    const deleted = await cmdbServices.deleteTask(taskId)
-    if (deleted) {
-        rsp.json({status: `Task with id ${taskId} deleted with success`})
-    } else {
-        rsp.status(404).json({error: `Task with id ${taskId} not found`})
+    if(req.query.moviesName != undefined) {
+        if(!isAString(req.query.moviesName)) {
+            return rsp
+                    .status(400)
+                    .json({error: `Invalid movie name`})
+        }
+        moviesObj.items = moviesObj.items.filter(movie => movie.title.includes(req.query.moviesName))
     }
+
+    if(req.query.limit != undefined) {
+        if(Number(req.query.limit) == NaN) {
+            return rsp
+                    .status(400)
+                    .json({error: `Invalid limit value`})
+        }
+        moviesObj.items = moviesObj.items.filter(movie => Number(movie.rank) <= req.query.limit)
+    }
+    
+    return rsp
+            .status(200)
+            .json({movies: moviesObj.items})
 }
 
-async function createTaskInternal(req, rsp) {
-    try {
-        let newTask = await cmdbServices.createTask(req.body)
-        rsp
-            .status(201)
-            .json({
-                status: `Task with id ${newTask.id} created with success`,
-                newTask: newTask
-                })
-    } catch(e) {
-        rsp
-            .status(400)
-            .json({error: `Error creating task: ${e}`})
+async function createGroupInternal(req, rsp) {
+    let fileContents = await readFile(GROUP_FILE)
+    let groupsObj = JSON.parse(fileContents)
+
+    if(!isAString(req.body.name) || !isAString(req.body.description) || Number(req.body.userId) == NaN) {
+        return rsp
+                .status(400)
+                .json({error: `Invalid group parameters`})
     }
-}
 
-async function updateTaskInternal(req, rsp) {
-    getTaskAndAct(req.params.id, rsp, update)
-    function update(task) {
-        rsp.json({
-            status: `Task with id ${task.id} updated with success`,
-            newTask: task
-            })
-    }
-}
+    
+    groupsObj.groups.forEach(group => {
+         if(group.name == req.body.name && group.userId == req.body.userId) {
+             return rsp
+                    .status(400)
+                     .json({error: `Group already exists`})
+        }
+    })
 
+    
 
+    req.body.id = getNewId()
+    req.body.movies = []
+    groupsObj.groups.push(req.body)
 
-async function getTaskAndAct(taskId, rsp, action) {
-    const task = await cmdbServices.getTask(taskId)
-    if(task != undefined) {
-        action(task)
-    } else {
-        rsp.status(404).json({error: `Task with id ${taskId} not found`})
-    }
+    await writeFile(GROUP_FILE, JSON.stringify(groupsObj, null , 4))
+    return rsp
+        .status(201)
+        .json({message: `Group created`})
 }
 
 // Middleware that verifies if the client trying to access the Web API is an authorized 
@@ -104,4 +105,12 @@ function verifyAuthentication(handlerFunction) {
         // Return the expected function         
         handlerFunction(req, rsp)
     }   
+}
+
+function isAString(value) {
+    return typeof value == 'string' && value != ""
+}
+
+function getNewId() {
+    return maxId++
 }

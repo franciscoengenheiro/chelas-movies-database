@@ -34,13 +34,15 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 // The API functions are only called, by the Express module, when the client makes 
 // the respective request.
 app.get('/movies', api.getPopularMovies)
-app.get('/groups', api.getGroups)
 app.post('/groups', api.createGroup)
+/*
+app.get('/groups', api.getGroups)
 app.get('/groups/:groupId', api.getGroupDetails)
 app.put('/groups/:groupId', api.editGroup)
 app.delete('/groups/:groupId', api.deleteGroup)
 app.put('/groups/:groupId/movies/:movieId', api.addMovieInGroup)
 app.delete('/groups/:groupId/movies/:movieId', api.removeMovieInGroup)
+*/
 
 // Sets the server to listen in a specified port.
 app.listen(PORT, () => console.log(`Server listening in http://localhost:${PORT}`))
