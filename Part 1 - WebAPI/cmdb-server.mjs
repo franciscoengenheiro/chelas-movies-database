@@ -35,11 +35,13 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 // the respective request.
 app.get('/movies', api.getPopularMovies)
 app.post('/groups', api.createGroup)
-/*
 app.get('/groups', api.getGroups)
 app.get('/groups/:groupId', api.getGroupDetails)
 app.put('/groups/:groupId', api.editGroup)
 app.delete('/groups/:groupId', api.deleteGroup)
+/*
+
+
 app.put('/groups/:groupId/movies/:movieId', api.addMovieInGroup)
 app.delete('/groups/:groupId/movies/:movieId', api.removeMovieInGroup)
 */
