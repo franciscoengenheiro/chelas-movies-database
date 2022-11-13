@@ -39,12 +39,9 @@ app.get('/groups', api.getGroups)
 app.get('/groups/:groupId', api.getGroupDetails)
 app.put('/groups/:groupId', api.editGroup)
 app.delete('/groups/:groupId', api.deleteGroup)
-/*
-
-
 app.put('/groups/:groupId/movies/:movieId', api.addMovieInGroup)
 app.delete('/groups/:groupId/movies/:movieId', api.removeMovieInGroup)
-*/
+
 
 // Sets the server to listen in a specified port.
 app.listen(PORT, () => console.log(`Server listening in http://localhost:${PORT}`))

@@ -10,7 +10,6 @@
 
 import * as cmdbServices from './cmdb-services.mjs'
 import {readFile, writeFile} from 'node:fs/promises'
-import { group } from 'node:console'
 
 // Functions to export:
 
@@ -20,11 +19,10 @@ export const getGroups = verifyAuthentication(getGroupsInternal)
 export const getGroupDetails = verifyAuthentication(getGroupDetailsInternal)
 export const editGroup = verifyAuthentication(editGroupInternal)
 export const deleteGroup = verifyAuthentication(deleteGroupInternal)
-/*
 export const addMovieInGroup = verifyAuthentication(addMovieInGroupInternal)
 export const removeMovieInGroup = verifyAuthentication(removeMovieInGroupInternal)
-*/
 
+const MOVIES_INFO = '../local_data/moviesInfo.json'
 const MOVIES_FILE = '../local_data/movies.json'
 const GROUP_FILE = '../local_data/groups.json'
 let maxId = 1
@@ -46,13 +44,13 @@ async function getPopularMoviesInternal(req, rsp) {
             }
         }
     
-        return rsp
-                .status(200)
-                .json({movies: moviesObj.items})
+        rsp
+            .status(200)
+            .json({movies: moviesObj.items})
     }catch(e){
-        return rsp
-                .status(400)
-                .json({error: `Error getting movies: ${e}`})
+        rsp
+            .status(400)
+            .json({error: `Error getting movies: ${e}`})
     }
 }
 
@@ -215,7 +213,109 @@ async function deleteGroupInternal(req, rsp) {
     }   
 } 
 
+async function addMovieInGroupInternal(req, rsp) {
+    let fileContents = await readFile(GROUP_FILE)
+    let groupsObj = JSON.parse(fileContents)
+    fileContents = await readFile(MOVIES_INFO)
+    let moviesObj = JSON.parse(fileContents)
+    let foundMovie = false
+    let foundGroup = false
 
+    try {
+        let receivedGroupID = req.params.groupId
+        let receivedMovieID = req.params.movieId
+
+        if (isNaN(receivedGroupID)) {
+            throw "Invalid group Id"
+        }
+
+        groupsObj.groups = groupsObj.groups.map(group =>{ 
+            if(group.id == receivedGroupID) {
+                foundGroup = true
+
+                if (group.movies.find(movie => movie.id == receivedMovieID) != undefined) {
+                    throw "Movie already exists in this group"
+                }
+
+                let getMovie = moviesObj.movies.find(movie => movie.id == receivedMovieID)
+                if(getMovie != undefined) {
+                    foundMovie = true
+
+                    let newMovie = {
+                        id: getMovie.id,
+                        title: getMovie.title,
+                        duration: getMovie.runtimeMins
+                    }
+    
+                    group.movies.push(newMovie)
+                }
+            }
+            return group
+        }) 
+
+        if(foundMovie && foundGroup) {
+            await writeFile(GROUP_FILE, JSON.stringify(groupsObj, null , 4))
+            rsp
+                .status(200)
+                .json({message: `Movie added with success`})
+        }
+        else if(!foundGroup){
+            rsp
+                .status(404)
+                .json({message: `Group Not Found`})
+        }
+        else {
+            rsp
+                .status(404)
+                .json({message: `Movie Not Found`})
+        }
+    } catch(e){
+        rsp
+            .status(400)
+            .json({error: `${e}`})
+    }
+}
+
+async function removeMovieInGroupInternal(req, rsp) {
+    let fileContents = await readFile(GROUP_FILE)
+    let groupsObj = JSON.parse(fileContents)
+
+    try {
+        let receivedGroupID = req.params.groupId
+        let receivedMovieID = req.params.movieId
+        
+        if (isNaN(receivedGroupID)){
+            throw "Invalid group Id"
+        }
+
+        let group = groupsObj.groups.find(group => receivedGroupID == group.id)
+
+        if(group != undefined) {
+            let movieIndex = group.movies.findIndex(movie => movie.id == receivedMovieID)
+            if (movieIndex < 0){
+                rsp
+                    .status(404)
+                    .json({Error: `Movie not found`})
+            } 
+            else {
+                group.movies.splice(movieIndex, 1)
+                await writeFile(GROUP_FILE, JSON.stringify(groupsObj, null , 4))
+                rsp
+                    .status(200)
+                    .json({message: `Movie deleted with sucess`})
+            }
+        }
+        else {
+            rsp
+            .status(404)
+            .json({Error: `Group not found`})
+        }
+    } catch(e) {
+        rsp
+            .status(400)
+            .json({error: `${e}`})
+    }
+}
 
 // Middleware that verifies if the client trying to access the Web API is an authorized 
 // user.

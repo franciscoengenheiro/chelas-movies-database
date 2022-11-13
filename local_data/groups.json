@@ -19,7 +19,13 @@
             "description": "1234",
             "userId": "41334",
             "id": 3,
-            "movies": []
+            "movies": [
+                {
+                    "id": "tt0468569",
+                    "title": "The Dark Knight",
+                    "duration": "152"
+                }
+            ]
         },
         {
             "name": "Group 2",
