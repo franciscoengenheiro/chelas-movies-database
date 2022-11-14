@@ -1,5 +1,3 @@
-'use strict'
-
 // Module that contains the functions that handle all HTTP API requests and make up the REST 
 // API of the Web Application
 
@@ -8,9 +6,10 @@
 //  - Invoque the corresponding operation on services
 //  - Generate the response
 
-import * as cmdbServices from './cmdb-services.mjs'
+'use strict'
 
-// Functions to export:
+import * as cmdbServices from '../services/cmdb-services.mjs'
+import translateToHTTPResponse from './http-error-responses.mjs'
 
 export const getPopularMovies = verifyAuthentication(getPopularMoviesInternal)
 export const createGroup = verifyAuthentication(createGroupInternal)
@@ -21,38 +20,32 @@ export const deleteGroup = verifyAuthentication(deleteGroupInternal)
 export const addMovieInGroup = verifyAuthentication(addMovieInGroupInternal)
 export const removeMovieInGroup = verifyAuthentication(removeMovieInGroupInternal)
 
-
 async function getPopularMoviesInternal(req, rsp) {
     try{
         let movies = await cmdbServices.getPopularMovies(req.query.moviesName, req.query.limit)
-    
         rsp
             .status(200)
             .json({movies: movies})
-    }catch(e){
-        rsp
-            .status(400)
-            .json({error: `Error getting movies: ${e}`})
+    } catch(e) {
+        let ret = translateToHTTPResponse(e)
+        rsp.status(ret.status).json(ret.body)
     }
 }
 
 async function createGroupInternal(req, rsp) {
     try{
         await cmdbServices.createGroup(req.body)
-
         return rsp
             .status(201)
             .json({message: `Group created`})
-    }catch(e){
-        return rsp
-                .status(400)
-                .json({error: `Error creating group: ${e}`})
+    } catch(e) {
+        let ret = translateToHTTPResponse(e)
+        rsp.status(ret.status).json(ret.body)
     }
 }
 
 async function getGroupsInternal(req, rsp) {
     let groups = await cmdbServices.getGroups()
-
     rsp
         .status(200)
         .json({groups: groups})
@@ -61,86 +54,68 @@ async function getGroupsInternal(req, rsp) {
 async function getGroupDetailsInternal(req, rsp) {
     try{
         let groupDetails = await cmdbServices.getGroupDetails(req.params.groupId)
-
         rsp
             .status(200)
             .json({group: groupDetails})
-    }
-    catch(e){
-        let error = e.split('/')
-        rsp
-            .status(Number(error[1]))
-            .json({error: `${error[0]}`})
+    } catch(e) {
+        let ret = translateToHTTPResponse(e)
+        rsp.status(ret.status).json(ret.body)
     }
 }
 
 async function editGroupInternal(req, rsp){
     try{
         await cmdbServices.editGroup(req.params.groupId, req.body)
-
         rsp
             .status(200)
             .json({Message: "Updated group with success"})
-
-    }catch(e){
-        let error = e.split('/')
-        rsp
-            .status(Number(error[1]))
-            .json({error: `${error[0]}`})
+    } catch(e) {
+        let ret = translateToHTTPResponse(e)
+        rsp.status(ret.status).json(ret.body)
     }
-
 }
 
 async function deleteGroupInternal(req, rsp) {
     try {
         await cmdbServices.deleteGroup(req.params.groupId)
-
         rsp
             .status(200)
             .json({message: `Group deleted with success`})           
     } catch(e) {
-        let error = e.split('/')
-        rsp
-            .status(Number(error[1]))
-            .json({error: `${error[0]}`})
+        let ret = translateToHTTPResponse(e)
+        rsp.status(ret.status).json(ret.body)
     }   
 } 
 
 async function addMovieInGroupInternal(req, rsp) {
     try {
         await cmdbServices.addMovieInGroup(req.params.groupId, req.params.movieId)
-
         rsp
-            .status(200)
+            .status(201)
             .json({message: `Movie added with success`})
-
-    } catch(e){
-        let error = e.split('/')
-        rsp
-            .status(Number(error[1]))
-            .json({error: `${error[0]}`})
+    } catch(e) {
+        let ret = translateToHTTPResponse(e)
+        rsp.status(ret.status).json(ret.body)
     }
 }
 
 async function removeMovieInGroupInternal(req, rsp) {
     try {
         await cmdbServices.removeMovieInGroup(req.params.groupId, req.params.movieId)
-
         rsp
             .status(200)
-            .json({message: `Movie deleted with sucess`})
+            .json({message: `Movie deleted with success`})
             
     } catch(e) {
-        let error = e.split('/')
-        rsp
-            .status(Number(error[1]))
-            .json({error: `${error[0]}`})
+        let ret = translateToHTTPResponse(e)
+        rsp.status(ret.status).json(ret.body)
     }
 }
 
-// Middleware that verifies if the client trying to access the Web API is an valid token.
+// TODO(mudar esta função")
+// Middleware that verifies if the client trying to access the Web API is a valid token.
 function verifyAuthentication(handlerFunction) {
-    // Function express calls
+    // Function called by express
     return function(req, rsp) {
         // Get the value of the Authorization header
         let reqAuthString = req.get("Authorization") 
@@ -156,8 +131,4 @@ function verifyAuthentication(handlerFunction) {
         // Return the expected function         
         handlerFunction(req, rsp)
     }   
-}
-
-function isAString(value) {
-    return typeof value == 'string' && value != ""
 }

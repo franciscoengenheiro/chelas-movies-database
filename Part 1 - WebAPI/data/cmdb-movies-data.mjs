@@ -1,7 +1,7 @@
-'use strict'
-
 // Module that manages application data.
 // Access to the Internet Movies Database API
+
+'use strict'
 
 // Constants
 const NUM_TASKS = 3
