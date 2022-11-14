@@ -1,15 +1,8 @@
 {
     "groups": [
         {
-            "name": "Grupo 3",
-            "description": "1234",
-            "userId": "41334",
-            "id": 1,
-            "movies": []
-        },
-        {
-            "name": "Grupo 1000",
-            "description": "grupo updated",
+            "name": "Updated Group",
+            "description": "my favourite movies",
             "userId": "41334",
             "id": 4,
             "movies": []
@@ -19,13 +12,7 @@
             "description": "1234",
             "userId": "41334",
             "id": 3,
-            "movies": [
-                {
-                    "id": "tt0468569",
-                    "title": "The Dark Knight",
-                    "duration": "152"
-                }
-            ]
+            "movies": []
         },
         {
             "name": "Group 2",
@@ -49,6 +36,13 @@
                     "duration": 152
                 }
             ]
+        },
+        {
+            "name": "Group 67",
+            "description": "1234",
+            "userId": "4967",
+            "id": 1,
+            "movies": []
         }
     ]
 }
