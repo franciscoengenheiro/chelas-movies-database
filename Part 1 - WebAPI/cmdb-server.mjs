@@ -34,6 +34,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 // the respective request.
 // URI paths and respective HTTP methods supported:
 app.get('/movies', api.getPopularMovies)
+app.get('/movies/:moviesName', api.searchMoviesByName)
 app.post('/groups', api.createGroup)
 app.get('/groups', api.getGroups)
 app.get('/groups/:groupId', api.getGroupDetails)

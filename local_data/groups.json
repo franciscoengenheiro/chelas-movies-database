@@ -2,7 +2,7 @@
     "groups": [
         {
             "name": "Updated Group",
-            "description": "my favourite movies",
+            "description": "Top 10 horror movies",
             "userId": "41334",
             "id": 4,
             "movies": []

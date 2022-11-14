@@ -11,27 +11,36 @@ import errors from '../errors/errors.mjs'
 const MOVIES_INFO_FILE = '../local_data/movies-info.json'
 const MOST_POPULAR_MOVIES_FILE = '../local_data/most-popular-movies.json'
 const GROUPS_FILE = '../local_data/groups.json'
+const MOVIES_SEARCHED_BY_NAME = '../local_data/movies-searched-by-name.json'
 
 let maxId = 1
 
-export async function getPopularMovies(moviesName, limit) {
-    let fileContents = await readFile(MOST_POPULAR_MOVIES_FILE)
-    let moviesObj = JSON.parse(fileContents)
-    if (moviesName != undefined) {
-        moviesObj.items = moviesObj.items.filter(movie => movie.title.includes(moviesName))
-    }
-    if (limit != undefined) {
-        if (!isNaN(limit) && Number(limit) <= 250)
-            moviesObj.items = moviesObj.items.filter(movie => Number(movie.rank) <= limit)
-        else 
-            throw errors.INVALID_ARGUMENT("limit")
-    }
+export async function getPopularMovies(limit) {
+    let moviesObj = await readFromFile(MOST_POPULAR_MOVIES_FILE)
+
+    checkLimitAndFilter(limit, function() {
+        moviesObj.items = moviesObj.items.filter(movie => Number(movie.rank) <= limit)
+    })
+
     return moviesObj.items
 }
 
+export async function searchMoviesByName(moviesName, limit) {
+    let moviesObj = await readFromFile(MOVIES_SEARCHED_BY_NAME)
+    let limitCounter = 1
+    
+    moviesObj.results = moviesObj.results.filter(movie => movie.title.includes(moviesName))
+    
+    checkLimitAndFilter(limit, function() {
+        moviesObj.results = moviesObj.results.filter(_ => limitCounter++ <= limit)
+    })
+
+    return moviesObj.results
+}
+
 export async function createGroup(obj) {
-    let fileContents = await readFile(GROUPS_FILE)
-    let groupsObj = JSON.parse(fileContents)
+    let groupsObj = await readFromFile(GROUPS_FILE)
+
     // TODO(missing userID validation, make a middleware function)
     if (!isAString(obj.name) || !isAString(obj.description) || isNaN(obj.userId)) {
         throw errors.INVALID_ARGUMENT("group missing a valid name and description")
@@ -47,8 +56,8 @@ export async function createGroup(obj) {
 }
 
 export async function getGroups() {
-    let fileContents = await readFile(GROUPS_FILE)
-    let groupsObj = JSON.parse(fileContents)
+    let groupsObj = await readFromFile(GROUPS_FILE)
+    
     groupsObj.groups = groupsObj.groups.map(group => {
         return {
             name: group.name,
@@ -59,9 +68,9 @@ export async function getGroups() {
 }
 
 export async function getGroupDetails(groupId) {
-    let fileContents = await readFile(GROUPS_FILE)
-    let groupsObj = JSON.parse(fileContents)
+    let groupsObj = await readFromFile(GROUPS_FILE)
     let totalDuration = 0
+
     if (isNaN(groupId)) {
         throw errors.INVALID_ARGUMENT("groupId")
     }
@@ -82,9 +91,9 @@ export async function getGroupDetails(groupId) {
 }
 
 export async function editGroup(groupId, obj) {
-    let fileContents = await readFile(GROUPS_FILE)
-    let groupsObj = JSON.parse(fileContents)
+    let groupsObj = await readFromFile(GROUPS_FILE)
     let found = false
+
     if (!isAString(obj.name) || !isAString(obj.description)){
         throw errors.INVALID_ARGUMENT("group missing a valid name and description")
     }
@@ -106,8 +115,8 @@ export async function editGroup(groupId, obj) {
 }
 
 export async function deleteGroup(groupId) {
-    let fileContents = await readFile(GROUPS_FILE)
-    let groupsObj = JSON.parse(fileContents)
+    let groupsObj = await readFromFile(GROUPS_FILE)
+    
     if (isNaN(groupId)){
         throw errors.INVALID_ARGUMENT("group Id")
     }
@@ -122,13 +131,14 @@ export async function deleteGroup(groupId) {
 
 export async function addMovieInGroup(groupId, movieId) {
     // Read from files:
-    let fileContents = await readFile(GROUPS_FILE)
-    let groupsObj = JSON.parse(fileContents)
-    fileContents = await readFile(MOVIES_INFO_FILE)
-    let moviesObj = JSON.parse(fileContents)
+    let groupsObj = await readFromFile(GROUPS_FILE)
+    let moviesObj = await readFromFile(MOVIES_INFO_FILE)
     // Booleans:
     let foundMovie = false
     let foundGroup = false
+
+    let newMovie = {}
+
     if (isNaN(groupId)) {
         throw errors.INVALID_ARGUMENT("group Id")
     }
@@ -141,7 +151,7 @@ export async function addMovieInGroup(groupId, movieId) {
             let getMovie = moviesObj.movies.find(movie => movie.id == movieId)
             if (getMovie != undefined) {
                 foundMovie = true
-                let newMovie = {
+                newMovie = {
                     id: getMovie.id,
                     title: getMovie.title,
                     duration: getMovie.runtimeMins
@@ -152,7 +162,8 @@ export async function addMovieInGroup(groupId, movieId) {
         return group
     }) 
     if(foundMovie && foundGroup) {
-        return writeFile(GROUPS_FILE, JSON.stringify(groupsObj, null , 4))
+        await writeFile(GROUPS_FILE, JSON.stringify(groupsObj, null , 4))
+        return newMovie
     }
     else if(!foundGroup){
         throw errors.ARGUMENT_NOT_FOUND("group")
@@ -163,8 +174,8 @@ export async function addMovieInGroup(groupId, movieId) {
 }
 
 export async function removeMovieInGroup(groupId, movieId) {
-    let fileContents = await readFile(GROUPS_FILE)
-    let groupsObj = JSON.parse(fileContents)    
+    let groupsObj = await readFromFile(GROUPS_FILE)
+
     if (isNaN(groupId)){
         throw errors.INVALID_ARGUMENT("group")
     }
@@ -190,4 +201,18 @@ function isAString(value) {
 
 function getNewId() {
     return maxId++
+}
+
+function checkLimitAndFilter(limit, action) {
+    if (limit != undefined) {
+        if (!isNaN(limit) && Number(limit) <= 250)
+            action()
+        else 
+            throw errors.INVALID_ARGUMENT("limit")
+    }
+}
+
+async function readFromFile(file_name) {
+    let fileContents = await readFile(file_name)
+    return JSON.parse(fileContents)
 }

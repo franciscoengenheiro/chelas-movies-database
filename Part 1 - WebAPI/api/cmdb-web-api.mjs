@@ -11,124 +11,98 @@
 import * as cmdbServices from '../services/cmdb-services.mjs'
 import translateToHTTPResponse from './http-error-responses.mjs'
 
-export const getPopularMovies = verifyAuthentication(getPopularMoviesInternal)
-export const createGroup = verifyAuthentication(createGroupInternal)
-export const getGroups = verifyAuthentication(getGroupsInternal)
-export const getGroupDetails = verifyAuthentication(getGroupDetailsInternal)
-export const editGroup = verifyAuthentication(editGroupInternal)
-export const deleteGroup = verifyAuthentication(deleteGroupInternal)
-export const addMovieInGroup = verifyAuthentication(addMovieInGroupInternal)
-export const removeMovieInGroup = verifyAuthentication(removeMovieInGroupInternal)
+export const getPopularMovies = handleRequest(getPopularMoviesInternal)
+export const searchMoviesByName = handleRequest(searchMoviesByNameInternal)
+export const createGroup = handleRequest(createGroupInternal)
+export const getGroups = handleRequest(getGroupsInternal)
+export const getGroupDetails = handleRequest(getGroupDetailsInternal)
+export const editGroup = handleRequest(editGroupInternal)
+export const deleteGroup = handleRequest(deleteGroupInternal)
+export const addMovieInGroup = handleRequest(addMovieInGroupInternal)
+export const removeMovieInGroup = handleRequest(removeMovieInGroupInternal)
 
 async function getPopularMoviesInternal(req, rsp) {
-    try{
-        let movies = await cmdbServices.getPopularMovies(req.query.moviesName, req.query.limit)
-        rsp
-            .status(200)
-            .json({movies: movies})
-    } catch(e) {
-        let ret = translateToHTTPResponse(e)
-        rsp.status(ret.status).json(ret.body)
-    }
+    return cmdbServices.getPopularMovies(req.query.limit)
+}
+
+async function searchMoviesByNameInternal(req, rsp) {
+    return cmdbServices.searchMoviesByName(req.params.moviesName, req.query.limit)
 }
 
 async function createGroupInternal(req, rsp) {
-    try{
-        await cmdbServices.createGroup(req.body)
-        return rsp
-            .status(201)
-            .json({message: `Group created`})
-    } catch(e) {
-        let ret = translateToHTTPResponse(e)
-        rsp.status(ret.status).json(ret.body)
+    let newGroup = await cmdbServices.createGroup(req.body)
+    rsp.status(201)
+
+    return {
+        message: `Group created`,
+        group: newGroup
     }
 }
 
 async function getGroupsInternal(req, rsp) {
-    let groups = await cmdbServices.getGroups()
-    rsp
-        .status(200)
-        .json({groups: groups})
+    return cmdbServices.getGroups()
 }
 
 async function getGroupDetailsInternal(req, rsp) {
-    try{
-        let groupDetails = await cmdbServices.getGroupDetails(req.params.groupId)
-        rsp
-            .status(200)
-            .json({group: groupDetails})
-    } catch(e) {
-        let ret = translateToHTTPResponse(e)
-        rsp.status(ret.status).json(ret.body)
-    }
+    return cmdbServices.getGroupDetails(req.params.groupId)
 }
 
 async function editGroupInternal(req, rsp){
-    try{
-        await cmdbServices.editGroup(req.params.groupId, req.body)
-        rsp
-            .status(200)
-            .json({Message: "Updated group with success"})
-    } catch(e) {
-        let ret = translateToHTTPResponse(e)
-        rsp.status(ret.status).json(ret.body)
+    await cmdbServices.editGroup(req.params.groupId, req.body)
+    
+    return {
+        message: "Updated group with success"
     }
 }
 
 async function deleteGroupInternal(req, rsp) {
-    try {
-        await cmdbServices.deleteGroup(req.params.groupId)
-        rsp
-            .status(200)
-            .json({message: `Group deleted with success`})           
-    } catch(e) {
-        let ret = translateToHTTPResponse(e)
-        rsp.status(ret.status).json(ret.body)
-    }   
+    await cmdbServices.deleteGroup(req.params.groupId)
+
+    return {
+        message: `Group deleted with success`
+    }    
 } 
 
 async function addMovieInGroupInternal(req, rsp) {
-    try {
-        await cmdbServices.addMovieInGroup(req.params.groupId, req.params.movieId)
-        rsp
-            .status(201)
-            .json({message: `Movie added with success`})
-    } catch(e) {
-        let ret = translateToHTTPResponse(e)
-        rsp.status(ret.status).json(ret.body)
+    let newMovie = await cmdbServices.addMovieInGroup(req.params.groupId, req.params.movieId)
+    rsp.status(201)
+
+    return {
+        message: `Movie added with success`,
+        movie: newMovie
     }
+        
 }
 
 async function removeMovieInGroupInternal(req, rsp) {
-    try {
-        await cmdbServices.removeMovieInGroup(req.params.groupId, req.params.movieId)
-        rsp
-            .status(200)
-            .json({message: `Movie deleted with success`})
-            
-    } catch(e) {
-        let ret = translateToHTTPResponse(e)
-        rsp.status(ret.status).json(ret.body)
+    await cmdbServices.removeMovieInGroup(req.params.groupId, req.params.movieId)
+    
+    return {
+        message: `Movie deleted with success`
     }
+            
 }
 
-// TODO(mudar esta função")
-// Middleware that verifies if the client trying to access the Web API is a valid token.
-function verifyAuthentication(handlerFunction) {
-    // Function called by express
-    return function(req, rsp) {
-        // Get the value of the Authorization header
-        let reqAuthString = req.get("Authorization") 
-        // Retrieve token with the expected format: Bearer <token> 
-        let userToken = reqAuthString ? reqAuthString.split(" ")[1] : null
-        if(!userToken) { // If the token isn't valid:
-            return rsp
-                    .status(401) // Unauthorized 
-                    .json({error: `User token must be provided`})
+function handleRequest(handler) {
+    return async function(req, rsp) {
+        const BEARER_STR = "Bearer "
+        const tokenHeader = req.get("Authorization")
+        if(!(tokenHeader && tokenHeader.startsWith(BEARER_STR) && tokenHeader.length > BEARER_STR.length)) {
+            rsp
+                .status(401)
+                .json({error: `Invalid authentication token`})
+                return
         }
-        // Create a property in the request to retrieve the user token
-        req.token = userToken 
-        // Return the expected function         
-        handlerFunction(req, rsp)
-    }   
+        req.token = tokenHeader.split(" ")[1]
+        try {
+            let body = await handler(req, rsp)
+            rsp
+                .json(body) //status code = 200
+        } catch(e) {
+            const response = translateToHTTPResponse(e)
+            rsp
+                .status(response.status)
+                .json(response.body)
+        }
+    }
 }
