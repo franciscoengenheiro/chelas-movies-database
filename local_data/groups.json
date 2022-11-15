@@ -1,23 +1,16 @@
 {
     "groups": [
         {
-            "name": "Updated Group",
-            "description": "Top 10 horror movies",
-            "userId": "41334",
-            "id": 4,
-            "movies": []
-        },
-        {
             "name": "Grupo 1",
             "description": "1234",
-            "userId": "41334",
-            "id": 3,
+            "userId": 1,
+            "id": 1,
             "movies": []
         },
         {
             "name": "Group 2",
             "description": "1234",
-            "userId": "4967",
+            "userId": 1,
             "id": 2,
             "movies": [
                 {
@@ -40,8 +33,15 @@
         {
             "name": "Group 67",
             "description": "1234",
-            "userId": "4967",
-            "id": 1,
+            "userId": 2,
+            "id": 3,
+            "movies": []
+        },
+        {
+            "name": "Group 56",
+            "description": "1234",
+            "userId": 2,
+            "id": 4,
             "movies": []
         }
     ]

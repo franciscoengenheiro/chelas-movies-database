@@ -2,8 +2,9 @@
 
 'use strict'
 
-import * as cmdbData from '../data/cmdb-movies-data.mjs'
-import * as usersData from '../data/cmdb-data-mem.mjs'
+import * as imdbData from '../data/cmdb-movies-data.mjs'
+import * as cmdbData from '../data/cmdb-data-mem.mjs'
+import * as cmdbUser from './cmdb-users-services.mjs'
 import {readFile, writeFile} from 'node:fs/promises'
 import errors from '../errors/errors.mjs'
 
@@ -12,8 +13,6 @@ const MOVIES_INFO_FILE = '../local_data/movies-info.json'
 const MOST_POPULAR_MOVIES_FILE = '../local_data/most-popular-movies.json'
 const GROUPS_FILE = '../local_data/groups.json'
 const MOVIES_SEARCHED_BY_NAME = '../local_data/movies-searched-by-name.json'
-
-let maxId = 1
 
 export async function getPopularMovies(limit) {
     let moviesObj = await readFromFile(MOST_POPULAR_MOVIES_FILE)
@@ -38,8 +37,10 @@ export async function searchMoviesByName(moviesName, limit) {
     return moviesObj.results
 }
 
-export async function createGroup(obj) {
+export async function createGroup(obj, userToken) {
     let groupsObj = await readFromFile(GROUPS_FILE)
+
+    let user = await checkUser(userToken)
 
     // TODO(missing userID validation, make a middleware function)
     if (!isAString(obj.name) || !isAString(obj.description) || isNaN(obj.userId)) {
@@ -49,15 +50,17 @@ export async function createGroup(obj) {
         if (group.name == obj.name && group.userId == obj.userId) 
             throw errors.INVALID_ARGUMENT("group already exists")
     })
-    obj.id = getNewId()
+    obj.id = getNewId(groupsObj.groups)
     obj.movies = []
     groupsObj.groups.push(obj)
     return writeFile(GROUPS_FILE, JSON.stringify(groupsObj, null , 4))
 }
 
-export async function getGroups() {
+export async function getGroups(userToken) {
     let groupsObj = await readFromFile(GROUPS_FILE)
     
+    let user = await checkUser(userToken)
+
     groupsObj.groups = groupsObj.groups.map(group => {
         return {
             name: group.name,
@@ -67,9 +70,11 @@ export async function getGroups() {
     return groupsObj.groups
 }
 
-export async function getGroupDetails(groupId) {
+export async function getGroupDetails(groupId, userToken) {
     let groupsObj = await readFromFile(GROUPS_FILE)
     let totalDuration = 0
+
+    let user = await checkUser(userToken)
 
     if (isNaN(groupId)) {
         throw errors.INVALID_ARGUMENT("groupId")
@@ -90,9 +95,11 @@ export async function getGroupDetails(groupId) {
     return newGroup
 }
 
-export async function editGroup(groupId, obj) {
+export async function editGroup(groupId, obj, userToken) {
     let groupsObj = await readFromFile(GROUPS_FILE)
     let found = false
+    
+    let user = await checkUser(userToken)
 
     if (!isAString(obj.name) || !isAString(obj.description)){
         throw errors.INVALID_ARGUMENT("group missing a valid name and description")
@@ -114,8 +121,10 @@ export async function editGroup(groupId, obj) {
     return writeFile(GROUPS_FILE, JSON.stringify(groupsObj, null , 4))
 }
 
-export async function deleteGroup(groupId) {
+export async function deleteGroup(groupId, userToken) {
     let groupsObj = await readFromFile(GROUPS_FILE)
+
+    let user = await checkUser(userToken)
     
     if (isNaN(groupId)){
         throw errors.INVALID_ARGUMENT("group Id")
@@ -129,10 +138,13 @@ export async function deleteGroup(groupId) {
     }           
 }
 
-export async function addMovieInGroup(groupId, movieId) {
+export async function addMovieInGroup(groupId, movieId, userToken) {
     // Read from files:
     let groupsObj = await readFromFile(GROUPS_FILE)
     let moviesObj = await readFromFile(MOVIES_INFO_FILE)
+
+    let user = await checkUser(userToken)
+
     // Booleans:
     let foundMovie = false
     let foundGroup = false
@@ -173,8 +185,10 @@ export async function addMovieInGroup(groupId, movieId) {
     }
 }
 
-export async function removeMovieInGroup(groupId, movieId) {
+export async function removeMovieInGroup(groupId, movieId, userToken) {
     let groupsObj = await readFromFile(GROUPS_FILE)
+
+    let user = await checkUser(userToken)
 
     if (isNaN(groupId)){
         throw errors.INVALID_ARGUMENT("group")
@@ -199,8 +213,14 @@ function isAString(value) {
     return typeof value == 'string' && value != ""
 }
 
-function getNewId() {
-    return maxId++
+function getNewId(groups) {
+    let idx = 1
+
+    if(groups.length > 0) {
+        idx = groups[groups.length - 1].id + 1
+    }
+
+    return idx
 }
 
 function checkLimitAndFilter(limit, action) {
@@ -212,7 +232,16 @@ function checkLimitAndFilter(limit, action) {
     }
 }
 
-async function readFromFile(file_name) {
+export async function readFromFile(file_name) {
     let fileContents = await readFile(file_name)
     return JSON.parse(fileContents)
+}
+
+async function checkUser(userToken) {
+    const user = await cmdbUser.getUser(userToken)
+    if(!user) {
+        throw errors.USER_NOT_FOUND(userToken)
+    }
+
+    return user
 }

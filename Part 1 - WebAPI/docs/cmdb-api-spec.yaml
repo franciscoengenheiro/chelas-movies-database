@@ -493,10 +493,14 @@ components:
           $ref: '#/components/schemas/Movie'
     NewUser:
       required:
+      - userId
       - userName
 
       type: object
       properties:
+        userId:
+          type: integer
+          example: 2
         userName:
           type: string
           example: joao

@@ -33,6 +33,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 // Reminder: the API functions are only called, by the Express module, when the client makes 
 // the respective request.
 // URI paths and respective HTTP methods supported:
+app.post('/users', api.createUser)
 app.get('/movies', api.getPopularMovies)
 app.get('/movies/:moviesName', api.searchMoviesByName)
 app.post('/groups', api.createGroup)
