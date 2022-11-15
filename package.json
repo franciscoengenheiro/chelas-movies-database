@@ -4,7 +4,7 @@
   "description": "This repo will serve to store and update the software of the WebAPI project.",
   "main": "Part 1 - WebAPI/cmdb-server.mjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
