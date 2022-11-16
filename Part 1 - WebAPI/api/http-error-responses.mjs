@@ -10,6 +10,7 @@ let errors = {
 export default function(exception) {
     let errorFunction = errors[exception.code]
     if(!errorFunction){
+        console.log(exception)
         return new HTTPResponse(500, "Internal Server error")
     } 
     return errorFunction(exception.description)
