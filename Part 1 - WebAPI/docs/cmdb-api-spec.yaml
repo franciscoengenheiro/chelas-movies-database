@@ -308,13 +308,6 @@ paths:
         required: true
         schema:
           type: integer
-      requestBody:
-        description: Movie to add
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/NewMovie'
-        required: true
       responses:
         201:
           description: movie added
@@ -414,7 +407,6 @@ components:
       required:
       - name
       - description
-      - userId
       
       type: object
       properties:
@@ -424,8 +416,6 @@ components:
         description:
           type: string
           example: Group description
-        userId:
-          type: integer
     NewGroupCreated:
       required:
       - status
@@ -461,24 +451,6 @@ components:
           type: integer
           minimum: 0
           example: 180
-    NewMovie:
-      required:
-      - name
-      - description
-      - duration
-      
-      type: object
-      properties:
-        name:
-          type: string
-          example: Jurassic Park
-        description:
-          type: string
-          example: Movie description
-        duration:
-          type: integer
-          minimum: 0
-          example: 180
     NewMovieCreated:
       required:
       - status
@@ -495,6 +467,7 @@ components:
       required:
       - userId
       - userName
+      - userToken
 
       type: object
       properties:
@@ -504,6 +477,9 @@ components:
         userName:
           type: string
           example: joao
+        userToken:
+          type: string
+          example: 36b8f84d-df4e-4d49-b662-bcde71a8764f
     ValidObjectRemoved:
       type: object
       properties:

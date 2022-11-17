@@ -1,12 +1,12 @@
 'use strict'
 
-import {readFile, writeFile} from 'node:fs/promises'
+import { readFromFile, writeToFile } from '../data/cmdb-data-mem.mjs'
 import errors from '../errors/errors.mjs'
 
 const USERS_FILE = '../local_data/users.json'
 
 export async function createUserData() {
-    let usersObj = await readFromFile()
+    let usersObj = await readFromFile(USERS_FILE)
     let idx = 1
 
     if(usersObj.users.length > 0) {
@@ -21,11 +21,11 @@ export async function createUserData() {
 
     usersObj.users.push(newUser)
 
-    return writeToFile(usersObj)
+    return writeToFile(usersObj, USERS_FILE)
 }
 
 export async function getUserData(userToken){
-    let usersObj = await readFromFile()
+    let usersObj = await readFromFile(USERS_FILE)
 
     return usersObj.users.find(user => user.token == userToken)
 }
@@ -37,14 +37,4 @@ export async function checkUserData(userToken) {
     }
 
     return user
-}
-
-
-async function readFromFile() {
-    let fileContents = await readFile(USERS_FILE)
-    return JSON.parse(fileContents)
-}
-
-async function writeToFile(obj){
-    return writeFile(USERS_FILE, JSON.stringify(obj, null , 4))
 }

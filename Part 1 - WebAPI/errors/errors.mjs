@@ -1,5 +1,7 @@
 // Define all possible application errors
 
+'use strict'
+
 export let errorCodes =  {
     INVALID_ARGUMENT_CODE: 1,
     ARGUMENT_NOT_FOUND_CODE: 2,
