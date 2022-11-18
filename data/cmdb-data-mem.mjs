@@ -6,7 +6,7 @@
 import {readFile, writeFile} from 'node:fs/promises'
 import errors from '../errors/errors.mjs'
 
-const GROUPS_FILE = '../local_data/groups.json'
+const GROUPS_FILE = './local_data/groups.json'
 
 
 export async function createGroupData(obj, userId){

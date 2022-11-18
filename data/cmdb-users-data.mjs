@@ -1,9 +1,9 @@
 'use strict'
 
-import { readFromFile, writeToFile } from '../data/cmdb-data-mem.mjs'
+import { readFromFile, writeToFile } from './cmdb-data-mem.mjs'
 import errors from '../errors/errors.mjs'
 
-const USERS_FILE = '../local_data/users.json'
+const USERS_FILE = './local_data/users.json'
 
 export async function createUserData() {
     let usersObj = await readFromFile(USERS_FILE)

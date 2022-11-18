@@ -3,11 +3,11 @@
 
 'use strict'
 
-import * as cmdbData from '../data/cmdb-data-mem.mjs'
+import * as cmdbData from './cmdb-data-mem.mjs'
 
-const MOVIES_INFO_FILE = '../local_data/movies-info.json'
-const MOST_POPULAR_MOVIES_FILE = '../local_data/most-popular-movies.json'
-const MOVIES_SEARCHED_BY_NAME = '../local_data/movies-searched-by-name.json'
+const MOVIES_INFO_FILE = './local_data/movies-info.json'
+const MOST_POPULAR_MOVIES_FILE = './local_data/most-popular-movies.json'
+const MOVIES_SEARCHED_BY_NAME = './local_data/movies-searched-by-name.json'
 
 
 export async function getPopularMoviesData(limit){
