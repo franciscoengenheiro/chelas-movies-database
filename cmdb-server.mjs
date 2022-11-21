@@ -6,10 +6,24 @@
 'use strict'
 
 import express from 'express'
-import * as api from './api/cmdb-web-api.mjs'
 import cors from 'cors'
 import swaggerUi from 'swagger-ui-express'
 import yaml from 'yamljs' // Yaml is similar to JSON but uses indentation to infer object and properties.
+
+import cmdbServicesInit from './services/cmdb-services.mjs' 
+import *  as userServices from './services/cmdb-users-services.mjs'
+import cmdbWebApiInit from './api/cmdb-web-api.mjs'
+
+import * as usersData from './data/cmdb-users-data.mjs'
+import * as cmdbData from './data/cmdb-data-mem.mjs'
+import imdbDataInit from './data/cmdb-movies-data.mjs'
+//import fetch from node-fetch
+import fetch from './data/local-fetch'
+
+const imdData = imdbDataInit(fetch)
+const cmdbServices = cmdbServicesInit(imdbData, cmdbData, usersData)
+const cmdbWebApi = cmdbWebApiInit(cmdbServices, userServices) 
+
 
 // Constants
 const PORT = 1904
@@ -33,16 +47,16 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 // Reminder: the API functions are only called, by the Express module, when the client makes 
 // the respective request.
 // URI paths and respective HTTP methods supported:
-app.post('/users', api.createUser)
-app.get('/movies', api.getPopularMovies)
-app.get('/movies/:moviesName', api.searchMoviesByName)
-app.post('/groups', api.createGroup)
-app.get('/groups', api.getGroups)
-app.get('/groups/:groupId', api.getGroupDetails)
-app.put('/groups/:groupId', api.editGroup)
-app.delete('/groups/:groupId', api.deleteGroup)
-app.put('/groups/:groupId/movies/:movieId', api.addMovieInGroup)
-app.delete('/groups/:groupId/movies/:movieId', api.removeMovieInGroup)
+app.post('/users', cmdbWebApi.createUser)
+app.get('/movies', cmdbWebApi.getPopularMovies)
+app.get('/movies/:moviesName', cmdbWebApi.searchMoviesByName)
+app.post('/groups', cmdbWebApi.createGroup)
+app.get('/groups', cmdbWebApi.getGroups)
+app.get('/groups/:groupId', cmdbWebApi.getGroupDetails)
+app.put('/groups/:groupId', cmdbWebApi.editGroup)
+app.delete('/groups/:groupId', cmdbWebApi.deleteGroup)
+app.put('/groups/:groupId/movies/:movieId', cmdbWebApi.addMovieInGroup)
+app.delete('/groups/:groupId/movies/:movieId', cmdbWebApi.removeMovieInGroup)
 
 // Sets the server to listen in a specified port.
 app.listen(PORT, () => console.log(`Server listening in http://localhost:${PORT}`))
