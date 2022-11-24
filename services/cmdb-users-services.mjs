@@ -11,7 +11,7 @@ export async function createUser(userToken) {
         throw errors.INVALID_USER("already exists")
     }
 
-    return userData.createUserData()
+    return userData.createUserData(userToken)
 }
 
 //crypto.randomUUID() --> to generate user token

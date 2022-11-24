@@ -26,13 +26,8 @@ paths:
       summary: Adds a user to the system
       description: Adds a user to the system
       operationId: addUser
-      requestBody:
-        description: User to add
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/NewUser'
-        required: true
+      security:
+        - bearerAuth: []
       responses:
         201:
           description: user created
@@ -193,13 +188,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Group'
-        400:
-          description: Invalid ID supplied
-          content: 
-            application/json:
-              schema: 
-                $ref: '#/components/schemas/InvalidRequest'
-                example: "Invalid Argument: group ID"
         404:
           description: Group not found
           content: 
@@ -237,12 +225,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Group'
         400:
-          description: Invalid ID supplied
+          description: Invalid Request Body 
           content: 
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidRequest'
-                example: "Invalid Argument: group ID"
+                example: "Invalid Argument: Invalid Request Body"
         404:
           description: Group not found
           content:
@@ -272,13 +260,6 @@ paths:
             application/json:
               schema: 
                 $ref: '#/components/schemas/ValidObjectRemoved'
-        400:
-          description: Invalid ID supplied
-          content: 
-            application/json:
-              schema: 
-                $ref: '#/components/schemas/InvalidRequest'
-                example: "Invalid Argument: group ID"
         404:
           description: Group not found
           content:
@@ -307,7 +288,7 @@ paths:
         description: A single Movie
         required: true
         schema:
-          type: integer
+          type: string
       responses:
         201:
           description: movie added
@@ -321,14 +302,14 @@ paths:
             application/json:
               schema: 
                 $ref: '#/components/schemas/InvalidRequest'
-                example: "Invalid Argument: movie ID"
+                example: "Invalid Argument: movie already exists"
         404:
           description: Movie or Group not found
           content:
             application/json:
               schema: 
                 $ref: '#/components/schemas/RequestNotFound'
-                example: "Argument not found: movie"
+                example: "Argument not found: movie or group"
     delete:
       tags:
       - Movies in a Group
@@ -349,7 +330,7 @@ paths:
         description: A single Movie
         required: true
         schema:
-          type: integer
+          type: string
       responses:
         200:
           description: Movie removed with success
@@ -357,13 +338,6 @@ paths:
             application/json:
               schema: 
                 $ref: '#/components/schemas/ValidObjectRemoved'
-        400:
-          description: Invalid ID supplied
-          content: 
-            application/json:
-              schema: 
-                $ref: '#/components/schemas/InvalidRequest'
-                example: "Invalid Argument: movie ID"
         404:
           description: Movie or Group not found
           content:
@@ -432,7 +406,6 @@ components:
       required:
       - id
       - name
-      - description
       - duration
       
       type: object
@@ -444,9 +417,6 @@ components:
         name:
           type: string
           example: Jurassic Park
-        description:
-          type: string
-          example: Movie description
         duration:
           type: integer
           minimum: 0
@@ -463,23 +433,6 @@ components:
           example: Movie with name "Jurassic Park" created with success
         movie:
           $ref: '#/components/schemas/Movie'
-    NewUser:
-      required:
-      - userId
-      - userName
-      - userToken
-
-      type: object
-      properties:
-        userId:
-          type: integer
-          example: 2
-        userName:
-          type: string
-          example: joao
-        userToken:
-          type: string
-          example: 36b8f84d-df4e-4d49-b662-bcde71a8764f
     ValidObjectRemoved:
       type: object
       properties:

@@ -3,28 +3,30 @@
 
 'use strict'
 
-import {readFile, writeFile} from 'node:fs/promises'
+
 import errors from '../errors/errors.mjs'
+import * as fileOperation from './read&write.mjs'
 
 const GROUPS_FILE = './local_data/groups.json'
 
 
 export async function createGroupData(obj, userId){
-    let groupsObj = await readFromFile(GROUPS_FILE)
+    let groupsObj = await fileOperation.readFromFile(GROUPS_FILE)
 
     groupsObj.groups.forEach(group => {
         if (group.name == obj.name && group.userId == userId) 
             throw errors.INVALID_ARGUMENT("group already exists")
     })
-    obj.id = getNewId(groupsObj.groups)
+    obj.id = getNewId(groupsObj.IDs)
     obj.movies = []
     obj.userId = userId
     groupsObj.groups.push(obj)
-    return writeToFile(groupsObj)
+    groupsObj.IDs++
+    return fileOperation.writeToFile(groupsObj, GROUPS_FILE)
 }
 
 export async function getGroupsData(userId){
-    let groupsObj = await readFromFile(GROUPS_FILE)
+    let groupsObj = await fileOperation.readFromFile(GROUPS_FILE)
     
     groupsObj.groups = groupsObj.groups
         .filter(group => group.userId == userId)
@@ -39,7 +41,7 @@ export async function getGroupsData(userId){
 
 export async function getGroupDetailsData(groupId, userId){
 
-    let groupsObj = await readFromFile(GROUPS_FILE)
+    let groupsObj = await fileOperation.readFromFile(GROUPS_FILE)
     let totalDuration = 0
 
     let group = groupsObj.groups.find(group => groupId == group.id && userId == group.userId)
@@ -50,7 +52,7 @@ export async function getGroupDetailsData(groupId, userId){
         name: group.name,
         description: group.description,
         movies: group.movies.map(movie => {
-            totalDuration += movie.duration
+            totalDuration += Number(movie.duration)
             return {title: movie.title}
         }),
         moviesTotalDuration: totalDuration
@@ -59,7 +61,7 @@ export async function getGroupDetailsData(groupId, userId){
 }
 
 export async function editGroupData(groupId, obj, userId){
-    let groupsObj = await readFromFile(GROUPS_FILE)
+    let groupsObj = await fileOperation.readFromFile(GROUPS_FILE)
     let found = false
     
     groupsObj.groups = groupsObj.groups.map(group => {
@@ -73,23 +75,23 @@ export async function editGroupData(groupId, obj, userId){
     if (!found){
         throw errors.ARGUMENT_NOT_FOUND("group")
     }
-    return writeToFile(groupsObj, GROUPS_FILE)
+    return fileOperation.writeToFile(groupsObj, GROUPS_FILE)
 }
 
 export async function deleteGroupData(groupId, userId){
-    let groupsObj = await readFromFile(GROUPS_FILE)
+    let groupsObj = await fileOperation.readFromFile(GROUPS_FILE)
     let groupIndex = groupsObj.groups.findIndex(group => group.id == groupId && group.userId == userId)
     if (groupIndex < 0){
         throw errors.ARGUMENT_NOT_FOUND("group")
     } else {
         groupsObj.groups.splice(groupIndex, 1) 
-        return writeToFile(groupsObj, GROUPS_FILE) 
+        return fileOperation.writeToFile(groupsObj, GROUPS_FILE) 
     }  
 }
 
 export async function addMovieInGroupData(groupId, movieId, moviesObj, userId){
         // Read from files:
-        let groupsObj = await readFromFile(GROUPS_FILE)
+        let groupsObj = await fileOperation.readFromFile(GROUPS_FILE)
     
     
         // Booleans:
@@ -104,13 +106,13 @@ export async function addMovieInGroupData(groupId, movieId, moviesObj, userId){
                 if (group.movies.find(movie => movie.id == movieId) != undefined) {
                     throw errors.INVALID_ARGUMENT("movie already exists in this group")
                 }
-                let getMovie = moviesObj.movies.find(movie => movie.id == movieId)
-                if (getMovie != undefined) {
+                
+                if (moviesObj != undefined) {
                     foundMovie = true
                     newMovie = {
-                        id: getMovie.id,
-                        title: getMovie.title,
-                        duration: getMovie.runtimeMins
+                        id: moviesObj.id,
+                        title: moviesObj.title,
+                        duration: moviesObj.runtimeMins
                     }
                     group.movies.push(newMovie)
                 }
@@ -118,7 +120,7 @@ export async function addMovieInGroupData(groupId, movieId, moviesObj, userId){
             return group
         }) 
         if(foundMovie && foundGroup) {
-            await writeToFile(groupsObj, GROUPS_FILE)
+            await fileOperation.writeToFile(groupsObj, GROUPS_FILE)
             return newMovie
         }
         else if(!foundGroup){
@@ -130,7 +132,7 @@ export async function addMovieInGroupData(groupId, movieId, moviesObj, userId){
 }
 
 export async function removeMovieInGroupData(groupId, movieId, userId){
-    let groupsObj = await readFromFile(GROUPS_FILE)
+    let groupsObj = await fileOperation.readFromFile(GROUPS_FILE)
     let group = groupsObj.groups.find(group => groupId == group.id && group.userId == userId)
     if (group != undefined) {
         let movieIndex = group.movies.findIndex(movie => movie.id == movieId)
@@ -139,28 +141,16 @@ export async function removeMovieInGroupData(groupId, movieId, userId){
         } 
         else {
             group.movies.splice(movieIndex, 1)
-            return writeToFile(groupsObj, GROUPS_FILE)
+            return fileOperation.writeToFile(groupsObj, GROUPS_FILE)
         }
     } else {
         throw errors.ARGUMENT_NOT_FOUND("group")
     }
 }
 
-export async function readFromFile(file_name) {
-    let fileContents = await readFile(file_name)
-    return JSON.parse(fileContents)
-}
 
-export async function writeToFile(obj, file_name){
-    return writeFile(file_name, JSON.stringify(obj, null , 4))
-}
 
-function getNewId(groups) {
-    let idx = 1
+function getNewId(NumIDs) {
 
-    if(groups.length > 0) {
-        idx = groups[groups.length - 1].id + 1
-    }
-
-    return idx
+    return ++NumIDs
 }

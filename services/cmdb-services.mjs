@@ -46,7 +46,7 @@ export default function(imdbData, cmdbData, usersData){
         let user = await usersData.checkUserData(userToken)
 
         // TODO(missing userID validation, make a middleware function)
-        if (!isAString(obj.name) || !isAString(obj.description) || isNaN(obj.userId)) {
+        if (!isAString(obj.name) || !isAString(obj.description)) {
             throw errors.INVALID_ARGUMENT("group missing a valid name and description")
         }
 
@@ -103,7 +103,7 @@ export default function(imdbData, cmdbData, usersData){
             throw errors.INVALID_ARGUMENT("group Id")
         }
 
-        return cmdbData.addMovieInGroupData(groupId, movieId, user.id)
+        return imdbData.addMovieInGroupData(groupId, movieId, user.id)
     }
 
     async function removeMovieInGroup(groupId, movieId, userToken) {
