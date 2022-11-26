@@ -1,14 +1,22 @@
+// Module that simulates a fetch operation, in order to work and test, without its limitations
+
 'use strict'
 
-import * as fileOperation from './read&write.mjs'
+import * as File from './file-operations.mjs'
+import { MOST_POPULAR_MOVIES, MOVIES_SEARCHED_BY_NAME, MOVIES_INFO } from './cmdb-movies-data.mjs'
 
+// Object that maps actual URLs to internal paths to files
 const data = {
-    'https://imdb-api.com/en/API/Top250Movies/k_jtqnxg0w': './local_data/most-popular-movies.json',
-    'https://imdb-api.com/en/API/SearchMovie/k_jtqnxg0w/inception 2010': './local_data/movies-searched-by-name.json',
-    'https://imdb-api.com/en/API/Title/k_jtqnxg0w/tt0468569': './local_data/movies-info.json'
+    [MOST_POPULAR_MOVIES]: './local_data/most-popular-movies.json',
+    [MOVIES_SEARCHED_BY_NAME]: './local_data/movies-searched-by-name.json',
+    [MOVIES_INFO]: './local_data/movies-info.json'
 }
 
-export default async function(URL){
-
-    return fileOperation.readFromFile(data[URL])
+/**
+ * Fetches specified content in local storage
+ * @param {String} URL local fetched data property
+ * @returns a promise that resolves to a JavaScript object of the result
+ */
+export default async function(URL) {
+    return File.read(data[URL])
 }

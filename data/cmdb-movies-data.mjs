@@ -1,17 +1,24 @@
-// Module that manages application data.
-// Access to the Internet Movies Database API
+// Module that manages application movies data.
+// Provides access to the Internet Movies Database (IMDb) API
 
 'use strict'
 
 import errors from '../errors/errors.mjs'
 import * as cmdbData from './cmdb-data-mem.mjs'
 
-const MOST_POPULAR_MOVIES = 'https://imdb-api.com/en/API/Top250Movies/k_jtqnxg0w'
-const MOVIES_SEARCHED_BY_NAME = 'https://imdb-api.com/en/API/SearchMovie/k_jtqnxg0w/'
-const MOVIES_INFO = 'https://imdb-api.com/en/API/Title/k_jtqnxg0w/'
+// Constants
+const IMDB_KEY = "k_jtqnxg0w"
+export const MOST_POPULAR_MOVIES = `https://imdb-api.com/en/API/Top250Movies/${IMDB_KEY}`
+export const MOVIES_SEARCHED_BY_NAME = `https://imdb-api.com/en/API/SearchMovie/${IMDB_KEY}/`
+export const MOVIES_INFO = `https://imdb-api.com/en/API/Title/${IMDB_KEY}/`
 
+/**
+ * @param {Function} fetch function that retrieves a resource from a container 
+ * @returns an object with all the avalaible movies data operations has properties
+ */
 export default function(fetch){
-    if(!fetch){
+    // Validate if the received fetch function exists
+    if (!fetch) {
         throw errors.INVALID_ARGUMENT("fetch")
     }
 
@@ -20,44 +27,61 @@ export default function(fetch){
         searchMoviesByNameData: searchMoviesByNameData,
         addMovieInGroupData: addMovieInGroupData
     }
-
+    /**
+     * Retrieves the 250 most popular movies
+     * @param {Number} limit option parameter to limit the search result 
+     * @returns an array with the search result
+     */
     async function getPopularMoviesData(limit){
         let moviesObj = await fetch(MOST_POPULAR_MOVIES)
-
         checkLimitAndFilter(limit, function() {
             moviesObj.items = moviesObj.items.filter(movie => Number(movie.rank) <= limit)
         })
-    
         return moviesObj.items
-    }
-    
+    } 
+
+    /**
+     * Retrieves the results of a search by a movie name
+     * @param {String} moviesName prefix or name of the movie to search
+     * @param {Number} limit option parameter to limit the search result
+     * @returns an array with the search result
+     */
     async function searchMoviesByNameData(moviesName, limit) {
         let moviesObj = await fetch(MOVIES_SEARCHED_BY_NAME + moviesName)
-        let limitCounter = 1
-        
+        let limitCounter = 1   
         checkLimitAndFilter(limit, function() {
             moviesObj.results = moviesObj.results.filter(_ => limitCounter++ <= limit)
         })
-    
         return moviesObj.results
     }
-    
+
+    /**
+     * Adds the chosen movie in the user specified group
+     * @param {Number} groupId group identifier
+     * @param {Number} movieId movie identifier
+     * @param {Number} userId user internal identifier
+     * @throws ArgumentNotFoundException if the movie does not exist as a result of a search
+     */
     async function addMovieInGroupData(groupId, movieId, userId){
         let moviesObj = await fetch(MOVIES_INFO + movieId)
-
-        if(moviesObj.title == null){
+        if (moviesObj.title == null) {
             throw errors.ARGUMENT_NOT_FOUND("Movie")
-        }else{
+        } else {
             return cmdbData.addMovieInGroupData(groupId, movieId, moviesObj, userId)
         }
     }
-    
+
+    // Auxiliary Functions
+    /**
+     * Checks the limit and returns a function to apply to a filter
+     * @param {Number} limit parameter to limit the search result
+     * @param {Function} action function to execute
+     * @throws InvalidArgumentException if the received limit is invalid
+     */
     function checkLimitAndFilter(limit, action) {
         if (limit != undefined) {
-            if (!isNaN(limit) && limit <= 250)
-                action()
-            else 
-                throw errors.INVALID_ARGUMENT("limit")
+            if (!isNaN(limit) && limit <= 250) action()
+            else throw errors.INVALID_ARGUMENT("limit")
         }
     }
 }

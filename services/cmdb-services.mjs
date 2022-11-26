@@ -1,22 +1,24 @@
-// Module that contains all of the logic of each of the application's functionalities 
+// Module that contains all of the logic of each of the application's functionalities
 
 'use strict'
 
 import errors from '../errors/errors.mjs'
 
-// Constants
-
-
-
-
+/**
+ * @param {*} imdbData module that manages application movies data
+ * @param {*} cmdbData module that manages application group data
+ * @param {*} usersData module that manages application user data 
+ * @returns an object with all the avalaible application's services has properties
+ */
 export default function(imdbData, cmdbData, usersData){
-    if(!imdbData){
+    // Validate if all the received data modules exist
+    if (!imdbData) { 
         throw errors.INVALID_ARGUMENT("imdbData")
     }
-    if(!cmdbData){
+    if (!cmdbData) {
         throw errors.INVALID_ARGUMENT("cmdbData")
     }
-    if(!usersData){
+    if (!usersData) {
         throw errors.INVALID_ARGUMENT("usersData")
     }
 
@@ -32,95 +34,127 @@ export default function(imdbData, cmdbData, usersData){
         removeMovieInGroup: removeMovieInGroup
     }
 
-    
+    /**
+     * Retrieves the top 250 most popular movies
+     * @param {Number} limit option parameter to limit the search result
+     */
     async function getPopularMovies(limit) {
         return imdbData.getPopularMoviesData(limit)
     }
-
+    /**
+     * Retrieves the results of a search by a movie name
+     * @param {String} moviesName prefix or name of the movie to search
+     * @param {Number} limit option parameter to limit the search result
+     */
     async function searchMoviesByName(moviesName, limit) {
         return imdbData.searchMoviesByNameData(moviesName, limit)
     }
-
+    /**
+     * Creates a group with the specified details in obj
+     * @param {*} obj object that has the group details to create
+     * @param {String} userToken user identifier
+     * @throws InvalidArgumentException if the group is missing a valid name and description
+     */
     async function createGroup(obj, userToken) {
-
         let user = await usersData.checkUserData(userToken)
-
-        // TODO(missing userID validation, make a middleware function)
         if (!isAString(obj.name) || !isAString(obj.description)) {
             throw errors.INVALID_ARGUMENT("group missing a valid name and description")
         }
-
         return cmdbData.createGroupData(obj, user.id)
     }
-
+    
+    /**
+     * Retrieves details for the user groups
+     * @param {String} userToken user identifier
+     */
     async function getGroups(userToken) {
-
         let user = await usersData.checkUserData(userToken)
-
         return cmdbData.getGroupsData(user.id)
     }
-
+    
+    /**
+     * Retrieves details for the user specified group
+     * @param {Number} groupId group identifier
+     * @param {String} userToken user identifier
+     * @throws InvalidArgumentException if the group id does not exist for this user
+     */
     async function getGroupDetails(groupId, userToken) {
-
         let user = await usersData.checkUserData(userToken)
-
         if (isNaN(groupId)) {
             throw errors.INVALID_ARGUMENT("groupId")
         }
-
         return cmdbData.getGroupDetailsData(groupId, user.id)
     }
 
+    /**
+     * Deletes the user specified group
+     * @param {Number} groupId group identifier
+     * @param {*} obj object that has the group details to edit
+     * @param {String} userToken user identifier
+     * @throws InvalidArgumentException if the group id does not exist for this user
+     * or if the group is missing a valid name and description
+     */
     async function editGroup(groupId, obj, userToken) {
         let user = await usersData.checkUserData(userToken)
-
-        if (!isAString(obj.name) || !isAString(obj.description)){
+        if (!isAString(obj.name) || !isAString(obj.description)) {
             throw errors.INVALID_ARGUMENT("group missing a valid name and description")
         }
-        if (isNaN(groupId)){
-            throw errors.INVALID_ARGUMENT("group Id")
+        if (isNaN(groupId)) {
+            throw errors.INVALID_ARGUMENT("groupId")
         }
-
         return cmdbData.editGroupData(groupId, obj, user.id)
     }
 
+    /**
+     * Deletes the user specified group
+     * @param {Number} groupId group identifier
+     * @param {String} userToken user identifier
+     * @throws InvalidArgumentException if the group id does not exist for this user
+     */
     async function deleteGroup(groupId, userToken) {
-
         let user = await usersData.checkUserData(userToken)
-        
-        if (isNaN(groupId)){
-            throw errors.INVALID_ARGUMENT("group Id")
+        if (isNaN(groupId)) {
+            throw errors.INVALID_ARGUMENT("groupId")
         }
-
         return cmdbData.deleteGroupData(groupId, user.id)
     }
 
+    /**
+     * Adds the chosen movie in the user specified group
+     * @param {Number} groupId group identifier
+     * @param {Number} movieId movie identifier
+     * @param {String} userToken user identifier
+     * @throws InvalidArgumentException if the group id does not exist for this user
+     */
     async function addMovieInGroup(groupId, movieId, userToken) {
-
         let user = await usersData.checkUserData(userToken)
-
         if (isNaN(groupId)) {
-            throw errors.INVALID_ARGUMENT("group Id")
+            throw errors.INVALID_ARGUMENT("groupId")
         }
-
         return imdbData.addMovieInGroupData(groupId, movieId, user.id)
     }
 
+    /**
+     * Removes the chosen movie in the user specified group
+     * @param {Number} groupId group identifier
+     * @param {Number} movieId movie identifier
+     * @param {String} userToken user identifier
+     * @throws InvalidArgumentException if the group id does not exist for this user
+     */
     async function removeMovieInGroup(groupId, movieId, userToken) {
-
         let user = await usersData.checkUserData(userToken)
-
-        if (isNaN(groupId)){
-            throw errors.INVALID_ARGUMENT("group")
+        if (isNaN(groupId)) {
+            throw errors.INVALID_ARGUMENT("groupId")
         }
-
         return cmdbData.removeMovieInGroupData(groupId, movieId, user.id)
-
-    }
-
-    // Auxiliary functions
+    }   
+    // Auxiliary functions:
+    /**
+     * Verifies that the received value is not an empty string and is of the type String.     
+     * @param {*} value value to check
+     * @returns returns false unless the prerequisites listed above are met
+     */ 
     function isAString(value) {
         return typeof value == 'string' && value != ""
     }
 }
-

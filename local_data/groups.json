@@ -1,4 +1,12 @@
 {
-    "IDs": 0,
-    "groups": []
+    "IDs": 1,
+    "groups": [
+        {
+            "name": "Updated Group",
+            "description": "Top 10 horror movies",
+            "userId": 1,
+            "id": 1,
+            "movies": []
+        }
+    ]
 }

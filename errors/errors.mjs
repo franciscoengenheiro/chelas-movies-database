@@ -1,7 +1,8 @@
-// Define all possible application errors
+// Module that defines all possible application errors
 
 'use strict'
 
+// Object to map application errors with correspondent internal identifier
 export let errorCodes =  {
     INVALID_ARGUMENT_CODE: 1,
     ARGUMENT_NOT_FOUND_CODE: 2,
@@ -9,6 +10,10 @@ export let errorCodes =  {
     USER_NOT_FOUND_CODE: 4
 }
 
+/**
+ * Object that returns each possible application error in a object format with
+ * two properties: code and description
+ */
 export default {
     INVALID_ARGUMENT: (argName) => {
         return {
