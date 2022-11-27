@@ -8,7 +8,7 @@ import errors from '../errors/errors.mjs'
  * @param {*} imdbData module that manages application movies data
  * @param {*} cmdbData module that manages application group data
  * @param {*} usersData module that manages application user data 
- * @returns an object with all the avalaible application's services has properties
+ * @returns an object with all the avalaible application's services as properties
  */
 export default function(imdbData, cmdbData, usersData){
     // Validate if all the received data modules exist
@@ -41,18 +41,20 @@ export default function(imdbData, cmdbData, usersData){
     async function getPopularMovies(limit) {
         return imdbData.getPopularMoviesData(limit)
     }
+
     /**
-     * Retrieves the results of a search by a movie name
+     * Retrieves the search results by a movie name
      * @param {String} moviesName prefix or name of the movie to search
      * @param {Number} limit option parameter to limit the search result
      */
     async function searchMoviesByName(moviesName, limit) {
         return imdbData.searchMoviesByNameData(moviesName, limit)
     }
+
     /**
-     * Creates a group with the specified details in obj
+     * Creates a group for an user
      * @param {*} obj object that has the group details to create
-     * @param {String} userToken user identifier
+     * @param {String} userToken token used to identify a user 
      * @throws InvalidArgumentException if the group is missing a valid name and description
      */
     async function createGroup(obj, userToken) {
@@ -64,8 +66,8 @@ export default function(imdbData, cmdbData, usersData){
     }
     
     /**
-     * Retrieves details for the user groups
-     * @param {String} userToken user identifier
+     * Retrieves all groups that belong to a specified user
+     * @param {String} userToken token used to identify a user 
      */
     async function getGroups(userToken) {
         let user = await usersData.checkUserData(userToken)
@@ -75,8 +77,8 @@ export default function(imdbData, cmdbData, usersData){
     /**
      * Retrieves details for the user specified group
      * @param {Number} groupId group identifier
-     * @param {String} userToken user identifier
-     * @throws InvalidArgumentException if the group id does not exist for this user
+     * @param {String} userToken token used to identify a user 
+     * @throws InvalidArgumentException if the group id is not a number
      */
     async function getGroupDetails(groupId, userToken) {
         let user = await usersData.checkUserData(userToken)
@@ -90,8 +92,8 @@ export default function(imdbData, cmdbData, usersData){
      * Deletes the user specified group
      * @param {Number} groupId group identifier
      * @param {*} obj object that has the group details to edit
-     * @param {String} userToken user identifier
-     * @throws InvalidArgumentException if the group id does not exist for this user
+     * @param {String} userToken token used to identify a user 
+     * @throws InvalidArgumentException if the group id is not a number for this user
      * or if the group is missing a valid name and description
      */
     async function editGroup(groupId, obj, userToken) {
@@ -108,8 +110,8 @@ export default function(imdbData, cmdbData, usersData){
     /**
      * Deletes the user specified group
      * @param {Number} groupId group identifier
-     * @param {String} userToken user identifier
-     * @throws InvalidArgumentException if the group id does not exist for this user
+     * @param {String} userToken token used to identify a user 
+     * @throws InvalidArgumentException if the group id is not a number
      */
     async function deleteGroup(groupId, userToken) {
         let user = await usersData.checkUserData(userToken)
@@ -120,11 +122,11 @@ export default function(imdbData, cmdbData, usersData){
     }
 
     /**
-     * Adds the chosen movie in the user specified group
+     * Adds a movie in a user specified group
      * @param {Number} groupId group identifier
      * @param {Number} movieId movie identifier
-     * @param {String} userToken user identifier
-     * @throws InvalidArgumentException if the group id does not exist for this user
+     * @param {String} userToken token used to identify a user 
+     * @throws InvalidArgumentException if the group id is not a number
      */
     async function addMovieInGroup(groupId, movieId, userToken) {
         let user = await usersData.checkUserData(userToken)
@@ -135,11 +137,11 @@ export default function(imdbData, cmdbData, usersData){
     }
 
     /**
-     * Removes the chosen movie in the user specified group
+     * Removes a movie in a user specified group
      * @param {Number} groupId group identifier
      * @param {Number} movieId movie identifier
-     * @param {String} userToken user identifier
-     * @throws InvalidArgumentException if the group id does not exist for this user
+     * @param {String} userToken token used to identify a user 
+     * @throws InvalidArgumentException if the group id is not a number
      */
     async function removeMovieInGroup(groupId, movieId, userToken) {
         let user = await usersData.checkUserData(userToken)
@@ -150,8 +152,8 @@ export default function(imdbData, cmdbData, usersData){
     }   
     // Auxiliary functions:
     /**
-     * Verifies that the received value is not an empty string and is of the type String.     
-     * @param {*} value value to check
+     * Verifies that the received value is not an empty string and is of the type String   
+     * @param {*} value value to assert
      * @returns returns false unless the prerequisites listed above are met
      */ 
     function isAString(value) {

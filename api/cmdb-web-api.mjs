@@ -1,5 +1,4 @@
-// Module that contains the functions that handle all HTTP API requests and make up the REST 
-// API of the Web Application
+// Module that provides a Web API that follows the REST principles
 
 // Handle HTTP request means:
 //  - Obtain data from requests. Request data can be obtained from: URI(path, query, fragment), headers, body
@@ -14,7 +13,7 @@ import translateToHTTPResponse from './http-error-responses.mjs'
 /**
  * @param {*} cmdbServices module that contains all application services
  * @param {*} cmdbUserServices module that contains all application user services
- * @returns an object with all the functions Express module can call, has properties, when a user makes a request
+ * @returns an object with all the functions Express module can call, as properties, when a user makes a request
  */
 export default function(cmdbServices, cmdbUserServices){
     // Validate if all the received services exist

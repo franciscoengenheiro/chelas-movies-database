@@ -13,7 +13,7 @@ export default function(exception) {
     let errorFunction = errors[exception.code]
     // If none was found:
     if (!errorFunction) {
-        console.log(exception)
+        // If the exception is of unknown type:
         return new HTTPResponse(500, "Internal Server error")
     } 
     return errorFunction(exception.description)

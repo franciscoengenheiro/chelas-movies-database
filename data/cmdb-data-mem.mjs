@@ -1,4 +1,4 @@
-// Module that manages application group data.
+// Module that manages application group data
 // Provides access to cmdb data (groups and users)
 
 'use strict'
@@ -10,7 +10,7 @@ import * as File from './file-operations.mjs'
 const GROUPS_FILE = './local_data/groups.json'
 
 /**
- * Creates a new group and updates group storage
+ * Creates a new group for an user and updates groups local storage
  * @param {*} obj object that has the group details to create
  * @param {Number} userId user internal identifier
  */
@@ -23,18 +23,18 @@ export async function createGroupData(obj, userId){
     })
     // Retrieve the new group Id 
     let newGroupID = ++groupsObj.IDs
-    // Create group properties
+    // Create properties for the new group
     obj.id = newGroupID
     obj.movies = []
     obj.userId = userId
-    // Store group  
+    // Store newly created group  
     groupsObj.groups.push(obj)
     await File.write(groupsObj, GROUPS_FILE)
     return obj
 }
 
 /**
- * Searchs in the group storage for the received user groups
+ * Searchs in the group local storage for the specified user groups
  * @param {Number} userId user internal identifier
  * @returns an array with the search result
  */
@@ -54,7 +54,7 @@ export async function getGroupsData(userId){
 }
 
 /**
- * Searchs in the group storage for the received user group
+ * Searchs in the group local storage for a specified user group
  * @param {Number} groupId group identifier
  * @param {Number} userId user internal identifier
  * @returns The group found
@@ -83,7 +83,7 @@ export async function getGroupDetailsData(groupId, userId){
 }
 
 /**
- * Searchs in the group storage for the received user group and replaces that group for a new one
+ * Searchs in the group local storage for the received user group and replaces that group for the new one
  * @param {Number} groupId group identifier
  * @param {*} obj object that has the group details to edit 
  * @param {Number} userId user internal identifier
@@ -107,7 +107,7 @@ export async function editGroupData(groupId, obj, userId){
 }
 
 /**
- * Deletes a user specified group in the group storage 
+ * Deletes a user specified group in the groups local storage 
  * @param {Number} groupId group identifier
  * @param {Number} userId user internal identifier
  * @throws ArgumentNotFoundException if the group wasn't found
@@ -126,7 +126,7 @@ export async function deleteGroupData(groupId, userId){
 }
 
 /**
- * Adds a movie to a user specified group 
+ * Adds a movie in a user specified group 
  * @param {Number} groupId group identifier
  * @param {Number} movieId movie identifier
  * @param {*} moviesObj object that represents the movie details to add
@@ -138,7 +138,7 @@ export async function addMovieInGroupData(groupId, movieId, moviesObj, userId){
         // Booleans:
         let foundGroup = false
         let newMovie = {}
-        groupsObj.groups = groupsObj.groups.map(group =>{ 
+        groupsObj.groups = groupsObj.groups.map(group => { 
             if (group.id == groupId && group.userId == userId) {
                 foundGroup = true
                 if (group.movies.find(movie => movie.id == movieId) != undefined) {
@@ -165,7 +165,7 @@ export async function addMovieInGroupData(groupId, movieId, moviesObj, userId){
 }
 
 /**
- * Removes a movie to a user specified group 
+ * Removes a movie in a user specified group 
  * @param {Number} groupId group identifier
  * @param {Number} movieId movie identifier
  * @param {Number} userId user internal identifier
@@ -182,7 +182,7 @@ export async function removeMovieInGroupData(groupId, movieId, userId){
         if (movieIndex < 0) {
             throw errors.ARGUMENT_NOT_FOUND("movie")
         } else {
-            // Remove movie from the movies array in the group
+            // Remove movie from the movies array 
             group.movies.splice(movieIndex, 1)
             return File.write(groupsObj, GROUPS_FILE)
         }

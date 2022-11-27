@@ -14,7 +14,7 @@ export const MOVIES_INFO = `https://imdb-api.com/en/API/Title/${IMDB_KEY}/`
 
 /**
  * @param {Function} fetch function that retrieves a resource from a container 
- * @returns an object with all the avalaible movies data operations has properties
+ * @returns an object with all the avalaible movies data operations as properties
  */
 export default function(fetch){
     // Validate if the received fetch function exists
@@ -48,19 +48,21 @@ export default function(fetch){
      */
     async function searchMoviesByNameData(moviesName, limit) {
         let moviesObj = await fetch(MOVIES_SEARCHED_BY_NAME + moviesName)
+        // Start a counter
         let limitCounter = 1   
         checkLimitAndFilter(limit, function() {
+            // Limit the search result
             moviesObj.results = moviesObj.results.filter(_ => limitCounter++ <= limit)
         })
         return moviesObj.results
     }
 
     /**
-     * Adds the chosen movie in the user specified group
+     * Adds a movie in a user specified group
      * @param {Number} groupId group identifier
      * @param {Number} movieId movie identifier
      * @param {Number} userId user internal identifier
-     * @throws ArgumentNotFoundException if the movie does not exist as a result of a search
+     * @throws ArgumentNotFoundException if the movie does not exist 
      */
     async function addMovieInGroupData(groupId, movieId, userId){
         let moviesObj = await fetch(MOVIES_INFO + movieId)
@@ -73,7 +75,7 @@ export default function(fetch){
 
     // Auxiliary Functions
     /**
-     * Checks the limit and returns a function to apply to a filter
+     * Validates the limit and returns a function to apply after
      * @param {Number} limit parameter to limit the search result
      * @param {Function} action function to execute
      * @throws InvalidArgumentException if the received limit is invalid

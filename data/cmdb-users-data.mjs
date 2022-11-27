@@ -9,14 +9,14 @@ import errors from '../errors/errors.mjs'
 const USERS_FILE = './local_data/users.json'
 
 /**
- * Creates a new user and updates user storage
- * @param {String} userToken user identifier
+ * Creates a new user and updates user local storage
+ * @param {String} userToken token used to identify a user
  */
 export async function createUserData(userToken) {
     let usersObj = await File.read(USERS_FILE)
     // Retrieve the new user Id 
     let newUserID = ++usersObj.IDs
-    // Object that represents the new user
+    // Create a new user
     let newUser = {
         id: newUserID,
         name: `User ${newUserID}`,
@@ -29,20 +29,20 @@ export async function createUserData(userToken) {
 }
 
 /**
- * Retrieves user data from storage
- * @param {String} userToken user identifier
+ * Retrieves user data from local storage
+ * @param {String} userToken token used to identify a user
  * @returns the user found or undefined
  */
-export async function getUserData(userToken){
+export async function getUserData(userToken) {
     let usersObj = await File.read(USERS_FILE)
     return usersObj.users.find(user => user.token == userToken)
 }
 
 /**
- * Checks if the user exists in the storage
- * @param {String} userToken user identifier
+ * Checks if the user exists in local storage
+ * @param {String} userToken token used to identify a user
  * @throws UserNotFoundException if the received token is invalid
- * @returns The user found.
+ * @returns The user found
  */
 export async function checkUserData(userToken) {
     const user = await getUserData(userToken)

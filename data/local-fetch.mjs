@@ -14,7 +14,7 @@ const data = {
 }
 
 /**
- * Fetches specified content in local storage
+ * Fetches specified resource in local storage
  * @param {String} URL local fetched data property
  * @returns a promise that resolves to a JavaScript object of the result
  */
@@ -23,6 +23,11 @@ export default async function(URL) {
     return File.read(data[URL])
 }
 
+/**
+ * Evaluates if the specified resource exists in local storage
+ * @param {String} URL path to a resource stored in local storage 
+ * @throws ArgumentNotFoundException if the movie couldn't be found
+ */
 function checkURL(URL) {
     let findURL = Object.keys(data).find(prop => URL == prop)
     if(!findURL) {
