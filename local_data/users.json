@@ -1,4 +1,10 @@
 {
-    "IDs": 0,
-    "users": []
+    "IDs": 1,
+    "users": [
+        {
+            "id": 1,
+            "name": "User 1",
+            "token": "asdasdadadadawqe"
+        }
+    ]
 }

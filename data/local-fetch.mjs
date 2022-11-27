@@ -2,6 +2,7 @@
 
 'use strict'
 
+import errors from '../errors/errors.mjs'
 import * as File from './file-operations.mjs'
 import { MOST_POPULAR_MOVIES, MOVIES_SEARCHED_BY_NAME, MOVIES_INFO } from './cmdb-movies-data.mjs'
 
@@ -18,5 +19,14 @@ const data = {
  * @returns a promise that resolves to a JavaScript object of the result
  */
 export default async function(URL) {
+    checkURL(URL)
     return File.read(data[URL])
+}
+
+function checkURL(URL) {
+    let findURL = Object.keys(data).find(prop => URL == prop)
+    if(!findURL) {
+        throw errors.ARGUMENT_NOT_FOUND('Movie')
+    }
+    return
 }

@@ -1,4 +1,12 @@
 {
-    "IDs": 0,
-    "groups": []
+    "IDs": 1,
+    "groups": [
+        {
+            "name": "Group 2",
+            "description": "1234",
+            "id": 1,
+            "movies": [],
+            "userId": 1
+        }
+    ]
 }

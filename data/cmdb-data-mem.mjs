@@ -135,7 +135,6 @@ export async function deleteGroupData(groupId, userId){
 export async function addMovieInGroupData(groupId, movieId, moviesObj, userId){
         let groupsObj = await File.read(GROUPS_FILE)
         // Booleans:
-        let foundMovie = false
         let foundGroup = false
         let newMovie = {}
         groupsObj.groups = groupsObj.groups.map(group =>{ 
@@ -145,7 +144,6 @@ export async function addMovieInGroupData(groupId, movieId, moviesObj, userId){
                     throw errors.INVALID_ARGUMENT("movie already exists in this group")
                 }
                 if (moviesObj != undefined) {
-                    foundMovie = true
                     newMovie = {
                         id: moviesObj.id,
                         title: moviesObj.title,
@@ -156,15 +154,12 @@ export async function addMovieInGroupData(groupId, movieId, moviesObj, userId){
             }
             return group
         }) 
-        if(foundMovie && foundGroup) {
+        if(foundGroup) {
             await File.write(groupsObj, GROUPS_FILE)
             return newMovie
         }
-        else if(!foundGroup){
-            throw errors.ARGUMENT_NOT_FOUND("group")
-        }
         else {
-            throw errors.ARGUMENT_NOT_FOUND("movie")
+            throw errors.ARGUMENT_NOT_FOUND("group")
         }
 }
 
