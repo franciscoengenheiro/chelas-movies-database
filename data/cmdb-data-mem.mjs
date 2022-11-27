@@ -29,7 +29,8 @@ export async function createGroupData(obj, userId){
     obj.userId = userId
     // Store group  
     groupsObj.groups.push(obj)
-    return File.write(groupsObj, GROUPS_FILE)
+    await File.write(groupsObj, GROUPS_FILE)
+    return obj
 }
 
 /**

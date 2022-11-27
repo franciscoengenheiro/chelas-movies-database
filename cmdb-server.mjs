@@ -18,8 +18,8 @@ import * as usersData from './data/cmdb-users-data.mjs'
 import * as cmdbData from './data/cmdb-data-mem.mjs'
 import imdbDataInit from './data/cmdb-movies-data.mjs'
 
-//import fetch from './data/node-fetch.mjs'
-import fetch from './data/local-fetch.mjs'
+import fetch from './data/node-fetch.mjs'
+//import fetch from './data/local-fetch.mjs'
 
 const imdbData = imdbDataInit(fetch)
 const cmdbServices = cmdbServicesInit(imdbData, cmdbData, usersData)

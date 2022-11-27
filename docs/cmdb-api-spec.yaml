@@ -35,14 +35,18 @@ paths:
             application/json:
               schema:
                 required:
-                - token
+                - user
                 type: object
                 properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
                   token:
                     type: string
                     format: uuid
         400:
-          description: Invalid input, object invalid
+          description: User already exists
           content:
             application/json:
               schema:
@@ -159,7 +163,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/NewGroupCreated'
         400:
-          description: Invalid input, object invalid
+          description: Group already exists
           content: 
             application/json:
               schema:
@@ -223,7 +227,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Group'
+                required:
+                - message
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Group updated with success"
         400:
           description: Invalid Request Body 
           content: 

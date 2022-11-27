@@ -24,7 +24,8 @@ export async function createUserData(userToken) {
     }
     // Store the newly created user
     usersObj.users.push(newUser)
-    return File.write(usersObj, USERS_FILE)
+    await File.write(usersObj, USERS_FILE)
+    return newUser
 }
 
 /**

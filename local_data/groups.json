@@ -2,8 +2,8 @@
     "IDs": 1,
     "groups": [
         {
-            "name": "Group 2",
-            "description": "1234",
+            "name": "Favourite Movies",
+            "description": "Group description",
             "id": 1,
             "movies": [],
             "userId": 1
