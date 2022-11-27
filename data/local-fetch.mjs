@@ -8,8 +8,8 @@ import { MOST_POPULAR_MOVIES, MOVIES_SEARCHED_BY_NAME, MOVIES_INFO } from './cmd
 // Object that maps actual URLs to internal paths to files
 const data = {
     [MOST_POPULAR_MOVIES]: './local_data/most-popular-movies.json',
-    [MOVIES_SEARCHED_BY_NAME]: './local_data/movies-searched-by-name.json',
-    [MOVIES_INFO]: './local_data/movies-info.json'
+    [MOVIES_SEARCHED_BY_NAME + "inception 2010"]: './local_data/movies-searched-by-name.json',
+    [MOVIES_INFO + "tt0468569"]: './local_data/movies-info.json'
 }
 
 /**
