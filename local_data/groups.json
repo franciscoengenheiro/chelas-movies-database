@@ -1,5 +1,5 @@
 {
-    "IDs": 1,
+    "IDs": 2,
     "groups": [
         {
             "name": "Favourite Movies",
@@ -7,6 +7,13 @@
             "id": 1,
             "movies": [],
             "userId": 1
+        },
+        {
+            "name": "Updated Group",
+            "description": "Top 10 horror movies",
+            "id": 2,
+            "movies": [],
+            "userId": 2
         }
     ]
 }
