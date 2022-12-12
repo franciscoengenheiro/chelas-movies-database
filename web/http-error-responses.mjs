@@ -19,12 +19,19 @@ export default function(exception) {
     return errorFunction(exception.description)
 }
 
-// Object to map application errors with correspondent HTTP error responses
+/**
+ * Object to map application errors with correspondent HTTP error responses
+ */ 
+// HTTP Errors Used:
+// 400 - Bad Request
+// 404 - Not Found
+// 415 - Unsupported Media Type
 let errors = {
     [errorCodes.INVALID_ARGUMENT_CODE]: (description) => new HTTPResponse(400, description),
     [errorCodes.ARGUMENT_NOT_FOUND_CODE]: (description) => new HTTPResponse(404, description),
     [errorCodes.INVALID_USER_CODE]: (description) => new HTTPResponse(401, description),
-    [errorCodes.USER_NOT_FOUND_CODE]: (description) => new HTTPResponse(404, description)
+    [errorCodes.USER_NOT_FOUND_CODE]: (description) => new HTTPResponse(404, description),
+    [errorCodes.UNSUPPORTED_FORMAT_CODE]: (description) => new HTTPResponse(415, description)
 }
 
 /** 

@@ -6,7 +6,6 @@
 
 import url from 'url'
 import errors from '../../errors/errors.mjs'
-import { handlerRequestInHTML } from '../http-handle-requests.mjs'
 
 // Retrieves the relative path to the file
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url)) 
@@ -17,54 +16,14 @@ export default function (cmdbServices) {
         throw errors.INVALID_ARGUMENT("cmdbServices")
     }
     return {
-        getHome: getHome,
-        getCss: getCss,
-        getTask: handlerRequestInHTML(getTask),
-        getTasks: handlerRequestInHTML(getTasks),
-        createTask: handlerRequestInHTML(createTask),
-        deleteTask: handlerRequestInHTML(deleteTask),
-        updateTask: handlerRequestInHTML(updateTask),
-        getNewTask: getNewTask
+       
     }
-    async function getHome(req, rsp) {
-        sendFile('index.html', rsp)
-    }
-
-    async function getCss(req, rsp) {
-        sendFile('site.css', rsp)
-    }
-
-    async function getTasks(req, rsp) {
-        const tasks = await tasksServices.getTasks(req.token, req.query.q, req.query.skip, req.query.limit)
-        return { name: 'tasks', data: { title: 'All tasks', tasks: tasks} }  
-    }
-
-    async function getTask(req, rsp) {
-        const taskId = req.params.id
-        const task = await tasksServices.getTask(req.token, taskId)
-        return new View('task', task)
-    }
-
-    async function getNewTask(req, rsp) {
-        rsp.render('newTask') 
-    }
-
+    // Example - to delete
     async function createTask(req, rsp) {
-        let newTask = await tasksServices.createTask(req.token, req.body)
-        // Post/Redirect/Get (PRG) is a web development design pattern that lets the page shown after a 
-        // form submission be reloaded, shared, or bookmarked without ill effects, such as submitting the 
-        // form another time.
+        // Post/Redirect/Get (PRG) is a web development design pattern that lets the page shown 
+        // after a form submission be reloaded, shared, or bookmarked without ill effects, such
+        // as submitting the form another time.
         rsp.redirect('/groups')
-    }
-
-    async function deleteTask(req, rsp) {
-        const taskId = req.params.id
-        const task = await tasksServices.deleteTask(req.token, taskId)
-        rsp.redirect('/tasks')
-    }
-
-    async function updateTask(req, rsp) {
-        // TODO()
     }
 
     /**

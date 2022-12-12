@@ -10,7 +10,7 @@ import errors from '../errors/errors.mjs'
  * @param {*} usersData module that manages application user data 
  * @returns an object with all the avalaible application's services as properties
  */
-export default function(imdbData, cmdbData, usersData){
+export default function(imdbData, cmdbData, usersData) {
     // Validate if all the received data modules exist
     if (!imdbData) { 
         throw errors.INVALID_ARGUMENT("imdbData")
@@ -25,13 +25,13 @@ export default function(imdbData, cmdbData, usersData){
     return {
         getPopularMovies: getPopularMovies,
         searchMoviesByName: searchMoviesByName,
-        createGroup: createGroup,
-        getGroups: getGroups,
-        getGroupDetails: getGroupDetails,
-        editGroup: editGroup,
-        deleteGroup: deleteGroup,
-        addMovieInGroup: addMovieInGroup,
-        removeMovieInGroup: removeMovieInGroup
+        createGroup: verifyUser(createGroup),
+        getGroups: verifyUser(getGroups),
+        getGroupDetails: verifyUser(getGroupDetails),
+        editGroup: verifyUser(editGroup),
+        deleteGroup: verifyUser(deleteGroup),
+        addMovieInGroup: verifyUser(addMovieInGroup),
+        removeMovieInGroup: verifyUser(removeMovieInGroup)
     }
 
     /**
@@ -57,21 +57,19 @@ export default function(imdbData, cmdbData, usersData){
      * @param {String} userToken token used to identify a user 
      * @throws InvalidArgumentException if the group is missing a valid name and description
      */
-    async function createGroup(obj, userToken) {
-        let user = await usersData.checkUserData(userToken)
+    async function createGroup(userId, obj) {
         if (!isAString(obj.name) || !isAString(obj.description)) {
             throw errors.INVALID_ARGUMENT("group missing a valid name and description")
         }
-        return cmdbData.createGroupData(obj, user.id)
+        return cmdbData.createGroupData(obj, userId)
     }
     
     /**
      * Retrieves all groups that belong to a specified user
      * @param {String} userToken token used to identify a user 
      */
-    async function getGroups(userToken) {
-        let user = await usersData.checkUserData(userToken)
-        return cmdbData.getGroupsData(user.id)
+    async function getGroups(userId) {
+        return cmdbData.getGroupsData(userId)
     }
     
     /**
@@ -80,12 +78,11 @@ export default function(imdbData, cmdbData, usersData){
      * @param {String} userToken token used to identify a user 
      * @throws InvalidArgumentException if the group id is not a number
      */
-    async function getGroupDetails(groupId, userToken) {
-        let user = await usersData.checkUserData(userToken)
+    async function getGroupDetails(userId, groupId) {
         if (isNaN(groupId)) {
             throw errors.INVALID_ARGUMENT("groupId")
         }
-        return cmdbData.getGroupDetailsData(groupId, user.id)
+        return cmdbData.getGroupDetailsData(groupId, userId)
     }
 
     /**
@@ -96,15 +93,14 @@ export default function(imdbData, cmdbData, usersData){
      * @throws InvalidArgumentException if the group id is not a number for this user
      * or if the group is missing a valid name and description
      */
-    async function editGroup(groupId, obj, userToken) {
-        let user = await usersData.checkUserData(userToken)
+    async function editGroup(userId, groupId, obj) {
         if (!isAString(obj.name) || !isAString(obj.description)) {
             throw errors.INVALID_ARGUMENT("group missing a valid name and description")
         }
         if (isNaN(groupId)) {
             throw errors.INVALID_ARGUMENT("groupId")
         }
-        return cmdbData.editGroupData(groupId, obj, user.id)
+        return cmdbData.editGroupData(groupId, obj, userId)
     }
 
     /**
@@ -113,12 +109,11 @@ export default function(imdbData, cmdbData, usersData){
      * @param {String} userToken token used to identify a user 
      * @throws InvalidArgumentException if the group id is not a number
      */
-    async function deleteGroup(groupId, userToken) {
-        let user = await usersData.checkUserData(userToken)
+    async function deleteGroup(userId, groupId) {
         if (isNaN(groupId)) {
             throw errors.INVALID_ARGUMENT("groupId")
         }
-        return cmdbData.deleteGroupData(groupId, user.id)
+        return cmdbData.deleteGroupData(groupId, userId)
     }
 
     /**
@@ -128,12 +123,11 @@ export default function(imdbData, cmdbData, usersData){
      * @param {String} userToken token used to identify a user 
      * @throws InvalidArgumentException if the group id is not a number
      */
-    async function addMovieInGroup(groupId, movieId, userToken) {
-        let user = await usersData.checkUserData(userToken)
+    async function addMovieInGroup(userId, groupId, movieId) {
         if (isNaN(groupId)) {
             throw errors.INVALID_ARGUMENT("groupId")
         }
-        return imdbData.addMovieInGroupData(groupId, movieId, user.id)
+        return imdbData.addMovieInGroupData(groupId, movieId, userId)
     }
 
     /**
@@ -143,13 +137,13 @@ export default function(imdbData, cmdbData, usersData){
      * @param {String} userToken token used to identify a user 
      * @throws InvalidArgumentException if the group id is not a number
      */
-    async function removeMovieInGroup(groupId, movieId, userToken) {
-        let user = await usersData.checkUserData(userToken)
+    async function removeMovieInGroup(userId, groupId, movieId) {
         if (isNaN(groupId)) {
             throw errors.INVALID_ARGUMENT("groupId")
         }
-        return cmdbData.removeMovieInGroupData(groupId, movieId, user.id)
+        return cmdbData.removeMovieInGroupData(groupId, movieId, userId)
     }   
+
     // Auxiliary functions:
     /**
      * Verifies that the received value is not an empty string and is of the type String   
@@ -158,5 +152,28 @@ export default function(imdbData, cmdbData, usersData){
      */ 
     function isAString(value) {
         return typeof value == 'string' && value != ""
+    }
+
+    /**
+     * Middleware that verifies if the userToken is valid before calling a service
+     * @param {*} service a function from Services
+     * @returns the same function but the first argument will be the userId instead of UserToken
+     */
+    function verifyUser(service) {
+        return async function(...args) {
+            // Retrieve received arguments from the service function
+            let serviceArgs = args
+            // Retrieve userToken from the service arguments
+            let userToken = serviceArgs[0]
+            // Verify if the user exists, if there's an error the promise will be rejected and 
+            // returned to the top
+            let user = await usersData.checkUserData(userToken)
+            // Override first service argument which is the userToken with the actual user id
+            // since the user was verified
+            serviceArgs[0] = user.id
+            // Call the received service function with the same arguments but with the 
+            // modification described above
+            return service.apply(this, serviceArgs) 
+        }
     }
 }

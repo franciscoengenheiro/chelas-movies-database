@@ -5,67 +5,48 @@
 'use strict'
 
 import translateToHTTPResponse from "./http-error-responses.mjs" 
+import errors from "../errors/errors.mjs"
 
-/**
- * Middleware that verifies if the client trying to access has a token
- * @param {*} handler function this middleware will be applied to
- * @return A response in JSON format
- */ 
-export function handleRequestInJSON(handler) {
-    // Function Express module calls
-    return async function(req, rsp) {
-        const BEARER_STR = "Bearer "
-        // Get the value of the Authorization header
-        const tokenHeader = req.get("Authorization")
-        // If the token isn't valid:
-        if (!(tokenHeader && 
-            tokenHeader.startsWith(BEARER_STR) && tokenHeader.length > BEARER_STR.length)) {
-            rsp
-                .status(401)
-                .json({error: `Invalid authentication token`})
-                return
-        }
-        // Retrieve token with the expected format: Bearer <token> and create a property in the 
-        // request object to easily retrieve it
-        req.token = tokenHeader.split(" ")[1]
-        try {
-            // With a token the actual function can be called
-            let body = await handler(req, rsp)
-            // Wrap the result in JSON format 
-            rsp
-                .json(body) //status code is 200 by default
-        } catch(e) {
-            // If an exception is found translate it to a HTTP response and wrap it in 
-            // JSON format 
-            const response = translateToHTTPResponse(e)
-            rsp
-                .status(response.status)
-                .json(response.body)
+export default function (handler) {
+    return async function (req, rsp) {
+        // Get the value of the Content-Type request header
+        const reqContentType = req.get("Content-Type")
+        switch(reqContentType) {
+            case 'application/json':
+                handlerInJSON(req, rsp, handler)
+                break
+            case 'application/x-www-form-urlencoded':
+                handlerInHTML(req, rsp, handler)
+                break
+            default:
+                throw errors.UNSUPPORTED_FORMAT(reqContentType)
         }
     }
 }
 
-/**
- * Middleware that verifies if the client trying to access has a token
- * @param {*} handler function this middleware will be applied to
- * @return A response in HTML document (View)
- */ 
-export function handlerRequestInHTML(handler) {
-    return async function (req, rsp) {
-        // While we do not have authentication in site interface,
-        // let's hardcode a token for an user
-        req.token = "c64ae5a8-6f3e-11ed-a1eb-0242ac120002"
-        try {
-            let view = await handler(req, rsp)
-            if(view) {
-                rsp.render(view.name , view.data)
-              }
-        } catch(e) {
-            // *TODO*("Change this JSON format to view format")
-            const response = translateToHTTPResponse(e)
-            rsp
-                .status(response.status)
-                .json(response.body)
-        }
+async function handlerInJSON(req, rsp, handler) {
+    try {
+        // With a token the actual function can be called
+        let body = await handler(req, rsp)
+        // Wrap the result in JSON format 
+        rsp.json(body) //status code is 200 by default
+    } catch(e) {
+        const httpResponse = translateToHTTPResponse(e)
+        rsp
+            .status(httpResponse.status)
+            .json(httpResponse.body)
     }
+}
+
+async function handlerInHTML(req, rsp, handler) {
+    try {
+        let view = await handler(req, rsp)
+        if (view) {
+            // Wrap the result in JSON format 
+            rsp.render(view.name , view.data)
+        }
+    } catch(e) {
+        const httpResponse = translateToHTTPResponse(e)
+        rsp.render(httpResponse.status, httpResponse.body);
+    }   
 }

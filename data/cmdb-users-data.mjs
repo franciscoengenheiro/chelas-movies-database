@@ -45,7 +45,7 @@ export async function getUserData(userToken) {
  * @returns The user found
  */
 export async function checkUserData(userToken) {
-    const user = await getUserData(userToken)
+    let user = await getUserData(userToken)
     if(!user) {
         throw errors.USER_NOT_FOUND(userToken)
     }
