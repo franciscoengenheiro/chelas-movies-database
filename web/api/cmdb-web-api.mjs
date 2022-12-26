@@ -8,7 +8,7 @@
 'use strict'
 
 import errors from '../../errors/errors.mjs'
-import handleRequest from '../http-handle-requests.mjs'
+import translateToHTTPResponse from '../http-error-responses.mjs'
 
 /**
  * @param {*} cmdbServices module that contains all application services
@@ -25,16 +25,17 @@ export default function(cmdbServices, cmdbUserServices){
     }
 
     return {
-        createUser: handleRequest(createUserInternal),
-        getPopularMovies: handleRequest(getPopularMoviesInternal),
-        searchMoviesByName: handleRequest(searchMoviesByNameInternal),
-        createGroup: handleRequest(createGroupInternal),
-        getGroups: handleRequest(getGroupsInternal),
-        getGroupDetails: handleRequest(getGroupDetailsInternal),
-        editGroup: handleRequest(editGroupInternal),
-        deleteGroup: handleRequest(deleteGroupInternal),
-        addMovieInGroup: handleRequest(addMovieInGroupInternal),
-        removeMovieInGroup: handleRequest(removeMovieInGroupInternal)
+        createUser: handleResponseInJSON(createUserInternal),
+        getPopularMovies: handleResponseInJSON(getPopularMoviesInternal),
+        searchMoviesByName: handleResponseInJSON(searchMoviesByNameInternal),
+        getMovieDetails: handleResponseInJSON(getMovieDetailsInternal),
+        createGroup: handleResponseInJSON(createGroupInternal),
+        getGroups: handleResponseInJSON(getGroupsInternal),
+        getGroupDetails: handleResponseInJSON(getGroupDetailsInternal),
+        editGroup: handleResponseInJSON(editGroupInternal),
+        deleteGroup: handleResponseInJSON(deleteGroupInternal),
+        addMovieInGroup: handleResponseInJSON(addMovieInGroupInternal),
+        removeMovieInGroup: handleResponseInJSON(removeMovieInGroupInternal)
     }
 
     // Functions:
@@ -53,6 +54,10 @@ export default function(cmdbServices, cmdbUserServices){
 
     async function searchMoviesByNameInternal(req, rsp) {
         return cmdbServices.searchMoviesByName(req.params.moviesName, req.query.limit)
+    }
+
+    async function getMovieDetailsInternal(req, rsp) {
+        return cmdbServices.getMovieDetails(req.params.movieId)
     }
 
     async function createGroupInternal(req, rsp) {
@@ -100,5 +105,36 @@ export default function(cmdbServices, cmdbUserServices){
         return {
             message: `Movie deleted with success`
         } 
-    }    
+    }
+    
+    function handleResponseInJSON(handler) {
+        return async function(req, rsp) {
+            const BEARER_STR = "Bearer "
+            // Get the value of the Authorization request header
+            const tokenHeader = req.get("Authorization")
+            // If the token isn't valid:
+            if (!(tokenHeader && tokenHeader.startsWith(BEARER_STR) && tokenHeader.length > BEARER_STR.length)) {
+                // Wrap the error esponse in JSON format
+                rsp
+                    .status(401)
+                    .json({error: `Invalid authentication token`})
+                    return
+            }
+            // Retrieve token with the expected format: Bearer <token> and create a property in the 
+            // request object to easily retrieve it
+            req.token = tokenHeader.split(" ")[1]
+
+            try {
+                // With a token the actual function can be called
+                let body = await handler(req, rsp)
+                // Wrap the result in JSON format 
+                rsp.json(body) //status code is 200 by default
+            } catch(e) {
+                const httpResponse = translateToHTTPResponse(e)
+                rsp
+                    .status(httpResponse.status)
+                    .json(httpResponse.body)
+            }
+        }
+    }
 }

@@ -25,7 +25,6 @@ import imdbDataInit from './data/cmdb-movies-data.mjs'
 import cmdbServicesInit from './services/cmdb-services.mjs' 
 import cmdbWebApiInit from './web/api/cmdb-web-api.mjs'
 import cmdbWebSiteInit from './web/site/cmdb-web-site.mjs'
-import { retrieveTokenFromBearer, retrieveToken } from './cmdb-midlewares.mjs'
 
 import fetch from './data/node-fetch.mjs'
 //import fetch from './data/local-fetch.mjs'
@@ -33,7 +32,7 @@ import fetch from './data/node-fetch.mjs'
 const imdbData = imdbDataInit(fetch)
 const cmdbServices = cmdbServicesInit(imdbData, cmdbData, usersData)
 const cmdbWebApi = cmdbWebApiInit(cmdbServices, userServices)
-const cmdbWebSite = cmdbWebSiteInit(cmdbServices) 
+const cmdbWebSite = cmdbWebSiteInit(cmdbServices)
 
 // Constants
 const PORT = 1904
@@ -61,32 +60,40 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
 app.use(express.json()) // Parses incoming requests with JSON payloads if the
                         // Content-Type of the request header matches this option 
-app.use(express.urlencoded()) // Parses incoming requests with urlencoded payloads if the
+app.use(express.urlencoded( { extended: false})) // Parses incoming requests with urlencoded payloads if the
                               // Content-Type of the request header matches this option 
 app.use(cookieParser()) // Parses Cookie Header and populates req.cookies with an object 
                         // keyed by the cookie names
-app.use(retrieveTokenFromBearer) // Populates req.token with the userToken only if the 
-                                 // Content-Type of the request header is in application/json
-app.use(retrieveToken) // Populates req.token with the userToken only if the 
-                                 // Content-Type of the request header is in application/json
 // ------------------------------------ Middlewares --------------------------------------------
 
 // -------------------------------------- WebSite ----------------------------------------------
-// app.get('/home', cmdbWebSite.getHome)
-// app.get('/groups', cmdbWebSite.getGroups)
+app.get('/home', cmdbWebSite.getHome)
+app.get('/groups', cmdbWebSite.getGroups)
+app.post('/users', cmdbWebSite.createUser)
+app.get('/movies', cmdbWebSite.getPopularMovies)
+app.get('/movies/search/:moviesName', cmdbWebSite.searchMoviesByName)
+app.get('/movies/find/:movieId', cmdbWebSite.getMovieDetails)
+app.post('/groups', cmdbWebSite.createGroup)
+app.get('/groups', cmdbWebSite.getGroups)
+app.get('/groups/:groupId', cmdbWebSite.getGroupDetails)
+app.post('/groups/:groupId', cmdbWebSite.editGroup)
+app.post('/groups/:groupId', cmdbWebSite.deleteGroup)
+app.post('/groups/:groupId/movies/:movieId', cmdbWebSite.addMovieInGroup)
+app.post('/groups/:groupId/movies/:movieId', cmdbWebSite.removeMovieInGroup)
 // -------------------------------------- WebSite ----------------------------------------------
 
 // -------------------------------------- WebApi -----------------------------------------------
-app.post('/users', cmdbWebApi.createUser)
-app.get('/movies', cmdbWebApi.getPopularMovies)
-app.get('/movies/:moviesName', cmdbWebApi.searchMoviesByName)
-app.post('/groups', cmdbWebApi.createGroup)
-app.get('/groups', cmdbWebApi.getGroups)
-app.get('/groups/:groupId', cmdbWebApi.getGroupDetails)
-app.put('/groups/:groupId', cmdbWebApi.editGroup)
-app.delete('/groups/:groupId', cmdbWebApi.deleteGroup)
-app.put('/groups/:groupId/movies/:movieId', cmdbWebApi.addMovieInGroup)
-app.delete('/groups/:groupId/movies/:movieId', cmdbWebApi.removeMovieInGroup)
+app.post('/api/users', cmdbWebApi.createUser)
+app.get('/api/movies', cmdbWebApi.getPopularMovies)
+app.get('/api/movies/search/:moviesName', cmdbWebApi.searchMoviesByName)
+app.get('/api/movies/find/:movieId', cmdbWebApi.getMovieDetails)
+app.post('/api/groups', cmdbWebApi.createGroup)
+app.get('/api/groups', cmdbWebApi.getGroups)
+app.get('/api/groups/:groupId', cmdbWebApi.getGroupDetails)
+app.put('/api/groups/:groupId', cmdbWebApi.editGroup)
+app.delete('/api/groups/:groupId', cmdbWebApi.deleteGroup)
+app.put('/api/groups/:groupId/movies/:movieId', cmdbWebApi.addMovieInGroup)
+app.delete('/api/groups/:groupId/movies/:movieId', cmdbWebApi.removeMovieInGroup)
 // -------------------------------------- WebApi -----------------------------------------------
 
 // Sets the server to listen in a specified port.

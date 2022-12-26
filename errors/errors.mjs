@@ -9,8 +9,7 @@ export let errorCodes =  {
     INVALID_ARGUMENT_CODE: 1,
     ARGUMENT_NOT_FOUND_CODE: 2,
     INVALID_USER_CODE: 3,
-    USER_NOT_FOUND_CODE: 4,
-    UNSUPPORTED_FORMAT_CODE: 5
+    USER_NOT_FOUND_CODE: 4
 }
 
 /**
@@ -25,9 +24,7 @@ export default {
     INVALID_USER: (argName) => 
         new InternalError(errorCodes.INVALID_USER_CODE, `Invalid user: ${argName}`), 
     USER_NOT_FOUND: (argName) => 
-        new InternalError(errorCodes.USER_NOT_FOUND_CODE, `User not found: ${argName}`),
-    UNSUPPORTED_FORMAT: (argName) => 
-        new InternalError(errorCodes.UNSUPPORTED_FORMAT_CODE, `Unsupported format: ${argName}`)
+        new InternalError(errorCodes.USER_NOT_FOUND_CODE, `User not found: ${argName}`)
 }
 
 /** 

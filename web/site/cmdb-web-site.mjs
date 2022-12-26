@@ -45,4 +45,22 @@ export default function (cmdbServices) {
         this.name = name,
         this.data = data
     }
+
+    function handleRequest(handler) {
+        return async function(req, rsp) {
+            // Hammered token
+            req.token = "c64ae5a8-6f3e-11ed-a1eb-0242ac120002"
+
+            try {
+                let view = await handler(req, rsp)
+                if (view) {
+                    // Wrap the result in JSON format 
+                    rsp.render(view.name , view.data)
+                }
+            } catch(e) {
+                const httpResponse = translateToHTTPResponse(e)
+                rsp.render(httpResponse.status, httpResponse.body);
+            }
+        }
+    }
 }

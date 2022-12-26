@@ -1,19 +1,18 @@
 {
-    "IDs": 5,
+    "IDs": 2,
     "groups": [
         {
-            "name": "Favourite Movies",
-            "description": "Group description",
-            "id": 1,
-            "movies": [],
+            "name": "Updated Group",
+            "description": "Top 10 horror movies",
+            "id": 2,
+            "movies": [
+                {
+                    "id": "tt0468569",
+                    "title": "The Dark Knight",
+                    "duration": "152"
+                }
+            ],
             "userId": 1
-        },
-        {
-            "name": "Group 4",
-            "description": "123ada4",
-            "id": 5,
-            "movies": [],
-            "userId": 2
         }
     ]
 }

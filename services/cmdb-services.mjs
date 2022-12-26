@@ -25,6 +25,7 @@ export default function(imdbData, cmdbData, usersData) {
     return {
         getPopularMovies: getPopularMovies,
         searchMoviesByName: searchMoviesByName,
+        getMovieDetails: getMovieDetails,
         createGroup: verifyUser(createGroup),
         getGroups: verifyUser(getGroups),
         getGroupDetails: verifyUser(getGroupDetails),
@@ -49,6 +50,14 @@ export default function(imdbData, cmdbData, usersData) {
      */
     async function searchMoviesByName(moviesName, limit) {
         return imdbData.searchMoviesByNameData(moviesName, limit)
+    }
+
+    /**
+     * Retrieves the details of a movie
+     * @param {Number} movieId Id of the movie to search
+     */
+    async function getMovieDetails(movieId) {
+        return imdbData.getMovieDetails(movieId)
     }
 
     /**

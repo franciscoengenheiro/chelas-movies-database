@@ -25,8 +25,10 @@ export default function(fetch){
     return {
         getPopularMoviesData: getPopularMoviesData,
         searchMoviesByNameData: searchMoviesByNameData,
+        getMovieDetails: getMovieDetails,
         addMovieInGroupData: addMovieInGroupData
     }
+
     /**
      * Retrieves the 250 most popular movies
      * @param {Number} limit option parameter to limit the search result 
@@ -55,6 +57,22 @@ export default function(fetch){
             moviesObj.results = moviesObj.results.filter(_ => limitCounter++ <= limit)
         })
         return moviesObj.results
+    }
+
+    async function getMovieDetails(movieId) {
+        let movieObj = await fetch(MOVIES_INFO + movieId)
+
+        let movieDetails = {
+            id: movieObj.id,
+            title: movieObj.title,
+            description: movieObj.plot,
+            image_url: movieObj.image,
+            runtimeMins: movieObj.runtimeMins,
+            director: movieObj.directors,
+            actors_names: movieObj.stars
+        }
+
+        return movieDetails
     }
 
     /**

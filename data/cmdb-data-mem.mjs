@@ -16,11 +16,6 @@ const GROUPS_FILE = './local_data/groups.json'
  */
 export async function createGroupData(obj, userId){
     let groupsObj = await File.read(GROUPS_FILE)
-    // Check if the group to create already exists
-    groupsObj.groups.forEach(group => {
-        if (group.name == obj.name && group.userId == userId) 
-            throw errors.INVALID_ARGUMENT("group already exists")
-    })
     // Retrieve the new group Id 
     let newGroupID = ++groupsObj.IDs
     // Create properties for the new group
