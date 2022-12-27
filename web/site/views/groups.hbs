@@ -1,0 +1,17 @@
+<h1>{{title}}</h1>
+
+<form action="/groups/newGroup" method="GET">
+  <input type="submit" value="Create Group">
+</form>
+
+<ul>
+  {{#each groups}}
+    <li>
+      <h2><a href="./groups/{{id}}">{{name}}</a></h2>
+      <p>{{description}}</p>
+      <form action="/groups/{{id}}/delete" method="POST">
+        <input type="submit" value="Delete">
+      </form>
+    </li>
+  {{/each}}
+</ul>

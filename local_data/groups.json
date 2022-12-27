@@ -1,5 +1,5 @@
 {
-    "IDs": 2,
+    "IDs": 6,
     "groups": [
         {
             "name": "Updated Group",
@@ -12,6 +12,20 @@
                     "duration": "152"
                 }
             ],
+            "userId": 1
+        },
+        {
+            "name": "My movies",
+            "description": "my movies :)",
+            "id": 3,
+            "movies": [],
+            "userId": 1
+        },
+        {
+            "name": "Group group group",
+            "description": "just another group",
+            "id": 6,
+            "movies": [],
             "userId": 1
         }
     ]

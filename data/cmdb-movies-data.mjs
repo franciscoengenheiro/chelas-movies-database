@@ -56,7 +56,7 @@ export default function(fetch){
             // Limit the search result
             moviesObj.results = moviesObj.results.filter(_ => limitCounter++ <= limit)
         })
-        return moviesObj.results
+        return moviesObj
     }
 
     async function getMovieDetails(movieId) {

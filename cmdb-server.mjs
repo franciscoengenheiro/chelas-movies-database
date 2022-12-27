@@ -67,19 +67,22 @@ app.use(cookieParser()) // Parses Cookie Header and populates req.cookies with a
 // ------------------------------------ Middlewares --------------------------------------------
 
 // -------------------------------------- WebSite ----------------------------------------------
-app.get('/home', cmdbWebSite.getHome)
-app.get('/groups', cmdbWebSite.getGroups)
-app.post('/users', cmdbWebSite.createUser)
+//app.get('/home', cmdbWebSite.getHome)
+//app.get('/site.css', cmdbWebSite.getCss)
+//app.post('/users', cmdbWebSite.createUser)
 app.get('/movies', cmdbWebSite.getPopularMovies)
 app.get('/movies/search/:moviesName', cmdbWebSite.searchMoviesByName)
 app.get('/movies/find/:movieId', cmdbWebSite.getMovieDetails)
 app.post('/groups', cmdbWebSite.createGroup)
+app.get('/groups/newGroup', cmdbWebSite.getNewGroup)
 app.get('/groups', cmdbWebSite.getGroups)
 app.get('/groups/:groupId', cmdbWebSite.getGroupDetails)
-app.post('/groups/:groupId', cmdbWebSite.editGroup)
-app.post('/groups/:groupId', cmdbWebSite.deleteGroup)
-app.post('/groups/:groupId/movies/:movieId', cmdbWebSite.addMovieInGroup)
-app.post('/groups/:groupId/movies/:movieId', cmdbWebSite.removeMovieInGroup)
+app.post('/groups/:groupId/edit', cmdbWebSite.editGroup)
+app.get('/groups/:groupId/editGroup', cmdbWebSite.getEditGroup)
+app.post('/groups/:groupId/delete', cmdbWebSite.deleteGroup)
+app.post('/groups/:groupId/movies', cmdbWebSite.addMovieInGroup)
+app.get('/groups/:groupId/movies/addMovie', cmdbWebSite.addMovie)
+//app.post('/groups/:groupId/movies/:movieId', cmdbWebSite.removeMovieInGroup)
 // -------------------------------------- WebSite ----------------------------------------------
 
 // -------------------------------------- WebApi -----------------------------------------------

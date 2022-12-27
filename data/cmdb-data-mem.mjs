@@ -42,7 +42,8 @@ export async function getGroupsData(userId){
         .map(group => {
             return {
                 name: group.name,
-                description: group.description
+                description: group.description,
+                id: group.id
             }
         })
     return groupsObj.groups

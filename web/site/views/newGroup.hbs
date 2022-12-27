@@ -1,9 +1,9 @@
 <h2>Create a new Group</h2>
 <form action="/groups" method="POST">
-    <p>Task name: <input type="text" name="name"></p>
+    <p>Group name: <input type="text" name="name"></p>
     <p>
-    Task description: <textarea name="description">
-    </textarea>
+        Group description: <textarea name="description"></textarea>
     </p>
-    <input type="submit" value="Create Group">
+    <input type="submit" value="Create">
+    <input type="button" value="Cancel" onclick='history.back()'></input>
 </form>
