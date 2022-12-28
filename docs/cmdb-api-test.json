@@ -3,7 +3,7 @@
 		"_postman_id": "1c1e122b-4173-4fa3-b2ab-4c61b992d1f4",
 		"name": "CMDB",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "24345245"
+		"_exporter_id": "24392404"
 	},
 	"item": [
 		{
@@ -25,13 +25,14 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:1904/users",
+							"raw": "http://localhost:1904/api/users",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "1904",
 							"path": [
+								"api",
 								"users"
 							]
 						}
@@ -78,13 +79,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:1904/movies?limit=19",
+							"raw": "http://localhost:1904/api/movies?limit=19",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "1904",
 							"path": [
+								"api",
 								"movies"
 							],
 							"query": [
@@ -153,14 +155,16 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:1904/movies/Inception?limit=3",
+							"raw": "http://localhost:1904/api/movies/search/Inception?limit=3",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "1904",
 							"path": [
+								"api",
 								"movies",
+								"search",
 								"Inception"
 							],
 							"query": [
@@ -206,6 +210,43 @@
 			]
 		},
 		{
+			"name": "GET /movies{movieid}",
+			"item": [
+				{
+					"name": "Get movie details",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "asdasdadadadawqe",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:1904/api/movies/find/tt0468569",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "1904",
+							"path": [
+								"api",
+								"movies",
+								"find",
+								"tt0468569"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "POST /groups",
 			"item": [
 				{
@@ -225,7 +266,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Group 2\",\r\n    \"description\": \"1234\"\r\n}",
+							"raw": "{\r\n    \"name\": \"Natal Group\",\r\n    \"description\": \"YAY\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -233,13 +274,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:1904/groups",
+							"raw": "http://localhost:1904/api/groups",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "1904",
 							"path": [
+								"api",
 								"groups"
 							]
 						}
@@ -297,13 +339,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:1904/groups",
+							"raw": "http://localhost:1904/api/groups",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "1904",
 							"path": [
+								"api",
 								"groups"
 							]
 						}
@@ -353,7 +396,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "asdasdadadadawqw",
+									"value": "asdasdadadadawqe",
 									"type": "string"
 								}
 							]
@@ -361,15 +404,16 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:1904/groups/3",
+							"raw": "http://localhost:1904/api/groups/2",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "1904",
 							"path": [
+								"api",
 								"groups",
-								"3"
+								"2"
 							]
 						}
 					},
@@ -435,15 +479,16 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:1904/groups/5",
+							"raw": "http://localhost:1904/api/groups/2",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "1904",
 							"path": [
+								"api",
 								"groups",
-								"5"
+								"2"
 							]
 						}
 					},
@@ -490,15 +535,16 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:1904/groups/4",
+							"raw": "http://localhost:1904/api/groups/1",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "1904",
 							"path": [
+								"api",
 								"groups",
-								"4"
+								"1"
 							]
 						}
 					},
@@ -555,17 +601,18 @@
 						"method": "PUT",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:1904/groups/1/movies/468569",
+							"raw": "http://localhost:1904/api/groups/2/movies/tt0468569",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "1904",
 							"path": [
+								"api",
 								"groups",
-								"1",
+								"2",
 								"movies",
-								"468569"
+								"tt0468569"
 							]
 						}
 					},
@@ -622,15 +669,16 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:1904/groups/3/movies/tt0468569",
+							"raw": "http://localhost:1904/api/groups/2/movies/tt0468569",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "1904",
 							"path": [
+								"api",
 								"groups",
-								"3",
+								"2",
 								"movies",
 								"tt0468569"
 							]

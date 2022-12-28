@@ -14,7 +14,7 @@ const GROUPS_FILE = './local_data/groups.json'
  * @param {*} obj object that has the group details to create
  * @param {Number} userId user internal identifier
  */
-export async function createGroupData(obj, userId){
+export async function createGroupData(obj, userId) {
     let groupsObj = await File.read(GROUPS_FILE)
     // Retrieve the new group Id 
     let newGroupID = ++groupsObj.IDs
@@ -33,7 +33,7 @@ export async function createGroupData(obj, userId){
  * @param {Number} userId user internal identifier
  * @returns an array with the search result
  */
-export async function getGroupsData(userId){
+export async function getGroupsData(userId) {
     let groupsObj = await File.read(GROUPS_FILE)
     // Retrieve only the groups that belong to the user and modify each group object
     // to only show selected properties
@@ -56,7 +56,7 @@ export async function getGroupsData(userId){
  * @returns The group found
  * @throws ArgumentNotFoundException if the group wasn't found
  */
-export async function getGroupDetailsData(groupId, userId){
+export async function getGroupDetailsData(groupId, userId) {
     let groupsObj = await File.read(GROUPS_FILE)
     // Start a counter
     let totalDuration = 0
@@ -85,11 +85,11 @@ export async function getGroupDetailsData(groupId, userId){
  * @param {Number} userId user internal identifier
  * @throws ArgumentNotFoundException if the group wasn't found
  */
-export async function editGroupData(groupId, obj, userId){
+export async function editGroupData(groupId, obj, userId) {
     let groupsObj = await File.read(GROUPS_FILE)
     let found = false
     groupsObj.groups = groupsObj.groups.map(group => {
-        if(group.id == groupId && group.userId == userId){
+        if(group.id == groupId && group.userId == userId) {
             group.name = obj.name
             group.description = obj.description
             found = true
@@ -108,11 +108,11 @@ export async function editGroupData(groupId, obj, userId){
  * @param {Number} userId user internal identifier
  * @throws ArgumentNotFoundException if the group wasn't found
  */
-export async function deleteGroupData(groupId, userId){
+export async function deleteGroupData(groupId, userId) {
     let groupsObj = await File.read(GROUPS_FILE)
     // Find group index
     let groupIndex = groupsObj.groups.findIndex(group => group.id == groupId && group.userId == userId)
-    if (groupIndex < 0){
+    if (groupIndex < 0) {
         throw errors.ARGUMENT_NOT_FOUND("group")
     } else {
         // Delete group from storage
@@ -129,7 +129,7 @@ export async function deleteGroupData(groupId, userId){
  * @param {Number} userId user internal identifier
  * @throws InvalidArgumentException if the movie already exists in the group or ArgumentNotFoundException if the either the group or movie weren't found
  */
-export async function addMovieInGroupData(groupId, movieId, moviesObj, userId){
+export async function addMovieInGroupData(groupId, movieId, moviesObj, userId) {
         let groupsObj = await File.read(GROUPS_FILE)
         // Booleans:
         let foundGroup = false
@@ -167,7 +167,7 @@ export async function addMovieInGroupData(groupId, movieId, moviesObj, userId){
  * @param {Number} userId user internal identifier
  * @throws ArgumentNotFoundException if the either the group or movie weren't found
  */
-export async function removeMovieInGroupData(groupId, movieId, userId){
+export async function removeMovieInGroupData(groupId, movieId, userId) {
     let groupsObj = await File.read(GROUPS_FILE)
     // Find the group within the groups array
     let group = groupsObj.groups.find(group => groupId == group.id && group.userId == userId)

@@ -13,8 +13,8 @@ export default function(exception) {
     let errorFunction = errors[exception.code]
     // If none was found:
     if (!errorFunction) {
-        // If the exception is of unknown type:
         console.log(exception)
+        // If the exception is of unknown type:
         return new HTTPResponse(500, "Internal Server error")
     } 
     return errorFunction(exception.description)
@@ -25,6 +25,7 @@ export default function(exception) {
  */ 
 // HTTP Errors Used:
 // 400 - Bad Request
+// 401 - Unathorized
 // 404 - Not Found
 let errors = {
     [errorCodes.INVALID_ARGUMENT_CODE]: (description) => new HTTPResponse(400, description),

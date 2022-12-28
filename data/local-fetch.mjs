@@ -10,7 +10,7 @@ import { MOST_POPULAR_MOVIES, MOVIES_SEARCHED_BY_NAME, MOVIES_INFO } from './cmd
 const data = {
     [MOST_POPULAR_MOVIES]: './local_data/most-popular-movies.json',
     [MOVIES_SEARCHED_BY_NAME + "inception 2010"]: './local_data/movies-searched-by-name.json',
-    [MOVIES_INFO + "tt0468569"]: './local_data/movies-info.json'
+    [MOVIES_INFO + "tt0468569"]: './local_data/movie-info.json'
 }
 
 /**

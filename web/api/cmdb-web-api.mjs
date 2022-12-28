@@ -15,7 +15,7 @@ import translateToHTTPResponse from '../http-error-responses.mjs'
  * @param {*} cmdbUserServices module that contains all application user services
  * @returns an object with all the functions Express module can call, as properties, when a user makes a request
  */
-export default function(cmdbServices, cmdbUserServices){
+export default function(cmdbServices, cmdbUserServices) {
     // Validate if all the received services exist
     if (!cmdbServices) {
         throw errors.INVALID_ARGUMENT("cmdbServices")
@@ -123,7 +123,6 @@ export default function(cmdbServices, cmdbUserServices){
             // Retrieve token with the expected format: Bearer <token> and create a property in the 
             // request object to easily retrieve it
             req.token = tokenHeader.split(" ")[1]
-
             try {
                 // With a token the actual function can be called
                 let body = await handler(req, rsp)

@@ -85,7 +85,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/InvalidRequest'
                 example: "Invalid Argument: limit"
-  /movies/{moviesName}:
+  /movies/search/{moviesName}:
     get:
       tags:
       - Movies
@@ -124,6 +124,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/InvalidRequest'
                 example: "Invalid Argument: limit"
+  /movies/find/{movieId}:
+    get:
+      tags:
+      - Movie
+      summary: Get movie details by id
+      description: Given an id retrieve movie detail\s
+      operationId: getMovieDetails
+      security:
+        - bearerAuth: []
+      parameters:
+      - name: movieId
+        in: path
+        description: movie to retrieve details from
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: movie details result
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MovieDetails'
   /groups:
     get:
       tags:
@@ -368,7 +393,6 @@ components:
       - id
       - movies
       - userId
-      
       type: object
       properties:
         name:
@@ -391,7 +415,6 @@ components:
       required:
       - name
       - description
-      
       type: object
       properties:
         name:
@@ -404,7 +427,6 @@ components:
       required:
       - status
       - group
-
       type: object
       properties:
         status:
@@ -417,12 +439,10 @@ components:
       - id
       - name
       - duration
-      
       type: object
       properties:
         id:
           type: string
-          minimum: 0
           example: "tt02345678"
         name:
           type: string
@@ -431,11 +451,43 @@ components:
           type: integer
           minimum: 0
           example: 180
+    MovieDetails:
+      required:
+      - id
+      - title
+      - description
+      - image_url
+      - runtimeMins
+      - director
+      - actors_names
+      type: object
+      properties:
+        id:
+          type: string
+          example: "tt02345678"
+        title:
+          type: string
+          example: "The Dark Knight"
+        description:
+          type: string
+          example: "When the menace known as the Joker wreaks havoc.."
+        image_url:
+          type: string 
+          example: "https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_Ratio0.6762_AL_.jpg"
+        runtimeMins:
+          type: integer
+          minimum: 0
+          example: 152      
+        director:
+          type: string
+          example: "Christopher Nolan"
+        actors_names:
+          type: string
+          example: "Christian Bale, Heath Ledger, Aaron Eckhart"
     NewMovieCreated:
       required:
       - status
       - movie
-
       type: object
       properties:
         status:

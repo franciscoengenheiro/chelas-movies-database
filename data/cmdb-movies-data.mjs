@@ -16,7 +16,7 @@ export const MOVIES_INFO = `https://imdb-api.com/en/API/Title/${IMDB_KEY}/`
  * @param {Function} fetch function that retrieves a resource from a container 
  * @returns an object with all the avalaible movies data operations as properties
  */
-export default function(fetch){
+export default function(fetch) {
     // Validate if the received fetch function exists
     if (!fetch) {
         throw errors.INVALID_ARGUMENT("fetch")
@@ -34,7 +34,7 @@ export default function(fetch){
      * @param {Number} limit option parameter to limit the search result 
      * @returns an array with the search result
      */
-    async function getPopularMoviesData(limit){
+    async function getPopularMoviesData(limit) {
         let moviesObj = await fetch(MOST_POPULAR_MOVIES)
         checkLimitAndFilter(limit, function() {
             moviesObj.items = moviesObj.items.filter(movie => Number(movie.rank) <= limit)
@@ -82,7 +82,7 @@ export default function(fetch){
      * @param {Number} userId user internal identifier
      * @throws ArgumentNotFoundException if the movie does not exist 
      */
-    async function addMovieInGroupData(groupId, movieId, userId){
+    async function addMovieInGroupData(groupId, movieId, userId) {
         let moviesObj = await fetch(MOVIES_INFO + movieId)
         if (moviesObj.title == null) {
             throw errors.ARGUMENT_NOT_FOUND("Movie")

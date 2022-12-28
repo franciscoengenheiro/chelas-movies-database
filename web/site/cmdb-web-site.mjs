@@ -4,7 +4,6 @@
 //  - Invoke the corresponding operation on services
 //  - Generate the response in HTML format
 
-import { group } from 'console'
 import url from 'url'
 import errors from '../../errors/errors.mjs'
 import translateToHTTPResponse from '../http-error-responses.mjs'
@@ -34,7 +33,7 @@ export default function (cmdbServices) {
        deleteGroup: handleResponseInHTML(deleteGroupInternal),
        addMovieInGroup: handleResponseInHTML(addMovieInGroupInternal),
        addMovie: addMovie,
-//       removeMovieInGroup: handleResponseInHTML(removeMovieInGroupInternal)
+       removeMovieInGroup: handleResponseInHTML(removeMovieInGroupInternal)
     }
 
     async function getPopularMoviesInternal(req, rsp) {
@@ -95,6 +94,11 @@ export default function (cmdbServices) {
         rsp.redirect('/groups')
     }
 
+    async function addMovie(req, rsp) {
+        const groupId = req.params.groupId
+        rsp.render('addMovie', {id: groupId})
+    }
+
     async function addMovieInGroupInternal(req, rsp) {
         const movieId = req.body.movieId
         const groupId = req.params.groupId
@@ -102,19 +106,16 @@ export default function (cmdbServices) {
         rsp.redirect(`/groups/${groupId}`)
     }
 
-    async function addMovie(req, rsp) {
-        const groupId = req.params.groupId
-        rsp.render('addMovie', {id: groupId})
-    }
-
-    // Example - to delete
-    async function createTask(req, rsp) {
+    async function removeMovieInGroupInternal(req, rsp) {
+        const movieId = req.body.movieId
+        const groupId = req.params.groupId        
+        const group = await cmdbServices.removeMovieInGroup(req.token, groupId, movieId)
         // Post/Redirect/Get (PRG) is a web development design pattern that lets the page shown 
         // after a form submission be reloaded, shared, or bookmarked without ill effects, such
         // as submitting the form another time.
-        rsp.redirect('/groups')
+        rsp.redirect(`/groups/${groupId}`)
     }
-
+    
     /**
      * Sends a file from the location given by filename current directory
      * @param {String} fileName end segment of the file path
@@ -141,11 +142,10 @@ export default function (cmdbServices) {
         return async function(req, rsp) {
             // Hammered token
             req.token = "c64ae5a8-6f3e-11ed-a1eb-0242ac120002"
-
             try {
                 let view = await handler(req, rsp)
                 if (view) {
-                    // Wrap the result in JSON format 
+                    // Wrap the result in HTML format 
                     rsp.render(view.name , view.data)
                 }
             } catch(e) {
