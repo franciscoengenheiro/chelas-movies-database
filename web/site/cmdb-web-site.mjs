@@ -31,8 +31,9 @@ export default function (cmdbServices) {
        editGroup: handleResponseInHTML(editGroupInternal),
        getEditGroup: handleResponseInHTML(getEditGroup),
        deleteGroup: handleResponseInHTML(deleteGroupInternal),
-       addMovieInGroup: handleResponseInHTML(addMovieInGroupInternal),
        addMovie: addMovie,
+       searchMovieToAdd: handleResponseInHTML(searchMovieToAdd),
+       addMovieInGroup: handleResponseInHTML(addMovieInGroupInternal),
        removeMovieInGroup: handleResponseInHTML(removeMovieInGroupInternal)
     }
 
@@ -43,8 +44,9 @@ export default function (cmdbServices) {
     }
 
     async function searchMoviesByNameInternal(req, rsp) {
-        const movies = await cmdbServices.searchMoviesByName(req.params.moviesName, req.query.limit)
-        const viewData = {title: movies.expression, movies: movies.results}
+        const movieName = req.params.moviesName
+        const movies = await cmdbServices.searchMoviesByName(movieName, req.query.limit)
+        const viewData = {title: movieName, movies: movies}
         return View('searchMovies', viewData)
     }
 
@@ -69,9 +71,7 @@ export default function (cmdbServices) {
     }
 
     async function getGroupDetailsInternal(req, rsp) {
-        const groupId = req.params.groupId
-        const group = await cmdbServices.getGroupDetails(req.token, groupId)
-        const viewData = {id: groupId, group: group}
+        const viewData = await getGroupDetailsMw(req, rsp)
         return View('group', viewData)
     }
 
@@ -82,9 +82,7 @@ export default function (cmdbServices) {
     }
 
     async function getEditGroup(req, rsp) {
-        const groupId = req.params.groupId
-        const group = await cmdbServices.getGroupDetails(req.token, groupId)
-        const viewData = {id: groupId, group: group}
+        const viewData = await getGroupDetailsMw(req, rsp)
         return View('editGroup', viewData)
     }
 
@@ -99,6 +97,14 @@ export default function (cmdbServices) {
         rsp.render('addMovie', {id: groupId})
     }
 
+    async function searchMovieToAdd(req, rsp) {
+        const groupId = req.query.groupId
+        const movieName = req.query.movieName
+        const movies = await cmdbServices.searchMoviesByName(movieName, req.query.limit)
+        const viewData = {title: movieName, movies: movies, groupId: groupId}
+        return View('searchMoviesToAdd', viewData)
+    }
+
     async function addMovieInGroupInternal(req, rsp) {
         const movieId = req.body.movieId
         const groupId = req.params.groupId
@@ -107,7 +113,7 @@ export default function (cmdbServices) {
     }
 
     async function removeMovieInGroupInternal(req, rsp) {
-        const movieId = req.body.movieId
+        const movieId = req.params.movieId
         const groupId = req.params.groupId        
         const group = await cmdbServices.removeMovieInGroup(req.token, groupId, movieId)
         // Post/Redirect/Get (PRG) is a web development design pattern that lets the page shown 
@@ -116,6 +122,12 @@ export default function (cmdbServices) {
         rsp.redirect(`/groups/${groupId}`)
     }
     
+    async function getGroupDetailsMw(req, rsp) {
+        const groupId = req.params.groupId
+        const group = await cmdbServices.getGroupDetails(req.token, groupId)
+        return {id: groupId, group: group}
+    }
+
     /**
      * Sends a file from the location given by filename current directory
      * @param {String} fileName end segment of the file path

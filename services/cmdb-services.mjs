@@ -136,7 +136,8 @@ export default function(imdbData, cmdbData, usersData) {
         if (isNaN(groupId)) {
             throw errors.INVALID_ARGUMENT("groupId")
         }
-        return imdbData.addMovieInGroupData(groupId, movieId, userId)
+        const moviesObj = await imdbData.addMovieInGroupData(movieId)
+        return cmdbData.addMovieInGroupData(groupId, movieId, moviesObj, userId)
     }
 
     /**

@@ -26,8 +26,8 @@ import cmdbServicesInit from './services/cmdb-services.mjs'
 import cmdbWebApiInit from './web/api/cmdb-web-api.mjs'
 import cmdbWebSiteInit from './web/site/cmdb-web-site.mjs'
 
-//import fetch from './data/node-fetch.mjs'
-import fetch from './data/local-fetch.mjs'
+import fetch from './data/node-fetch.mjs'
+//import fetch from './data/local-fetch.mjs'
 
 const imdbData = imdbDataInit(fetch)
 const cmdbServices = cmdbServicesInit(imdbData, cmdbData, usersData)
@@ -81,8 +81,9 @@ app.post('/groups/:groupId/edit', cmdbWebSite.editGroup)
 app.get('/groups/:groupId/editGroup', cmdbWebSite.getEditGroup)
 app.post('/groups/:groupId/delete', cmdbWebSite.deleteGroup)
 app.get('/groups/:groupId/movies/addMovie', cmdbWebSite.addMovie)
+app.get('/groups/:groupId/movies/searchTheMovie', cmdbWebSite.searchMovieToAdd)
 app.post('/groups/:groupId/movies', cmdbWebSite.addMovieInGroup)
-// app.get('/groups/:groupId/movies/:movieId', cmdbWebSite.removeMovieInGroup)
+app.post('/groups/:groupId/movies/:movieId', cmdbWebSite.removeMovieInGroup)
 // -------------------------------------- WebSite ----------------------------------------------
 
 // -------------------------------------- WebApi -----------------------------------------------

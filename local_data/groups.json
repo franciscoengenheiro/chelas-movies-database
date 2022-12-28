@@ -2,7 +2,7 @@
     "IDs": 6,
     "groups": [
         {
-            "name": "Updated Group",
+            "name": "Horror Movies",
             "description": "Top 10 horror movies",
             "id": 2,
             "movies": [
@@ -18,14 +18,44 @@
             "name": "My movies",
             "description": "my movies :)",
             "id": 3,
-            "movies": [],
+            "movies": [
+                {
+                    "id": "tt0489270",
+                    "title": "Saw III",
+                    "duration": "108"
+                }
+            ],
             "userId": 1
         },
         {
             "name": "Group group group",
             "description": "just another group",
             "id": 6,
-            "movies": [],
+            "movies": [
+                {
+                    "id": "tt0060479",
+                    "title": "The Group",
+                    "duration": "150"
+                }
+            ],
+            "userId": 1
+        },
+        {
+            "name": "Best Movies",
+            "description": "My favourite Movies",
+            "id": 8,
+            "movies": [
+                {
+                    "id": "tt0499549",
+                    "title": "Avatar",
+                    "duration": "162"
+                },
+                {
+                    "id": "tt1630029",
+                    "title": "Avatar: The Way of Water",
+                    "duration": "192"
+                }
+            ],
             "userId": 1
         }
     ]

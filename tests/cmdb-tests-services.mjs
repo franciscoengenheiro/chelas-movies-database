@@ -172,7 +172,7 @@ describe("Services modules tests:", function() {
             assert.deepEqual(newUser, users)
         })
 
-        it("Should create a new user", async function() {
+        it("Should not create a new user", async function() {
             // Arrange
             let originalUsers = await File.read(USERS_FILE) 
             let userTest = "userTest"
@@ -352,7 +352,7 @@ describe("Services modules tests:", function() {
             // Arrange
             let originalGroups = await File.read(GROUPS_FILE)
             let originalUsers = await File.read(USERS_FILE)
-            const userTest = "userTestToken"  
+            const userTest = "userTest"  
             let group = {
                 "name": "Test group 1",
                 "description": "random"

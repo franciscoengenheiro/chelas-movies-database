@@ -18,15 +18,14 @@
     <h2>Movies</h2>
   {{#each group.movies}}
     <li>
-      <h4>{{title}}</h4>
+      <h4><a href="/movies/find/{{id}}">{{title}}</a></h4>
+      <form action="/groups/{{../id}}/movies/{{id}}" method="POST">
+        <input type="submit" value="Remove">
+      </form>
     </li>
   {{/each}}
 </ul>
 
 <form action="/groups/{{id}}/movies/addMovie" method="GET">
     <input type="submit" value="Add Movie">
-</form>
-
-<form action="/groups/{{id}}/movies/removeMovie" method="GET">
-    <input type="submit" value="Remove Movie">
 </form>

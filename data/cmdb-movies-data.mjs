@@ -56,7 +56,7 @@ export default function(fetch) {
             // Limit the search result
             moviesObj.results = moviesObj.results.filter(_ => limitCounter++ <= limit)
         })
-        return moviesObj
+        return moviesObj.results
     }
 
     async function getMovieDetails(movieId) {
@@ -82,12 +82,12 @@ export default function(fetch) {
      * @param {Number} userId user internal identifier
      * @throws ArgumentNotFoundException if the movie does not exist 
      */
-    async function addMovieInGroupData(groupId, movieId, userId) {
+    async function addMovieInGroupData(movieId) {
         let moviesObj = await fetch(MOVIES_INFO + movieId)
         if (moviesObj.title == null) {
             throw errors.ARGUMENT_NOT_FOUND("Movie")
         } else {
-            return cmdbData.addMovieInGroupData(groupId, movieId, moviesObj, userId)
+            return moviesObj
         }
     }
 
