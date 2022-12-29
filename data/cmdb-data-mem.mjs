@@ -41,7 +41,7 @@ export async function getGroupsData(userId) {
         .filter(group => group.userId == userId) 
         .map(group => {
             return {
-                id: group.id, // Different in testServices
+                id: group.id,
                 name: group.name,
                 description: group.description
             }
@@ -72,7 +72,7 @@ export async function getGroupDetailsData(groupId, userId) {
         movies: group.movies.map(movie => {
             totalDuration += Number(movie.duration)
             return {
-                id: movie.id, // Different in testServices
+                id: movie.id,
                 title: movie.title
             }
         }),

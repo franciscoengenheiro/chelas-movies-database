@@ -4,7 +4,6 @@
 'use strict'
 
 import errors from '../errors/errors.mjs'
-import * as cmdbData from './cmdb-data-mem.mjs'
 
 // Constants
 const IMDB_KEY = "k_jtqnxg0w"

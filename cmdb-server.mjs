@@ -20,7 +20,8 @@ import session from 'express-session'
 // Internal imports
 import * as userServices from './services/cmdb-users-services.mjs'
 import * as usersData from './data/cmdb-users-data.mjs'
-import * as cmdbData from './data/cmdb-data-mem.mjs'
+//import * as cmdbData from './data/cmdb-data-mem.mjs'
+import cmdbDataElasticsearchInit from './data/cmdb-data-elasticsearch.mjs'
 import imdbDataInit from './data/cmdb-movies-data.mjs'
 import cmdbServicesInit from './services/cmdb-services.mjs' 
 import cmdbWebApiInit from './web/api/cmdb-web-api.mjs'
@@ -29,6 +30,7 @@ import cmdbWebSiteInit from './web/site/cmdb-web-site.mjs'
 import fetch from './data/node-fetch.mjs'
 // import fetch from './data/local-fetch.mjs'
 
+const cmdbData = cmdbDataElasticsearchInit()
 const imdbData = imdbDataInit(fetch)
 const cmdbServices = cmdbServicesInit(imdbData, cmdbData, usersData)
 const cmdbWebApi = cmdbWebApiInit(cmdbServices, userServices)

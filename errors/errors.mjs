@@ -18,11 +18,11 @@ export let errorCodes =  {
  */
 export default {
     INVALID_ARGUMENT: (argName) => 
-        new InternalError(errorCodes.INVALID_ARGUMENT_CODE, `Invalid argument: ${argName}`), 
+        new InternalError(errorCodes.INVALID_ARGUMENT_CODE, `Invalid argument: ${argName}`),
     ARGUMENT_NOT_FOUND: (argName) => 
-        new InternalError(errorCodes.ARGUMENT_NOT_FOUND_CODE, `Argument not found: ${argName}`), 
+        new InternalError(errorCodes.ARGUMENT_NOT_FOUND_CODE, `Argument not found: ${argName}`),
     INVALID_USER: (argName) => 
-        new InternalError(errorCodes.INVALID_USER_CODE, `Invalid user: ${argName}`), 
+        new InternalError(errorCodes.INVALID_USER_CODE, `Invalid user: ${argName}`),
     USER_NOT_FOUND: (argName) => 
         new InternalError(errorCodes.USER_NOT_FOUND_CODE, `User not found: ${argName}`)
 }

@@ -88,9 +88,6 @@ export default function(imdbData, cmdbData, usersData) {
      * @throws InvalidArgumentException if the group id is not a number
      */
     async function getGroupDetails(userId, groupId) {
-        if (isNaN(groupId)) {
-            throw errors.INVALID_ARGUMENT("groupId")
-        }
         return cmdbData.getGroupDetailsData(groupId, userId)
     }
 
@@ -106,9 +103,6 @@ export default function(imdbData, cmdbData, usersData) {
         if (!isAString(obj.name) || !isAString(obj.description)) {
             throw errors.INVALID_ARGUMENT("group missing a valid name and description")
         }
-        if (isNaN(groupId)) {
-            throw errors.INVALID_ARGUMENT("groupId")
-        }
         return cmdbData.editGroupData(groupId, obj, userId)
     }
 
@@ -119,9 +113,6 @@ export default function(imdbData, cmdbData, usersData) {
      * @throws InvalidArgumentException if the group id is not a number
      */
     async function deleteGroup(userId, groupId) {
-        if (isNaN(groupId)) {
-            throw errors.INVALID_ARGUMENT("groupId")
-        }
         return cmdbData.deleteGroupData(groupId, userId)
     }
 
@@ -133,9 +124,6 @@ export default function(imdbData, cmdbData, usersData) {
      * @throws InvalidArgumentException if the group id is not a number
      */
     async function addMovieInGroup(userId, groupId, movieId) {
-        if (isNaN(groupId)) {
-            throw errors.INVALID_ARGUMENT("groupId")
-        }
         const moviesObj = await imdbData.addMovieInGroupData(movieId)
         return cmdbData.addMovieInGroupData(groupId, movieId, moviesObj, userId)
     }
@@ -148,9 +136,6 @@ export default function(imdbData, cmdbData, usersData) {
      * @throws InvalidArgumentException if the group id is not a number
      */
     async function removeMovieInGroup(userId, groupId, movieId) {
-        if (isNaN(groupId)) {
-            throw errors.INVALID_ARGUMENT("groupId")
-        }
         return cmdbData.removeMovieInGroupData(groupId, movieId, userId)
     }   
 

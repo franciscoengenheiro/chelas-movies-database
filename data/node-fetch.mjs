@@ -9,7 +9,7 @@ import fetch from "node-fetch"
  * @param {String} URL resource path to retrieve information from in the web
  * @returns a promise that resolves to a JavaScript object of the result
  */
-export default async function(URL) {
-    let fetched_obj = await fetch(URL)
+export default async function(URL, options) {
+    let fetched_obj = await fetch(URL, options)
     return fetched_obj.json()
 }

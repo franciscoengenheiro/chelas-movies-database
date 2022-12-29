@@ -162,7 +162,8 @@ export default function (cmdbServices) {
                 view = View('onError', httpResponse)
             }
             // Wrap the result in HTML format 
-            rsp.render(view.name , view.data)
+            console.log(view)
+            if(view) rsp.render(view.name , view.data)
         }
     }
 }
