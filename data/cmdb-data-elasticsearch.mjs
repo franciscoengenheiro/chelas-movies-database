@@ -47,11 +47,10 @@ async function createGroupData(obj, userId) {
  * @returns an array with the search result
  */
 async function getGroupsData(userId) {
-    let groupsObj = await fetch(GROUPS_BASE_URL + '/_search')
+    let groupsObj = await fetch(GROUPS_BASE_URL + '/_search?q=' + userId)
     // Retrieve only the groups that belong to the user and modify each group object
     // to only show selected properties
     groupsObj.hits.hits = groupsObj.hits.hits
-        .filter(group => group._source.userId == userId) 
         .map(group => {
             return {
                 id: group._id,
