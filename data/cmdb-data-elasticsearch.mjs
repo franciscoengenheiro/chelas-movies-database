@@ -47,7 +47,7 @@ async function createGroupData(obj, userId) {
  * @returns an array with the search result
  */
 async function getGroupsData(userId) {
-    let groupsObj = await fetch(GROUPS_BASE_URL + '/_search?q=' + userId)
+    let groupsObj = await fetch(GROUPS_BASE_URL + '/_search')
     // Retrieve only the groups that belong to the user and modify each group object
     // to only show selected properties
     groupsObj.hits.hits = groupsObj.hits.hits
@@ -115,12 +115,14 @@ async function editGroupData(groupId, obj, userId) {
     if(groupObj._source.userId != userId) {
         throw errors.INVALID_USER("userId")
     }
+    groupObj._source.name = obj.name
+    groupObj._source.description = obj.description
     let options = {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(obj)
+        body: JSON.stringify(groupObj._source)
     }
     groupObj = await fetch(GROUPS_BASE_URL + '/_doc/' + groupId, options)
     return groupObj._source
@@ -156,6 +158,7 @@ async function deleteGroupData(groupId, userId) {
  */
 async function addMovieInGroupData(groupId, movieId, moviesObj, userId) {
     let groupObj = await fetch(GROUPS_BASE_URL + '/_doc/' + groupId) 
+    let newMovie = {}
     if (!groupObj.found) {
         throw errors.ARGUMENT_NOT_FOUND("group") 
     }
@@ -179,7 +182,7 @@ async function addMovieInGroupData(groupId, movieId, moviesObj, userId) {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(groupObj)
+        body: JSON.stringify(groupObj._source)
     }
     await fetch(GROUPS_BASE_URL + '/_doc/' + groupId, options) 
 }
