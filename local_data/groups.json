@@ -1,5 +1,5 @@
 {
-    "IDs": 6,
+    "IDs": 9,
     "groups": [
         {
             "name": "Horror Movies",
@@ -10,6 +10,11 @@
                     "id": "tt0468569",
                     "title": "The Dark Knight",
                     "duration": "152"
+                },
+                {
+                    "id": "tt3065204",
+                    "title": "The Conjuring 2",
+                    "duration": "134"
                 }
             ],
             "userId": 1
@@ -28,14 +33,19 @@
             "userId": 1
         },
         {
-            "name": "Group group group",
-            "description": "just another group",
+            "name": "Nostalgia Group",
+            "description": "2005-2012 films",
             "id": 6,
             "movies": [
                 {
-                    "id": "tt0060479",
-                    "title": "The Group",
-                    "duration": "150"
+                    "id": "tt0382932",
+                    "title": "Ratatouille",
+                    "duration": "111"
+                },
+                {
+                    "id": "tt0317705",
+                    "title": "The Incredibles",
+                    "duration": "115"
                 }
             ],
             "userId": 1

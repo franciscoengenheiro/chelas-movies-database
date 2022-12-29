@@ -22,6 +22,15 @@ const GET_MOVIE_BY_ID = "./local_data/movie-info.json"
 const USERS_FILE = './local_data/users.json'
 const GROUPS_FILE = './local_data/groups.json'
 
+// --------------------------------------- Notes --------------------------------------------------------
+// Before running the tests make sure:
+// - Local fetch is enabled in the server module
+// - Local_data package files - groups.json and users.json - ID's are matching the current data
+// On error while running tests:
+// - Delete users.json created test user and try again
+// To run a single test or a set of tests: use it.only or describe.only respectively
+// Run tests (in root directory) with: npm test tests
+// --------------------------------------- Notes --------------------------------------------------------
 describe("Services modules tests:", function() {
     describe("Getting the most popular movies:", function() {
         it("Should return an object with an array of the 250 most popular movies", async function() {
@@ -208,7 +217,7 @@ describe("Services modules tests:", function() {
 
             // Act
             await cmdbUserServices.createUser(userTest)     
-            await cmdbServices.createGroup(groupToCreate, userTest)
+            await cmdbServices.createGroup(userTest, groupToCreate)
 
             let alteredGroups = await File.read(GROUPS_FILE)
 
@@ -235,7 +244,7 @@ describe("Services modules tests:", function() {
 
             // Assert
             try {
-                await cmdbServices.createGroup(invalidGroup, userTest)
+                await cmdbServices.createGroup(userTest, invalidGroup)
             } catch(e) {
                 assert.deepEqual(e, errors.INVALID_ARGUMENT("group missing a valid name and description"))
                 // Retrieve previous data
@@ -255,10 +264,12 @@ describe("Services modules tests:", function() {
             const userTest = "userTest"
             let groupsTest = []
             let group1 = {
+                "id": originalGroups.IDs + 1,
                 "name": "Test group 1",
                 "description": "random"
             }
             let group2 = {
+                "id": originalGroups.IDs + 2,
                 "name": "Test group 2",
                 "description": "still random"
             }
@@ -266,12 +277,13 @@ describe("Services modules tests:", function() {
             // Act
             await cmdbUserServices.createUser(userTest)
             // Create groups for this user
-            await cmdbServices.createGroup(group1, userTest)
-            await cmdbServices.createGroup(group2, userTest)
+            await cmdbServices.createGroup(userTest, group1)
+            await cmdbServices.createGroup(userTest, group2)
 
             groupsTest.push(group1, group2)
             groupsTest = groupsTest.map(group => {
                 return {
+                    id: group.id,
                     name: group.name,
                     description: group.description
                 }
@@ -302,7 +314,7 @@ describe("Services modules tests:", function() {
             // Act
             await cmdbUserServices.createUser(userTest)
             // Create groups for this user
-            await cmdbServices.createGroup(group, userTest)
+            await cmdbServices.createGroup(userTest, group)
             let newGroup = {
                 name: group.name,
                 description: group.description,
@@ -310,7 +322,7 @@ describe("Services modules tests:", function() {
                 moviesTotalDuration: 0
             }
             // Retrieve the group created
-            let sut = await cmdbServices.getGroupDetails(groupId, userTest) 
+            let sut = await cmdbServices.getGroupDetails(userTest, groupId) 
             // Restore previous data
             await File.write(originalUsers, USERS_FILE)
             await File.write(originalGroups, GROUPS_FILE)
@@ -333,9 +345,9 @@ describe("Services modules tests:", function() {
             // Act
             await cmdbUserServices.createUser(userTest)
             // Create groups for this user
-            await cmdbServices.createGroup(group, userTest)
+            await cmdbServices.createGroup(userTest, group)
             try {
-                await cmdbServices.getGroupDetails(groupId, userTest) 
+                await cmdbServices.getGroupDetails(userTest, groupId) 
             } catch(e) {
                 assert.deepEqual(e, errors.ARGUMENT_NOT_FOUND("group"))
                 // Restore previous data
@@ -362,9 +374,9 @@ describe("Services modules tests:", function() {
             // Act
             await cmdbUserServices.createUser(userTest)
             // Create groups for this user
-            await cmdbServices.createGroup(group, userTest)
+            await cmdbServices.createGroup(userTest, group)
             try {
-                await cmdbServices.getGroupDetails(groupId, userTest) 
+                await cmdbServices.getGroupDetails(userTest, groupId) 
             } catch(e) {
                 assert.deepEqual(e, errors.INVALID_ARGUMENT("groupId"))
                 // Restore previous data
@@ -405,8 +417,8 @@ describe("Services modules tests:", function() {
 
             // Act
             await cmdbUserServices.createUser(userTest)
-            await cmdbServices.createGroup(groupBodyTest, userTest)
-            await cmdbServices.editGroup(newGroupId, groupBodyUpdatedTest, userTest)
+            await cmdbServices.createGroup(userTest, groupBodyTest)
+            await cmdbServices.editGroup(userTest, newGroupId, groupBodyUpdatedTest)
 
             let cmdb_edit_movie_to_group = await File.read(GROUPS_FILE)
             cmdb_edit_movie_to_group = cmdb_edit_movie_to_group.groups.find(group => group.id == newGroupId)
@@ -435,8 +447,8 @@ describe("Services modules tests:", function() {
             // Act
             try {
                 await cmdbUserServices.createUser(userTest)
-                await cmdbServices.createGroup(groupBodyTest, userTest)
-                await cmdbServices.editGroup("AHHHHHHHHHHHH", groupBodyUpdatedTest, userTest)
+                await cmdbServices.createGroup(userTest, groupBodyTest)
+                await cmdbServices.editGroup(userTest, "AHHHHHHHHHHHH", groupBodyUpdatedTest)
             } catch(e) {
                 await File.write(originalUsers, USERS_FILE)
                 await File.write(originalGroups, GROUPS_FILE)
@@ -467,8 +479,8 @@ describe("Services modules tests:", function() {
             // Act
             try {
                 await cmdbUserServices.createUser(userTest)
-                await cmdbServices.createGroup(groupBodyTest, userTest)
-                await cmdbServices.editGroup(newGroupId, groupBodyUpdatedTest, userTest)
+                await cmdbServices.createGroup(userTest, groupBodyTest)
+                await cmdbServices.editGroup(userTest, newGroupId, groupBodyUpdatedTest)
             } catch(e) {
                 await File.write(originalUsers, USERS_FILE)
                 await File.write(originalGroups, GROUPS_FILE)
@@ -497,8 +509,8 @@ describe("Services modules tests:", function() {
 
             // Act
             await cmdbUserServices.createUser(userTest)
-            await cmdbServices.createGroup(groupBodyTest, userTest)
-            await cmdbServices.deleteGroup(newGroupId, userTest)
+            await cmdbServices.createGroup(userTest, groupBodyTest)
+            await cmdbServices.deleteGroup(userTest, newGroupId)
 
             let cmdb_remove_movie_to_group = await File.read(GROUPS_FILE)
             cmdb_remove_movie_to_group = cmdb_remove_movie_to_group.groups
@@ -523,8 +535,8 @@ describe("Services modules tests:", function() {
             // Act
             try {
                 await cmdbUserServices.createUser(userTest)
-                await cmdbServices.createGroup(groupBodyTest, userTest)
-                await cmdbServices.deleteGroup("AHHHHHHHHHHHHH", userTest)
+                await cmdbServices.createGroup(userTest, groupBodyTest)
+                await cmdbServices.deleteGroup(userTest, "AHHHHHHHHHHHHH")
             } catch(e) {
                 await File.write(originalUsers, USERS_FILE)
                 await File.write(originalGroups, GROUPS_FILE)
@@ -550,8 +562,8 @@ describe("Services modules tests:", function() {
             //Act
             try {
                 await cmdbUserServices.createUser(userTest)
-                await cmdbServices.createGroup(groupBodyTest, userTest)
-                await cmdbServices.deleteGroup(-1, userTest)
+                await cmdbServices.createGroup(userTest, groupBodyTest)
+                await cmdbServices.deleteGroup(userTest, -1)
             } catch(e) {
                 await File.write(originalUsers, USERS_FILE)
                 await File.write(originalGroups, GROUPS_FILE)
@@ -594,8 +606,8 @@ describe("Services modules tests:", function() {
 
             // Act
             await cmdbUserServices.createUser(userTest)
-            await cmdbServices.createGroup(groupBodyTest, userTest)
-            await cmdbServices.addMovieInGroup(newGroupId, "tt0468569", userTest)
+            await cmdbServices.createGroup(userTest, groupBodyTest)
+            await cmdbServices.addMovieInGroup(userTest, newGroupId, "tt0468569")
 
             let cmdb_add_movie_to_group = await File.read(GROUPS_FILE)
             cmdb_add_movie_to_group = cmdb_add_movie_to_group.groups.find(group => group.id == newGroupId)
@@ -620,8 +632,8 @@ describe("Services modules tests:", function() {
             // Act
             try {
                 await cmdbUserServices.createUser(userTest)
-                await cmdbServices.createGroup(groupBodyTest, userTest)
-                await cmdbServices.addMovieInGroup("AHHHHHHHHHHHHHHH", "tt0468569", userTest)
+                await cmdbServices.createGroup(userTest, groupBodyTest)
+                await cmdbServices.addMovieInGroup(userTest, "AHHHHHHHHHHHHHHH", "tt0468569")
             } catch(e) {
                 await File.write(originalUsers, USERS_FILE)
                 await File.write(originalGroups, GROUPS_FILE)
@@ -647,8 +659,8 @@ describe("Services modules tests:", function() {
             // Act
             try {
                 await cmdbUserServices.createUser(userTest)
-                await cmdbServices.createGroup(groupBodyTest, userTest)
-                await cmdbServices.addMovieInGroup(-1, "tt0468569", userTest)
+                await cmdbServices.createGroup(userTest, groupBodyTest)
+                await cmdbServices.addMovieInGroup(userTest, -1, "tt0468569")
             } catch(e) {
                 await File.write(originalUsers, USERS_FILE)
                 await File.write(originalGroups, GROUPS_FILE)
@@ -675,8 +687,8 @@ describe("Services modules tests:", function() {
             // Act
             try {
                 await cmdbUserServices.createUser(userTest)
-                await cmdbServices.createGroup(groupBodyTest, userTest)
-                await cmdbServices.addMovieInGroup(newGroupId, "468569", userTest)
+                await cmdbServices.createGroup(userTest, groupBodyTest)
+                await cmdbServices.addMovieInGroup(userTest, newGroupId, "468569")
             } catch(e) {
                 await File.write(originalUsers, USERS_FILE)
                 await File.write(originalGroups, GROUPS_FILE)
@@ -725,9 +737,9 @@ describe("Services modules tests:", function() {
 
             // Act
             await cmdbUserServices.createUser(userTest)
-            await cmdbServices.createGroup(groupBodyTest, userTest)
-            await cmdbServices.addMovieInGroup(newGroupId, "tt0468569", userTest)
-            await cmdbServices.removeMovieInGroup(newGroupId, "tt0468569", userTest)
+            await cmdbServices.createGroup(userTest, groupBodyTest)
+            await cmdbServices.addMovieInGroup(userTest, newGroupId, "tt0468569")
+            await cmdbServices.removeMovieInGroup(userTest, newGroupId, "tt0468569")
 
             let cmdb_remove_movie_to_group = await File.read(GROUPS_FILE)
             cmdb_remove_movie_to_group = cmdb_remove_movie_to_group.groups.find(group => group.id == newGroupId)
@@ -753,9 +765,9 @@ describe("Services modules tests:", function() {
             //Act
             try {
                 await cmdbUserServices.createUser(userTest)
-                await cmdbServices.createGroup(groupBodyTest, userTest)
-                await cmdbServices.addMovieInGroup(newGroupId, "tt0468569", userTest)
-                await cmdbServices.removeMovieInGroup("AHHHHHHHHHHHHHHH", "tt0468569", userTest)
+                await cmdbServices.createGroup(userTest, groupBodyTest)
+                await cmdbServices.addMovieInGroup(userTest, newGroupId, "tt0468569")
+                await cmdbServices.removeMovieInGroup(userTest, "AHHHHHHHHHHHHHHH", "tt0468569")
             } catch(e) {
                 await File.write(originalUsers, USERS_FILE)
                 await File.write(originalGroups, GROUPS_FILE)
@@ -782,9 +794,9 @@ describe("Services modules tests:", function() {
             // Act
             try {
                 await cmdbUserServices.createUser(userTest)
-                await cmdbServices.createGroup(groupBodyTest, userTest)
-                await cmdbServices.addMovieInGroup(newGroupId, "tt0468569", userTest)
-                await cmdbServices.removeMovieInGroup(-1, "tt0468569", userTest)
+                await cmdbServices.createGroup(userTest, groupBodyTest)
+                await cmdbServices.addMovieInGroup(userTest, newGroupId, "tt0468569")
+                await cmdbServices.removeMovieInGroup(userTest, -1, "tt0468569")
             } catch(e) {
                 await File.write(originalUsers, USERS_FILE)
                 await File.write(originalGroups, GROUPS_FILE)
@@ -811,9 +823,9 @@ describe("Services modules tests:", function() {
             // Act
             try {
                 await cmdbUserServices.createUser(userTest)
-                await cmdbServices.createGroup(groupBodyTest, userTest)
-                await cmdbServices.addMovieInGroup(newGroupId, "tt0468569", userTest)
-                await cmdbServices.removeMovieInGroup(newGroupId, "468569", userTest)
+                await cmdbServices.createGroup(userTest, groupBodyTest)
+                await cmdbServices.addMovieInGroup(userTest, newGroupId, "tt0468569")
+                await cmdbServices.removeMovieInGroup(userTest, newGroupId, "468569")
             } catch(e) {
                 await File.write(originalUsers, USERS_FILE)
                 await File.write(originalGroups, GROUPS_FILE)

@@ -39,7 +39,7 @@ export default function (cmdbServices) {
 
     async function getPopularMoviesInternal(req, rsp) {
         const popularMovies = await cmdbServices.getPopularMovies(req.query.limit)
-        const viewData = {title: 'Popular Movies', movies: popularMovies}
+        const viewData = {title: 'Top 250 Most popular movies', movies: popularMovies}
         return View('popularMovies', viewData)
     }
 
@@ -140,8 +140,8 @@ export default function (cmdbServices) {
   
     /** 
      * Constructs a new View with the given name and data to send to response render function
-     * @param {*} viewName - identifies the uri end segment
-     * @param {*} viewData - object with data to send 
+     * @param {String} viewName - the name of the html/hbs view file
+     * @param {Object} viewData - object with data to render
      */
     function View(viewName, viewData) {
         return {
@@ -154,16 +154,15 @@ export default function (cmdbServices) {
         return async function(req, rsp) {
             // Hammered token
             req.token = "c64ae5a8-6f3e-11ed-a1eb-0242ac120002"
+            let view
             try {
-                let view = await handler(req, rsp)
-                if (view) {
-                    // Wrap the result in HTML format 
-                    rsp.render(view.name , view.data)
-                }
+                view = await handler(req, rsp)
             } catch(e) {
                 const httpResponse = translateToHTTPResponse(e)
-                rsp.render(httpResponse.status, httpResponse.body);
+                view = View('onError', httpResponse)
             }
+            // Wrap the result in HTML format 
+            rsp.render(view.name , view.data)
         }
     }
 }
