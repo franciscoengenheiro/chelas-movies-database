@@ -18,10 +18,7 @@ export default function (cmdbServices) {
     }
 
     return {
-        // getHome: getHome,
-        // getCss: getCss,
         getPopularMovies: handleResponseInHTML(getPopularMoviesInternal),
-        createUser: handleResponseInHTML(createUserInternal),
         searchMoviesByName: handleResponseInHTML(searchMoviesByNameInternal),
         getMovieDetails: handleResponseInHTML(getMovieDetailsInternal),
         createGroup: handleResponseInHTML(createGroupInternal),
@@ -35,10 +32,6 @@ export default function (cmdbServices) {
         searchMovieToAdd: handleResponseInHTML(searchMovieToAdd),
         addMovieInGroup: handleResponseInHTML(addMovieInGroupInternal),
         removeMovieInGroup: handleResponseInHTML(removeMovieInGroupInternal)
-    }
-
-    async function createUserInternal(req, rsp) {
-        // TODO()
     }
 
     async function getPopularMoviesInternal(req, rsp) {
@@ -157,7 +150,7 @@ export default function (cmdbServices) {
     function handleResponseInHTML(handler) {
         return async function(req, rsp) {
             // Hammered token
-            req.token = "c64ae5a8-6f3e-11ed-a1eb-0242ac120002"
+            req.token = "c64ae5a8-6f3e-11ed-a1eb-0242ac120002" //req.user.token
             let view
             try {
                 view = await handler(req, rsp)

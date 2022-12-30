@@ -6,7 +6,7 @@
 import errors from '../errors/errors.mjs'
 
 // Constants
-const IMDB_KEY = "k_lcs891ko" // "k_jtqnxg0w"
+const IMDB_KEY = "k_jtqnxg0w" // "k_lcs891ko"
 export const MOST_POPULAR_MOVIES = `https://imdb-api.com/en/API/Top250Movies/${IMDB_KEY}`
 export const MOVIES_SEARCHED_BY_NAME = `https://imdb-api.com/en/API/SearchMovie/${IMDB_KEY}/`
 export const MOVIES_INFO = `https://imdb-api.com/en/API/Title/${IMDB_KEY}/`

@@ -162,7 +162,10 @@ export default function(imdbData, cmdbData, usersData) {
             let userToken = serviceArgs[0]
             // Verify if the user exists, if there's an error the promise will be rejected and 
             // returned to the top
-            let user = await usersData.checkUserData(userToken)
+            let user = await usersData.getUserData(userToken)
+            if(!user) {
+                throw errors.USER_NOT_FOUND(userToken)
+            }
             // Override first service argument which is the userToken with the actual user id
             // since the user was verified
             serviceArgs[0] = user.id

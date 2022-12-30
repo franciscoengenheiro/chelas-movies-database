@@ -37,17 +37,3 @@ export async function getUserData(userToken) {
     let usersObj = await File.read(USERS_FILE)
     return usersObj.users.find(user => user.token == userToken)
 }
-
-/**
- * Checks if the user exists in local storage
- * @param {String} userToken token used to identify a user
- * @throws UserNotFoundException if the received token is invalid
- * @returns The user found
- */
-export async function checkUserData(userToken) {
-    let user = await getUserData(userToken)
-    if(!user) {
-        throw errors.USER_NOT_FOUND(userToken)
-    }
-    return user
-}

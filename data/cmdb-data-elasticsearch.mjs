@@ -46,7 +46,23 @@ async function createGroupData(obj, userId) {
  * @returns an array with the search result
  */
 async function getGroupsData(userId) {
-    let groupsObj = await fetch(GROUPS_BASE_URL + '/_search?q=userId:' + userId)
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            "query": {
+                "match": {
+                    "userId": {
+                        "query": userId,
+                        "operator": "AND"
+                    }
+                }
+            }
+        })
+    }
+    let groupsObj = await fetch(GROUPS_BASE_URL + '/_search', options)
     // Retrieve only the groups that belong to the user and modify each group object
     // to only show selected properties
     groupsObj.hits.hits = groupsObj.hits.hits
@@ -72,13 +88,13 @@ async function getGroupDetailsData(groupId, userId) {
     let groupsObj = await fetch(GROUPS_BASE_URL + '/_doc/' + groupId)
     // Start a counter
     let totalDuration = 0
-    // Checks if the group is from the corresponding user
-    if(groupsObj._source.userId != userId) {
-        throw errors.INVALID_USER("userId")
-    }
     // Checks if group exists
     if (!groupsObj.found) {
         throw errors.ARGUMENT_NOT_FOUND("group")
+    }
+    // Checks if the group is from the corresponding user
+    if(groupsObj._source.userId != userId) {
+        throw errors.INVALID_USER("userId")
     }
     // Create the new group object
     let newGroup = {

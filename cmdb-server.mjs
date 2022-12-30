@@ -15,6 +15,7 @@ import hbs from 'hbs'
 import path from 'path'
 import url from 'url'
 import cookieParser from 'cookie-parser'
+import passport from 'passport'
 import session from 'express-session'
 
 // Internal imports
@@ -25,6 +26,7 @@ import cmdbUsersElastiSearchInit from './data/cmdb-users-elasticsearch.mjs'
 import cmdbDataElasticSearchInit from './data/cmdb-data-elasticsearch.mjs'
 import imdbDataInit from './data/cmdb-movies-data.mjs'
 import cmdbServicesInit from './services/cmdb-services.mjs' 
+import cmdbUsersWebSiteInit from './web/site/cmdb-users-web-site.mjs'
 import cmdbWebApiInit from './web/api/cmdb-web-api.mjs'
 import cmdbWebSiteInit from './web/site/cmdb-web-site.mjs'
 
@@ -38,6 +40,7 @@ const imdbData = imdbDataInit(fetch)
 const cmdbServices = cmdbServicesInit(imdbData, cmdbData, usersData)
 const cmdbWebApi = cmdbWebApiInit(cmdbServices, userServices)
 const cmdbWebSite = cmdbWebSiteInit(cmdbServices)
+const cmdbUserWebSite = cmdbUsersWebSiteInit(userServices)
 
 // Constants
 const PORT = 1904
@@ -69,12 +72,28 @@ app.use(express.urlencoded( { extended: false})) // Parses incoming requests wit
                               // Content-Type of the request header matches this option 
 app.use(cookieParser()) // Parses Cookie Header and populates req.cookies with an object 
                         // keyed by the cookie names
+app.use(session({
+    secret: 'leic-ipw-g06',
+    resave: false,
+    saveUninitialized: false
+}));
+app.use(passport.session()) // Passport initialization
+app.use(passport.initialize())
 // ------------------------------------ Middlewares --------------------------------------------
 
+app.use(express.static(path.join(__dirname, 'web', 'site')));
+
 // -------------------------------------- WebSite ----------------------------------------------
-//app.get('/home', cmdbWebSite.getHome)
-//app.get('/site.css', cmdbWebSite.getCss)
-//app.post('/users', cmdbWebSite.createUser)
+// --------------------------------------Public Website-----------------------------------------
+app.get('/home', cmdbUserWebSite.homeNotAuthenticated)
+app.use('/auth', cmdbUserWebSite.verifyAuthenticated)
+// --------------------------------------Public Website-----------------------------------------
+// --------------------------------------Private Website----------------------------------------
+app.get('/auth/home', cmdbUserWebSite.homeAuthenticated)
+app.get('/login', cmdbUserWebSite.loginForm)
+app.post('/login', cmdbUserWebSite.validateLogin)
+app.post('/logout', cmdbUserWebSite.logout)
+app.post('/users', cmdbUserWebSite.createUser)
 app.get('/movies', cmdbWebSite.getPopularMovies)
 app.get('/movies/search/:moviesName', cmdbWebSite.searchMoviesByName)
 app.get('/movies/find/:movieId', cmdbWebSite.getMovieDetails)
@@ -89,6 +108,7 @@ app.get('/groups/:groupId/movies/addMovie', cmdbWebSite.addMovie)
 app.get('/groups/:groupId/movies/searchTheMovie', cmdbWebSite.searchMovieToAdd)
 app.post('/groups/:groupId/movies', cmdbWebSite.addMovieInGroup)
 app.post('/groups/:groupId/movies/:movieId', cmdbWebSite.removeMovieInGroup)
+// --------------------------------------Private Website----------------------------------------
 // -------------------------------------- WebSite ----------------------------------------------
 
 // -------------------------------------- WebApi -----------------------------------------------

@@ -38,7 +38,7 @@ export async function getGroupsData(userId) {
     // Retrieve only the groups that belong to the user and modify each group object
     // to only show selected properties
     groupsObj.groups = groupsObj.groups
-        .filter(group => group.userId == userId) 
+        .filter(group => group.userId == userId)
         .map(group => {
             return {
                 id: group.id,
