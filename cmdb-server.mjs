@@ -19,18 +19,21 @@ import session from 'express-session'
 
 // Internal imports
 import * as userServices from './services/cmdb-users-services.mjs'
-import * as usersData from './data/cmdb-users-data.mjs'
-//import * as cmdbData from './data/cmdb-data-mem.mjs'
-import cmdbDataElasticsearchInit from './data/cmdb-data-elasticsearch.mjs'
+// import * as usersData from './data/cmdb-users-data.mjs'
+// import * as cmdbData from './data/cmdb-data-mem.mjs'
+import cmdbUsersElastiSearchInit from './data/cmdb-users-elasticsearch.mjs'
+import cmdbDataElasticSearchInit from './data/cmdb-data-elasticsearch.mjs'
 import imdbDataInit from './data/cmdb-movies-data.mjs'
 import cmdbServicesInit from './services/cmdb-services.mjs' 
 import cmdbWebApiInit from './web/api/cmdb-web-api.mjs'
 import cmdbWebSiteInit from './web/site/cmdb-web-site.mjs'
 
+// Fetch
 import fetch from './data/node-fetch.mjs'
 // import fetch from './data/local-fetch.mjs'
 
-const cmdbData = cmdbDataElasticsearchInit()
+const usersData = cmdbUsersElastiSearchInit()
+const cmdbData = cmdbDataElasticSearchInit()
 const imdbData = imdbDataInit(fetch)
 const cmdbServices = cmdbServicesInit(imdbData, cmdbData, usersData)
 const cmdbWebApi = cmdbWebApiInit(cmdbServices, userServices)
@@ -41,7 +44,7 @@ const PORT = 1904
 
 console.log("-------------- Start setting up server --------------")
 
-let app = express() // Instance of the HTTP application
+let app = express() // Instance of the application
  
 // View engine setup
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));

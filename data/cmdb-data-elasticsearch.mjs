@@ -1,12 +1,11 @@
 'use strict'
 
 import errors from '../errors/errors.mjs'
-import * as File from './file-operations.mjs'
 import fetch from './node-fetch.mjs'
 
-// Constants
-const GROUPS_BASE_URL = 'http://localhost:9200/groups'
-const REFRESH = 'refresh=wait_for'
+export const baseURL = 'http://localhost:9200'
+export const REFRESH = '?refresh=wait_for'
+const GROUPS_BASE_URL = `${baseURL}/groups`
 
 export default function() {
     return {
@@ -37,7 +36,7 @@ async function createGroupData(obj, userId) {
         },
         body: JSON.stringify(obj)
     }
-    await fetch(GROUPS_BASE_URL + '/_doc', options)
+    await fetch(GROUPS_BASE_URL + '/_doc' + REFRESH, options)
     return obj
 }
 
@@ -47,7 +46,7 @@ async function createGroupData(obj, userId) {
  * @returns an array with the search result
  */
 async function getGroupsData(userId) {
-    let groupsObj = await fetch(GROUPS_BASE_URL + '/_search?q=' + userId)
+    let groupsObj = await fetch(GROUPS_BASE_URL + '/_search?q=userId:' + userId)
     // Retrieve only the groups that belong to the user and modify each group object
     // to only show selected properties
     groupsObj.hits.hits = groupsObj.hits.hits
@@ -123,7 +122,7 @@ async function editGroupData(groupId, obj, userId) {
         },
         body: JSON.stringify(groupObj._source)
     }
-    groupObj = await fetch(GROUPS_BASE_URL + '/_doc/' + groupId, options)
+    groupObj = await fetch(GROUPS_BASE_URL + '/_doc/' + groupId + REFRESH, options)
     return groupObj._source
 }
 
@@ -144,7 +143,7 @@ async function deleteGroupData(groupId, userId) {
         throw errors.INVALID_USER("userId")
     }
     // Delete group from storage
-    return fetch(GROUPS_BASE_URL + '/_doc/' + groupId, {method: 'DELETE'})
+    return fetch(GROUPS_BASE_URL + '/_doc/' + groupId + REFRESH, {method: 'DELETE'})
 }
 
 /**
@@ -183,7 +182,7 @@ async function addMovieInGroupData(groupId, movieId, moviesObj, userId) {
         },
         body: JSON.stringify(groupObj._source)
     }
-    await fetch(GROUPS_BASE_URL + '/_doc/' + groupId, options) 
+    await fetch(GROUPS_BASE_URL + '/_doc/' + groupId + REFRESH, options) 
 }
 
 /**
@@ -217,6 +216,6 @@ async function removeMovieInGroupData(groupId, movieId, userId) {
             },
             body: JSON.stringify(groupsObj._source)
         }
-        return fetch(GROUPS_BASE_URL + '/_doc/' + groupId, options)
+        return fetch(GROUPS_BASE_URL + '/_doc/' + groupId + REFRESH, options)
     }
 }

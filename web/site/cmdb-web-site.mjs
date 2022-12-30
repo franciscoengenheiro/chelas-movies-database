@@ -18,23 +18,27 @@ export default function (cmdbServices) {
     }
 
     return {
-//       getHome: getHome,
-//       getCss: getCss,
-       getPopularMovies: handleResponseInHTML(getPopularMoviesInternal),
-//       createUser: handleResponseInHTML(createUserInternal),
-       searchMoviesByName: handleResponseInHTML(searchMoviesByNameInternal),
-       getMovieDetails: handleResponseInHTML(getMovieDetailsInternal),
-       createGroup: handleResponseInHTML(createGroupInternal),
-       getNewGroup: getNewGroup,
-       getGroups: handleResponseInHTML(getGroupsInternal),
-       getGroupDetails: handleResponseInHTML(getGroupDetailsInternal),
-       editGroup: handleResponseInHTML(editGroupInternal),
-       getEditGroup: handleResponseInHTML(getEditGroup),
-       deleteGroup: handleResponseInHTML(deleteGroupInternal),
-       addMovie: addMovie,
-       searchMovieToAdd: handleResponseInHTML(searchMovieToAdd),
-       addMovieInGroup: handleResponseInHTML(addMovieInGroupInternal),
-       removeMovieInGroup: handleResponseInHTML(removeMovieInGroupInternal)
+        // getHome: getHome,
+        // getCss: getCss,
+        getPopularMovies: handleResponseInHTML(getPopularMoviesInternal),
+        createUser: handleResponseInHTML(createUserInternal),
+        searchMoviesByName: handleResponseInHTML(searchMoviesByNameInternal),
+        getMovieDetails: handleResponseInHTML(getMovieDetailsInternal),
+        createGroup: handleResponseInHTML(createGroupInternal),
+        getNewGroup: getNewGroup,
+        getGroups: handleResponseInHTML(getGroupsInternal),
+        getGroupDetails: handleResponseInHTML(getGroupDetailsInternal),
+        editGroup: handleResponseInHTML(editGroupInternal),
+        getEditGroup: handleResponseInHTML(getEditGroup),
+        deleteGroup: handleResponseInHTML(deleteGroupInternal),
+        addMovie: addMovie,
+        searchMovieToAdd: handleResponseInHTML(searchMovieToAdd),
+        addMovieInGroup: handleResponseInHTML(addMovieInGroupInternal),
+        removeMovieInGroup: handleResponseInHTML(removeMovieInGroupInternal)
+    }
+
+    async function createUserInternal(req, rsp) {
+        // TODO()
     }
 
     async function getPopularMoviesInternal(req, rsp) {
