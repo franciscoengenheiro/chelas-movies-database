@@ -19,7 +19,7 @@ import passport from 'passport'
 import session from 'express-session'
 
 // Internal imports
-import * as userServices from './services/cmdb-users-services.mjs'
+import cmdbUserServicesInit from './services/cmdb-users-services.mjs'
 // import * as usersData from './data/cmdb-users-data.mjs'
 // import * as cmdbData from './data/cmdb-data-mem.mjs'
 import cmdbUsersElastiSearchInit from './data/cmdb-users-elasticsearch.mjs'
@@ -38,9 +38,10 @@ const usersData = cmdbUsersElastiSearchInit()
 const cmdbData = cmdbDataElasticSearchInit()
 const imdbData = imdbDataInit(fetch)
 const cmdbServices = cmdbServicesInit(imdbData, cmdbData, usersData)
-const cmdbWebApi = cmdbWebApiInit(cmdbServices, userServices)
+const cmdbUserServices = cmdbUserServicesInit(usersData)
+const cmdbWebApi = cmdbWebApiInit(cmdbServices, cmdbUserServices)
 const cmdbWebSite = cmdbWebSiteInit(cmdbServices)
-const cmdbUserWebSite = cmdbUsersWebSiteInit(userServices)
+const cmdbUserWebSite = cmdbUsersWebSiteInit(cmdbUserServices)
 
 // Constants
 const PORT = 1904
@@ -93,21 +94,24 @@ app.get('/auth/home', cmdbUserWebSite.homeAuthenticated)
 app.get('/login', cmdbUserWebSite.loginForm)
 app.post('/login', cmdbUserWebSite.validateLogin)
 app.post('/logout', cmdbUserWebSite.logout)
+app.get('/users/newUser',cmdbUserWebSite.newUser)
 app.post('/users', cmdbUserWebSite.createUser)
+app.get('/movies/limit', cmdbWebSite.limitForMovies)
 app.get('/movies', cmdbWebSite.getPopularMovies)
-app.get('/movies/search/:moviesName', cmdbWebSite.searchMoviesByName)
+app.get('/movies/search/limit', cmdbWebSite.limitForSearch)
+app.get('/movies/search/:movieName', cmdbWebSite.searchMoviesByName)
 app.get('/movies/find/:movieId', cmdbWebSite.getMovieDetails)
-app.post('/groups', cmdbWebSite.createGroup)
-app.get('/groups/newGroup', cmdbWebSite.getNewGroup)
-app.get('/groups', cmdbWebSite.getGroups)
-app.get('/groups/:groupId', cmdbWebSite.getGroupDetails)
-app.post('/groups/:groupId/edit', cmdbWebSite.editGroup)
-app.get('/groups/:groupId/editGroup', cmdbWebSite.getEditGroup)
-app.post('/groups/:groupId/delete', cmdbWebSite.deleteGroup)
-app.get('/groups/:groupId/movies/addMovie', cmdbWebSite.addMovie)
-app.get('/groups/:groupId/movies/searchTheMovie', cmdbWebSite.searchMovieToAdd)
-app.post('/groups/:groupId/movies', cmdbWebSite.addMovieInGroup)
-app.post('/groups/:groupId/movies/:movieId', cmdbWebSite.removeMovieInGroup)
+app.post('/auth/groups', cmdbWebSite.createGroup)
+app.get('/auth/groups/newGroup', cmdbWebSite.getNewGroup)
+app.get('/auth/groups', cmdbWebSite.getGroups)
+app.get('/auth/groups/:groupId', cmdbWebSite.getGroupDetails)
+app.post('/auth/groups/:groupId/edit', cmdbWebSite.editGroup)
+app.get('/auth/groups/:groupId/editGroup', cmdbWebSite.getEditGroup)
+app.post('/auth/groups/:groupId/delete', cmdbWebSite.deleteGroup)
+app.get('/auth/groups/:groupId/movies/addMovie', cmdbWebSite.addMovie)
+app.get('/auth/groups/:groupId/movies/searchTheMovie', cmdbWebSite.searchMovieToAdd)
+app.post('/auth/groups/:groupId/movies', cmdbWebSite.addMovieInGroup)
+app.post('/auth/groups/:groupId/movies/:movieId', cmdbWebSite.removeMovieInGroup)
 // --------------------------------------Private Website----------------------------------------
 // -------------------------------------- WebSite ----------------------------------------------
 

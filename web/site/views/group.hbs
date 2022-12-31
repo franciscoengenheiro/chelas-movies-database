@@ -1,13 +1,13 @@
-<form action="/groups" method="GET">
+<form action="/auth/groups" method="GET">
     <input type="submit" value="Back">
 </form>
 
 <h2>{{group.name}}</h2>
 
-<form action="/groups/{{id}}/editGroup" method="GET">
+<form action="/auth/groups/{{id}}/editGroup" method="GET">
   <input type="submit" value="Edit">
 </form>
-<form action="/groups/{{id}}/delete" method="POST">
+<form action="/auth/groups/{{id}}/delete" method="POST">
   <input type="submit" value="Delete">
 </form>
 
@@ -18,7 +18,7 @@
   {{#each group.movies}}
     <li>
       <h4><a href="/movies/find/{{id}}">{{title}}</a></h4>
-      <form action="/groups/{{../id}}/movies/{{id}}" method="POST">
+      <form action="/auth/groups/{{../id}}/movies/{{id}}" method="POST">
         <input type="submit" value="Remove">
       </form>
     </li>

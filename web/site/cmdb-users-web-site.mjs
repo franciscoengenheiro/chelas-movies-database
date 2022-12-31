@@ -6,7 +6,7 @@ export default function(userServices) {
         throw errors.INVALID_ARGUMENT("userServices")
     }
     return {
-        createUser: createUser,
+        newUser: newUserInternal,
         createUser: createUserInternal,
         homeNotAuthenticated: homeNotAuthenticatedInternal,
         verifyAuthenticated: verifyAuthenticatedInternal,
@@ -16,12 +16,15 @@ export default function(userServices) {
         logout: logoutInternal
     }
 
-    function createUser(req, rsp) {
+    function newUserInternal(req, rsp) {
         rsp.render('newUser')
     }
 
     async function createUserInternal(req, rsp) {
-        const newUser = await userServices.createUser()
+        const username = req.body.username
+        const password = req.body.password
+        const newUser = await userServices.createUser(username, password)
+        rsp.redirect('/home')
     }
 
     function homeNotAuthenticatedInternal(req, rsp) {
@@ -38,41 +41,18 @@ export default function(userServices) {
     }
 
     async function validateUser(username, password) {
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                "query": {
-                    "match": {
-                        "token": {
-                            "query": username,
-                            "operator": "AND"
-                        }
-                    }
-                }
-            })
-        }
-        let userObj = await fetch(USERS_BASE_URL + '/_search', options)
-        let user = {}
-        if(userObj.hits.hits.length == 1){
-            user = userObj.hits.hits[0]._source
-        }
-        if(user.password == password) return user
-        
-        return undefined
+        return userServices.checkUser(username, password)
     }
 
-    function validateLoginInternal(req, rsp) {
-        let user = validateUser(req.body.username, req.body.password)
+    async function validateLoginInternal(req, rsp) {
+        let user = await validateUser(req.body.username, req.body.password)
         if(user) {
             // Represents a user in the CMDB application
             // Passport saves this object in session, and when the request arrives and while the 
             // session for this user is active, the data can be accessed in req.user
             req.login({
                 username: user.username,
-                token: Crypto.randomUUID()
+                token: user.token
             }), () => rsp.redirect('/auth/home')
         }
     }

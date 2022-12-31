@@ -63,6 +63,9 @@ async function getGroupsData(userId) {
         })
     }
     let groupsObj = await fetch(GROUPS_BASE_URL + '/_search', options)
+    if(groupsObj.hits.hits.length == 0){
+        throw errors.ARGUMENT_NOT_FOUND("groups")
+    }
     // Retrieve only the groups that belong to the user and modify each group object
     // to only show selected properties
     groupsObj.hits.hits = groupsObj.hits.hits

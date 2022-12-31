@@ -18,7 +18,9 @@ export default function (cmdbServices) {
     }
 
     return {
+        limitForMovies: limitForMovies,
         getPopularMovies: handleResponseInHTML(getPopularMoviesInternal),
+        limitForSearch: limitForSearch,
         searchMoviesByName: handleResponseInHTML(searchMoviesByNameInternal),
         getMovieDetails: handleResponseInHTML(getMovieDetailsInternal),
         createGroup: handleResponseInHTML(createGroupInternal),
@@ -34,15 +36,27 @@ export default function (cmdbServices) {
         removeMovieInGroup: handleResponseInHTML(removeMovieInGroupInternal)
     }
 
+    async function limitForMovies(req, rsp) {
+        rsp.render('limitForMovies')
+    }
+
     async function getPopularMoviesInternal(req, rsp) {
-        const popularMovies = await cmdbServices.getPopularMovies(req.query.limit)
+        const limit = req.query.limit
+        const popularMovies = await cmdbServices.getPopularMovies(limit)
         const viewData = {title: 'Top 250 Most popular movies', movies: popularMovies}
         return View('popularMovies', viewData)
     }
 
+    async function limitForSearch(req, rsp) {
+        const movie = req.query.movieName
+        const viewData = {movie: movie}
+        rsp.render('limitForSearch', viewData)
+    }
+
     async function searchMoviesByNameInternal(req, rsp) {
-        const movieName = req.params.moviesName
-        const movies = await cmdbServices.searchMoviesByName(movieName, req.query.limit)
+        const movieName = req.query.movieName
+        const limit = req.query.limit
+        const movies = await cmdbServices.searchMoviesByName(movieName, limit)
         const viewData = {title: movieName, movies: movies}
         return View('searchMovies', viewData)
     }
@@ -149,8 +163,7 @@ export default function (cmdbServices) {
 
     function handleResponseInHTML(handler) {
         return async function(req, rsp) {
-            // Hammered token
-            req.token = "c64ae5a8-6f3e-11ed-a1eb-0242ac120002" //req.user.token
+            req.token = "c64ae5a8-6f3e-11ed-a1eb-0242ac120002"//req.user.token
             let view
             try {
                 view = await handler(req, rsp)
