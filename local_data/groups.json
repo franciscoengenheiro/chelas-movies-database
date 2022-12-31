@@ -1,71 +1,11 @@
 {
-    "IDs": 9,
+    "IDs": 1,
     "groups": [
         {
-            "name": "Horror Movies",
-            "description": "Top 10 horror movies",
-            "id": 2,
-            "movies": [
-                {
-                    "id": "tt0468569",
-                    "title": "The Dark Knight",
-                    "duration": "152"
-                },
-                {
-                    "id": "tt3065204",
-                    "title": "The Conjuring 2",
-                    "duration": "134"
-                }
-            ],
-            "userId": 1
-        },
-        {
-            "name": "My movies",
-            "description": "my movies :)",
-            "id": 3,
-            "movies": [
-                {
-                    "id": "tt0489270",
-                    "title": "Saw III",
-                    "duration": "108"
-                }
-            ],
-            "userId": 1
-        },
-        {
-            "name": "Nostalgia Group",
-            "description": "2005-2012 films",
-            "id": 6,
-            "movies": [
-                {
-                    "id": "tt0382932",
-                    "title": "Ratatouille",
-                    "duration": "111"
-                },
-                {
-                    "id": "tt0317705",
-                    "title": "The Incredibles",
-                    "duration": "115"
-                }
-            ],
-            "userId": 1
-        },
-        {
-            "name": "Best Movies",
-            "description": "My favourite Movies",
-            "id": 8,
-            "movies": [
-                {
-                    "id": "tt0499549",
-                    "title": "Avatar",
-                    "duration": "162"
-                },
-                {
-                    "id": "tt1630029",
-                    "title": "Avatar: The Way of Water",
-                    "duration": "192"
-                }
-            ],
+            "name": "Natal Group",
+            "description": "YAY",
+            "id": 1,
+            "movies": [],
             "userId": 1
         }
     ]

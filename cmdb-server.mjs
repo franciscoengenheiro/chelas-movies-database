@@ -20,8 +20,8 @@ import session from 'express-session'
 
 // Internal imports
 import cmdbUserServicesInit from './services/cmdb-users-services.mjs'
-// import * as usersData from './data/cmdb-users-data.mjs'
-// import * as cmdbData from './data/cmdb-data-mem.mjs'
+//import * as usersData from './data/cmdb-users-data.mjs'
+//import * as cmdbData from './data/cmdb-data-mem.mjs'
 import cmdbUsersElastiSearchInit from './data/cmdb-users-elasticsearch.mjs'
 import cmdbDataElasticSearchInit from './data/cmdb-data-elasticsearch.mjs'
 import imdbDataInit from './data/cmdb-movies-data.mjs'
@@ -73,6 +73,10 @@ app.use(express.urlencoded( { extended: false})) // Parses incoming requests wit
                               // Content-Type of the request header matches this option 
 app.use(cookieParser()) // Parses Cookie Header and populates req.cookies with an object 
                         // keyed by the cookie names
+
+passport.serializeUser((userInfo, done) => { done(null, userInfo); });
+passport.deserializeUser((userInfo, done) => { done(null, userInfo); });
+
 app.use(session({
     secret: 'leic-ipw-g06',
     resave: false,

@@ -23,7 +23,7 @@ export default function(userServices) {
     async function createUserInternal(req, rsp) {
         const username = req.body.username
         const password = req.body.password
-        const newUser = await userServices.createUser(username, password)
+        await userServices.createUser(username, password)
         rsp.redirect('/home')
     }
 
@@ -41,7 +41,15 @@ export default function(userServices) {
     }
 
     async function validateUser(username, password) {
-        return userServices.checkUser(username, password)
+        let user = await userServices.getUser(username)
+
+        console.log(user)
+
+        if(user.password != password){
+            return undefined
+        }
+
+        return user
     }
 
     async function validateLoginInternal(req, rsp) {
@@ -53,7 +61,7 @@ export default function(userServices) {
             req.login({
                 username: user.username,
                 token: user.token
-            }), () => rsp.redirect('/auth/home')
+            }, () => rsp.redirect('/auth/home'))
         }
     }
     

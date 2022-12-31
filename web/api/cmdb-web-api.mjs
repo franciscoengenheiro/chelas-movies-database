@@ -25,22 +25,22 @@ export default function(cmdbServices, cmdbUserServices) {
     }
 
     return {
-        createUser: handleResponseInJSON(createUserInternal),
-        getPopularMovies: handleResponseInJSON(getPopularMoviesInternal),
-        searchMoviesByName: handleResponseInJSON(searchMoviesByNameInternal),
-        getMovieDetails: handleResponseInJSON(getMovieDetailsInternal),
-        createGroup: handleResponseInJSON(createGroupInternal),
-        getGroups: handleResponseInJSON(getGroupsInternal),
-        getGroupDetails: handleResponseInJSON(getGroupDetailsInternal),
-        editGroup: handleResponseInJSON(editGroupInternal),
-        deleteGroup: handleResponseInJSON(deleteGroupInternal),
-        addMovieInGroup: handleResponseInJSON(addMovieInGroupInternal),
-        removeMovieInGroup: handleResponseInJSON(removeMovieInGroupInternal)
+        createUser: handleRequestInJSON(createUserInternal),
+        getPopularMovies: handleRequestInJSON(getPopularMoviesInternal),
+        searchMoviesByName: handleRequestInJSON(searchMoviesByNameInternal),
+        getMovieDetails: handleRequestInJSON(getMovieDetailsInternal),
+        createGroup: verifyAuthentication(createGroupInternal),
+        getGroups: verifyAuthentication(getGroupsInternal),
+        getGroupDetails: verifyAuthentication(getGroupDetailsInternal),
+        editGroup: verifyAuthentication(editGroupInternal),
+        deleteGroup: verifyAuthentication(deleteGroupInternal),
+        addMovieInGroup: verifyAuthentication(addMovieInGroupInternal),
+        removeMovieInGroup: verifyAuthentication(removeMovieInGroupInternal)
     }
 
     // Functions:
     async function createUserInternal(req, rsp) {
-        let newUser = await cmdbUserServices.createUser(req.token)  
+        let newUser = await cmdbUserServices.createUser()
         rsp.status(201)
         return {
             message: `User created`,
@@ -106,9 +106,9 @@ export default function(cmdbServices, cmdbUserServices) {
             message: `Movie deleted with success`
         } 
     }
-    
-    function handleResponseInJSON(handler) {
-        return async function(req, rsp) {
+
+    function verifyAuthentication(handler){
+        return async function(req, rsp){
             const BEARER_STR = "Bearer "
             // Get the value of the Authorization request header
             const tokenHeader = req.get("Authorization")
@@ -123,6 +123,15 @@ export default function(cmdbServices, cmdbUserServices) {
             // Retrieve token with the expected format: Bearer <token> and create a property in the 
             // request object to easily retrieve it
             req.token = tokenHeader.split(" ")[1]
+    
+            const requestHandler = handleRequestInJSON(handler)
+
+            return requestHandler(req, rsp)
+        }
+    }
+    
+    function handleRequestInJSON(handler) {
+        return async function(req, rsp){
             try {
                 // With a token the actual function can be called
                 let body = await handler(req, rsp)

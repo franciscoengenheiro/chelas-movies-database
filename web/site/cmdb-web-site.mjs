@@ -19,21 +19,21 @@ export default function (cmdbServices) {
 
     return {
         limitForMovies: limitForMovies,
-        getPopularMovies: handleResponseInHTML(getPopularMoviesInternal),
+        getPopularMovies: handleRequestInHTML(getPopularMoviesInternal),
         limitForSearch: limitForSearch,
-        searchMoviesByName: handleResponseInHTML(searchMoviesByNameInternal),
-        getMovieDetails: handleResponseInHTML(getMovieDetailsInternal),
-        createGroup: handleResponseInHTML(createGroupInternal),
+        searchMoviesByName: handleRequestInHTML(searchMoviesByNameInternal),
+        getMovieDetails: handleRequestInHTML(getMovieDetailsInternal),
+        createGroup: verifyAuthentication(createGroupInternal),
         getNewGroup: getNewGroup,
-        getGroups: handleResponseInHTML(getGroupsInternal),
-        getGroupDetails: handleResponseInHTML(getGroupDetailsInternal),
-        editGroup: handleResponseInHTML(editGroupInternal),
-        getEditGroup: handleResponseInHTML(getEditGroup),
-        deleteGroup: handleResponseInHTML(deleteGroupInternal),
+        getGroups: verifyAuthentication(getGroupsInternal),
+        getGroupDetails: verifyAuthentication(getGroupDetailsInternal),
+        editGroup: verifyAuthentication(editGroupInternal),
+        getEditGroup: verifyAuthentication(getEditGroup),
+        deleteGroup: verifyAuthentication(deleteGroupInternal),
         addMovie: addMovie,
-        searchMovieToAdd: handleResponseInHTML(searchMovieToAdd),
-        addMovieInGroup: handleResponseInHTML(addMovieInGroupInternal),
-        removeMovieInGroup: handleResponseInHTML(removeMovieInGroupInternal)
+        searchMovieToAdd: verifyAuthentication(searchMovieToAdd),
+        addMovieInGroup: verifyAuthentication(addMovieInGroupInternal),
+        removeMovieInGroup: verifyAuthentication(removeMovieInGroupInternal)
     }
 
     async function limitForMovies(req, rsp) {
@@ -161,9 +161,18 @@ export default function (cmdbServices) {
         }
     }
 
-    function handleResponseInHTML(handler) {
+    function verifyAuthentication(handler){
+        return async function(req, rsp){
+            req.token = req.user.token
+
+            let requestHandler = handleRequestInHTML(handler)
+
+            requestHandler(req, rsp)
+        }
+    }
+
+    function handleRequestInHTML(handler) {
         return async function(req, rsp) {
-            req.token = "c64ae5a8-6f3e-11ed-a1eb-0242ac120002"//req.user.token
             let view
             try {
                 view = await handler(req, rsp)

@@ -22,7 +22,7 @@ export default function() {
         let user = {
             username: username,
             password: password,
-            token: Crypto.randomUUID()
+            token: crypto.randomUUID()
         }
 
         let options = {
@@ -32,8 +32,8 @@ export default function() {
             },
             body: JSON.stringify(user)
         }
-        await fetch(USERS_BASE_URL + '/_doc' + REFRESH, options)
-        return obj
+        let obj = await fetch(USERS_BASE_URL + '/_doc' + REFRESH, options)
+        return getUserData(user.token)
     }
 
     /**
@@ -41,7 +41,9 @@ export default function() {
      * @param {String} userToken token used to identify a user
      * @returns the user found or undefined
      */
-    async function getUserData(username, password) {
+    async function getUserData(query_value) {
+        if(query_value == undefined) return undefined
+
         const options = {
             method: 'POST',
             headers: {
@@ -49,25 +51,20 @@ export default function() {
             },
             body: JSON.stringify({
                 "query": {
-                    "match": {
-                        "token": {
-                            "query": username,
-                            "operator": "AND"
-                        }
+                    "multi_match": {
+                        "query": query_value,
+                        "fields": ["username.keyword", "token.keyword"]
                     }
                 }
             })
         }
         let userObj = await fetch(USERS_BASE_URL + '/_search', options)
-        let user = {}
+        let user = undefined
         if(userObj.hits.hits.length == 1){
             user = userObj.hits.hits[0]._source
-        }
-        if(user.password == password){
             user.id = userObj.hits.hits[0]._id
-            return user
-        } 
+        }
         
-        return undefined
+        return user
     }
 }

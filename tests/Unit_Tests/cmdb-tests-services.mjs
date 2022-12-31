@@ -3,15 +3,15 @@
 'use strict'
 
 import * as assert from "assert"
-import * as File from "../data/file-operations.mjs"
+import * as File from "../../data/file-operations.mjs"
 
-import * as cmdbUserServices from '../services/cmdb-users-services.mjs'
-import cmdbServicesInit from '../services/cmdb-services.mjs' 
-import * as usersData from '../data/cmdb-users-data.mjs'
-import * as cmdbData from '../data/cmdb-data-mem.mjs'
-import imdbDataInit from '../data/cmdb-movies-data.mjs'
-import fetch from '../data/local-fetch.mjs'
-import errors from '../errors/errors.mjs'
+import * as cmdbUserServices from '../../services/cmdb-users-services.mjs'
+import cmdbServicesInit from '../../services/cmdb-services.mjs' 
+import * as usersData from '../../data/cmdb-users-data.mjs'
+import * as cmdbData from '../../data/cmdb-data-mem.mjs'
+import imdbDataInit from '../../data/cmdb-movies-data.mjs'
+import fetch from '../../data/local-fetch.mjs'
+import errors from '../../errors/errors.mjs'
 
 const imdbData = imdbDataInit(fetch)
 const cmdbServices = cmdbServicesInit(imdbData, cmdbData, usersData)

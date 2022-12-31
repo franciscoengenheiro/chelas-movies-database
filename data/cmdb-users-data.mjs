@@ -12,7 +12,7 @@ const USERS_FILE = './local_data/users.json'
  * Creates a new user and updates user local storage
  * @param {String} userToken token used to identify a user
  */
-export async function createUserData(userToken) {
+export async function createUserData() {
     let usersObj = await File.read(USERS_FILE)
     // Retrieve the new user Id 
     let newUserID = ++usersObj.IDs
@@ -20,7 +20,7 @@ export async function createUserData(userToken) {
     let newUser = {
         id: newUserID,
         name: `User ${newUserID}`,
-        token: userToken
+        token: crypto.randomUUID()
     }
     // Store the newly created user
     usersObj.users.push(newUser)
