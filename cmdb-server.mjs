@@ -20,8 +20,8 @@ import session from 'express-session'
 
 // Internal imports
 import cmdbUserServicesInit from '#services/cmdb-users-services.mjs'
-import * as usersData from '#data_access/internal/cmdb-users-data.mjs'
-import * as cmdbData from '#data_access/internal/cmdb-data-mem.mjs'
+//import * as usersData from '#data_access/internal/cmdb-users-data.mjs'
+//import * as cmdbData from '#data_access/internal/cmdb-data-mem.mjs'
 import cmdbUsersElastiSearchInit from '#data_access/elasticsearch/cmdb-users-elasticsearch.mjs'
 import cmdbDataElasticSearchInit from '#data_access/elasticsearch/cmdb-data-elasticsearch.mjs'
 import imdbDataInit from '#data_access/imdb-movies-data.mjs'
@@ -35,8 +35,8 @@ import fetch from '#data_access/fetch/node-fetch.mjs'
 // import fetch from '#data_access/fetch/local-fetch.mjs'
 
 // Initializations 
-// const usersData = cmdbUsersElastiSearchInit()
-// const cmdbData = cmdbDataElasticSearchInit()
+const usersData = cmdbUsersElastiSearchInit()
+const cmdbData = cmdbDataElasticSearchInit()
 const imdbData = imdbDataInit(fetch)
 const cmdbServices = cmdbServicesInit(imdbData, cmdbData, usersData)
 const cmdbUserServices = cmdbUserServicesInit(usersData)
@@ -70,7 +70,7 @@ app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
 app.use(express.json()) // Parses incoming requests with JSON payloads if the
                         // Content-Type of the request header matches this option 
-app.use(express.urlencoded( { extended: true})) // Parses incoming requests with urlencoded payloads if the
+app.use(express.urlencoded( { extended: false})) // Parses incoming requests with urlencoded payloads if the
                               // Content-Type of the request header matches this option 
 app.use(cookieParser()) // Parses Cookie Header and populates req.cookies with an object 
                         // keyed by the cookie names
@@ -79,12 +79,14 @@ passport.serializeUser((userInfo, done) => { done(null, userInfo); });
 passport.deserializeUser((userInfo, done) => { done(null, userInfo); });
 app.use(session({
     secret: 'leic-ipw-g06',
+    cookie:{_expires : 10800000}, // time im ms (corresponds to 3 hours)
     resave: false,
     saveUninitialized: false
 }));
 app.use(passport.session()) // Passport initialization
 app.use(passport.initialize())
 app.use(express.static(path.join(__dirname, 'web', 'site')));
+app.use('/auth', cmdbUserWebSite.verifyAuthenticated)
 // ------------------------------------ Middlewares --------------------------------------------
 
 // ----------------------------------- Public Website -----------------------------------------
@@ -99,7 +101,7 @@ app.get('/movies/search/limit', cmdbWebSite.limitForSearch)
 app.get('/movies/search/:movieName', cmdbWebSite.searchMoviesByName)
 app.get('/movies/find/:movieId', cmdbWebSite.getMovieDetails)
 // ----------------------------------- Public Website -----------------------------------------
-app.use('/auth', cmdbUserWebSite.verifyAuthenticated)
+
 // ----------------------------------- Private Website -----------------------------------------
 app.post('/logout', cmdbUserWebSite.logout)
 app.get('/auth/home', cmdbUserWebSite.homeAuthenticated)

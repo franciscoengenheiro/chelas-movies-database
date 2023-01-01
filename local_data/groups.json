@@ -1,5 +1,5 @@
 {
-    "IDs": 3,
+    "IDs": 4,
     "groups": [
         {
             "name": "top 10 horror movies",
@@ -20,16 +20,18 @@
             "id": 2,
             "movies": [
                 {
-                    "id": "tt0382932",
-                    "title": "Ratatouille",
-                    "duration": "111"
-                },
-                {
-                    "id": "tt0435761",
-                    "title": "Toy Story 3",
-                    "duration": "103"
+                    "id": "tt1979376",
+                    "title": "Toy Story 4",
+                    "duration": "100"
                 }
             ],
+            "userId": 1
+        },
+        {
+            "name": "a",
+            "description": "b",
+            "id": 4,
+            "movies": [],
             "userId": 1
         }
     ]

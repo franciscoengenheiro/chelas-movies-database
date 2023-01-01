@@ -62,6 +62,7 @@ export default function(userServices) {
     }
     
     function verifyAuthenticatedInternal(req, rsp, next) {
+        console.log(`user = ${req.user}`)
         // The user is only authenticated if req.user != undefined
         if(req.user) {
             return next()
