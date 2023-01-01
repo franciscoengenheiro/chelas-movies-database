@@ -1,38 +1,4 @@
 {
-    "IDs": 4,
-    "groups": [
-        {
-            "name": "top 10 horror movies",
-            "description": "just bloody horror",
-            "id": 1,
-            "movies": [
-                {
-                    "id": "tt3065204",
-                    "title": "The Conjuring 2",
-                    "duration": "134"
-                }
-            ],
-            "userId": 2
-        },
-        {
-            "name": "Nostalgia Group",
-            "description": "2005-2012 movies",
-            "id": 2,
-            "movies": [
-                {
-                    "id": "tt1979376",
-                    "title": "Toy Story 4",
-                    "duration": "100"
-                }
-            ],
-            "userId": 1
-        },
-        {
-            "name": "a",
-            "description": "b",
-            "id": 4,
-            "movies": [],
-            "userId": 1
-        }
-    ]
+    "IDs": 1,
+    "groups": []
 }

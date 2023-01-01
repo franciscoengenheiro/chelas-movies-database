@@ -99,7 +99,7 @@ export default function(fetch) {
      */
     function checkLimitAndFilter(limit, action) {
         if (limit != undefined) {
-            if (!isNaN(limit) && limit <= 250) action()
+            if (!isNaN(limit) && limit <= 250 && limit >= 1) action()
             else throw errors.INVALID_ARGUMENT("limit")
         }
     }
