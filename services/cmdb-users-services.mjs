@@ -2,7 +2,7 @@
 
 'use strict'
 
-import errors from '../errors/errors.mjs'
+import errors from '#errors/errors.mjs'
 
 export default function(userData) {
     return {
@@ -13,14 +13,14 @@ export default function(userData) {
     /**
      * Creates a new user with a given token
      * @param {String} userToken token used to identify a user  
-     * @throws Invalid User Exception if the user already exists
+     * @throws InvalidUserException if the user already exists
      */
     async function createUser(query_value, password) {
         // Retrieves user if it exists in users data
-        let checkUser = await userData.getUserData(query_value)
+        let user = await userData.getUserData(query_value)
         // If the user already exists:
-        if(checkUser != undefined) {
-            throw errors.INVALID_USER("already exists")
+        if(user != undefined) {
+            throw errors.INVALID_USER("user already exists")
         }
         return userData.createUserData(query_value, password)
     }

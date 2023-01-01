@@ -1,4 +1,6 @@
-// validate login and more... Aula 27 01:34:45
+'use strict'
+
+import errors from "#errors/errors.mjs"
 
 export default function(userServices) {
     // Validate if all the received services exist
@@ -32,8 +34,8 @@ export default function(userServices) {
     }
         
     function homeAuthenticatedInternal(req, rsp) {
-        const viewData = {user: req.user}
-        rsp.render('homeAuth', viewData)
+        const viewData = { user: req.user }
+        rsp.render('home', viewData)
     }
     
     function loginFormInternal(req, rsp) {
@@ -42,14 +44,8 @@ export default function(userServices) {
 
     async function validateUser(username, password) {
         let user = await userServices.getUser(username)
-
-        console.log(user)
-
-        if(user.password != password){
-            return undefined
-        }
-
-        return user
+        if (!user || user.password != password) return undefined
+        else return user
     }
 
     async function validateLoginInternal(req, rsp) {
@@ -62,7 +58,7 @@ export default function(userServices) {
                 username: user.username,
                 token: user.token
             }, () => rsp.redirect('/auth/home'))
-        }
+        } else rsp.redirect('/login')
     }
     
     function verifyAuthenticatedInternal(req, rsp, next) {

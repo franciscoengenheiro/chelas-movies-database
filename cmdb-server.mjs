@@ -19,23 +19,24 @@ import passport from 'passport'
 import session from 'express-session'
 
 // Internal imports
-import cmdbUserServicesInit from './services/cmdb-users-services.mjs'
-//import * as usersData from './data/cmdb-users-data.mjs'
-//import * as cmdbData from './data/cmdb-data-mem.mjs'
-import cmdbUsersElastiSearchInit from './data/cmdb-users-elasticsearch.mjs'
-import cmdbDataElasticSearchInit from './data/cmdb-data-elasticsearch.mjs'
-import imdbDataInit from './data/cmdb-movies-data.mjs'
-import cmdbServicesInit from './services/cmdb-services.mjs' 
-import cmdbUsersWebSiteInit from './web/site/cmdb-users-web-site.mjs'
-import cmdbWebApiInit from './web/api/cmdb-web-api.mjs'
-import cmdbWebSiteInit from './web/site/cmdb-web-site.mjs'
+import cmdbUserServicesInit from '#services/cmdb-users-services.mjs'
+import * as usersData from '#data_access/internal/cmdb-users-data.mjs'
+import * as cmdbData from '#data_access/internal/cmdb-data-mem.mjs'
+import cmdbUsersElastiSearchInit from '#data_access/elasticsearch/cmdb-users-elasticsearch.mjs'
+import cmdbDataElasticSearchInit from '#data_access/elasticsearch/cmdb-data-elasticsearch.mjs'
+import imdbDataInit from '#data_access/imdb-movies-data.mjs'
+import cmdbServicesInit from '#services/cmdb-services.mjs' 
+import cmdbWebApiInit from '#web/api/cmdb-web-api.mjs'
+import cmdbWebSiteInit from '#web/site/cmdb-web-site.mjs'
+import cmdbUsersWebSiteInit from '#web/site/cmdb-users-web-site.mjs'
 
-// Fetch
-import fetch from './data/node-fetch.mjs'
-// import fetch from './data/local-fetch.mjs'
+// Fetch Modules
+import fetch from '#data_access/fetch/node-fetch.mjs'
+// import fetch from '#data_access/fetch/local-fetch.mjs'
 
-const usersData = cmdbUsersElastiSearchInit()
-const cmdbData = cmdbDataElasticSearchInit()
+// Initializations 
+// const usersData = cmdbUsersElastiSearchInit()
+// const cmdbData = cmdbDataElasticSearchInit()
 const imdbData = imdbDataInit(fetch)
 const cmdbServices = cmdbServicesInit(imdbData, cmdbData, usersData)
 const cmdbUserServices = cmdbUserServicesInit(usersData)
@@ -65,18 +66,17 @@ app.use(cors()) // CORS (Cross Origin Resource Sharing) is an HTTP-header based 
 // Converts OpenAPI specification in yaml to javascript object
 const swaggerDocument = yaml.load('./docs/cmdb-api-spec.yaml')
 // Establish a way in the application which users can access the OpenAPI HTML specification page.
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
 app.use(express.json()) // Parses incoming requests with JSON payloads if the
                         // Content-Type of the request header matches this option 
-app.use(express.urlencoded( { extended: false})) // Parses incoming requests with urlencoded payloads if the
+app.use(express.urlencoded( { extended: true})) // Parses incoming requests with urlencoded payloads if the
                               // Content-Type of the request header matches this option 
 app.use(cookieParser()) // Parses Cookie Header and populates req.cookies with an object 
                         // keyed by the cookie names
 
 passport.serializeUser((userInfo, done) => { done(null, userInfo); });
 passport.deserializeUser((userInfo, done) => { done(null, userInfo); });
-
 app.use(session({
     secret: 'leic-ipw-g06',
     resave: false,
@@ -84,48 +84,45 @@ app.use(session({
 }));
 app.use(passport.session()) // Passport initialization
 app.use(passport.initialize())
+app.use(express.static(path.join(__dirname, 'web', 'site')));
 // ------------------------------------ Middlewares --------------------------------------------
 
-app.use(express.static(path.join(__dirname, 'web', 'site')));
-
-// -------------------------------------- WebSite ----------------------------------------------
-// --------------------------------------Public Website-----------------------------------------
+// ----------------------------------- Public Website -----------------------------------------
 app.get('/home', cmdbUserWebSite.homeNotAuthenticated)
-app.use('/auth', cmdbUserWebSite.verifyAuthenticated)
-// --------------------------------------Public Website-----------------------------------------
-// --------------------------------------Private Website----------------------------------------
-app.get('/auth/home', cmdbUserWebSite.homeAuthenticated)
 app.get('/login', cmdbUserWebSite.loginForm)
 app.post('/login', cmdbUserWebSite.validateLogin)
-app.post('/logout', cmdbUserWebSite.logout)
-app.get('/users/newUser',cmdbUserWebSite.newUser)
-app.post('/users', cmdbUserWebSite.createUser)
-app.get('/movies/limit', cmdbWebSite.limitForMovies)
+app.get('/register',cmdbUserWebSite.newUser)
+app.post('/register', cmdbUserWebSite.createUser)
 app.get('/movies', cmdbWebSite.getPopularMovies)
+app.get('/movies/limit', cmdbWebSite.limitForMovies)
 app.get('/movies/search/limit', cmdbWebSite.limitForSearch)
 app.get('/movies/search/:movieName', cmdbWebSite.searchMoviesByName)
 app.get('/movies/find/:movieId', cmdbWebSite.getMovieDetails)
+// ----------------------------------- Public Website -----------------------------------------
+app.use('/auth', cmdbUserWebSite.verifyAuthenticated)
+// ----------------------------------- Private Website -----------------------------------------
+app.post('/logout', cmdbUserWebSite.logout)
+app.get('/auth/home', cmdbUserWebSite.homeAuthenticated)
+app.get('/auth/groups', cmdbWebSite.getGroups)
 app.post('/auth/groups', cmdbWebSite.createGroup)
 app.get('/auth/groups/newGroup', cmdbWebSite.getNewGroup)
-app.get('/auth/groups', cmdbWebSite.getGroups)
 app.get('/auth/groups/:groupId', cmdbWebSite.getGroupDetails)
-app.post('/auth/groups/:groupId/edit', cmdbWebSite.editGroup)
 app.get('/auth/groups/:groupId/editGroup', cmdbWebSite.getEditGroup)
+app.post('/auth/groups/:groupId/edit', cmdbWebSite.editGroup)
 app.post('/auth/groups/:groupId/delete', cmdbWebSite.deleteGroup)
 app.get('/auth/groups/:groupId/movies/addMovie', cmdbWebSite.addMovie)
 app.get('/auth/groups/:groupId/movies/searchTheMovie', cmdbWebSite.searchMovieToAdd)
 app.post('/auth/groups/:groupId/movies', cmdbWebSite.addMovieInGroup)
 app.post('/auth/groups/:groupId/movies/:movieId', cmdbWebSite.removeMovieInGroup)
-// --------------------------------------Private Website----------------------------------------
-// -------------------------------------- WebSite ----------------------------------------------
+// ----------------------------------- Private Website -----------------------------------------
 
 // -------------------------------------- WebApi -----------------------------------------------
 app.post('/api/users', cmdbWebApi.createUser)
 app.get('/api/movies', cmdbWebApi.getPopularMovies)
 app.get('/api/movies/search/:moviesName', cmdbWebApi.searchMoviesByName)
 app.get('/api/movies/find/:movieId', cmdbWebApi.getMovieDetails)
-app.post('/api/groups', cmdbWebApi.createGroup)
 app.get('/api/groups', cmdbWebApi.getGroups)
+app.post('/api/groups', cmdbWebApi.createGroup)
 app.get('/api/groups/:groupId', cmdbWebApi.getGroupDetails)
 app.put('/api/groups/:groupId', cmdbWebApi.editGroup)
 app.delete('/api/groups/:groupId', cmdbWebApi.deleteGroup)

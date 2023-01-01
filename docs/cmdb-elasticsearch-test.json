@@ -1,0 +1,463 @@
+{
+	"info": {
+		"_postman_id": "eb0c74eb-d62a-4b09-9bf8-2f0fa40370ba",
+		"name": "Elastic Search",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "24392404"
+	},
+	"item": [
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Create indice for users",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/users",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete indice for users",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/users",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create a document in users",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"miguel\",\r\n    \"token\": \"ab3e6c33-6e16-4875-beef-2c815f3c4a07\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/users/_doc",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"users",
+								"_doc"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create a document in users",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/users/_doc/<<myownId>>",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"users",
+								"_doc",
+								"<<myownId>>"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a document in users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/users/_doc/SRtEY4UB7uCqhza2VIQX",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"users",
+								"_doc",
+								"SRtEY4UB7uCqhza2VIQX"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete document in users",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/users/_doc/L5AmaoUBKgdlHOFfP26d",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"users",
+								"_doc",
+								"L5AmaoUBKgdlHOFfP26d"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List all users documents",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/users/_search",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"users",
+								"_search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search in users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/users/_search/?q=token:4c333be4-fdea-4028-9225-030bca3230f1&operator=AND",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"users",
+								"_search",
+								""
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "token:4c333be4-fdea-4028-9225-030bca3230f1"
+								},
+								{
+									"key": "operator",
+									"value": "AND"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Personalized search in users",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"query\": {\r\n        \"multi_match\": {\r\n            \"query\": \"6f3d9c6c-4305-4442-83a4-f\",\r\n            \"fields\": [\"username.keyword\", \"token.keyword\"]\r\n        }\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/users/_search/",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"users",
+								"_search",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Groups",
+			"item": [
+				{
+					"name": "Create indice for groups",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/groups",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"groups"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete indice for groups",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/groups",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"groups"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create a document in groups",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"My movies\",\r\n    \"description\": \"my movies :)\",\r\n    \"movies\": [\r\n        {\r\n            \"id\": \"tt0489270\",\r\n            \"title\": \"Saw III\",\r\n            \"duration\": \"108\"\r\n        }\r\n    ],\r\n    \"userId\": \"EQBlZYUBmk_s-g4Agw7t\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/groups/_doc",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"groups",
+								"_doc"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create a document in groups",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"My movies\",\r\n    \"description\": \"my movies :)\",\r\n    \"movies\": [\r\n        {\r\n            \"id\": \"tt0489270\",\r\n            \"title\": \"Saw III\",\r\n            \"duration\": \"108\"\r\n        }\r\n    ],\r\n    \"userId\": \"urv1Y4UBuy-31ojH2yDk\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/groups/_doc/HONoX4UBECaQDPRF-46o",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"groups",
+								"_doc",
+								"HONoX4UBECaQDPRF-46o"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a document in groups",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/groups/_doc/isK6YIUBJ4mHGfAGSQE-",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"groups",
+								"_doc",
+								"isK6YIUBJ4mHGfAGSQE-"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete document in groups",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/groups/_doc/EABjZYUBmk_s-g4A8g6b",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"groups",
+								"_doc",
+								"EABjZYUBmk_s-g4A8g6b"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List all groups documents",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/groups/_search",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"groups",
+								"_search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search in groups",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/groups/_search?q=description: s",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"groups",
+								"_search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "description: s"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Personalized search in groups",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"query\": {\r\n        \"match\": {\r\n            \"userId.keyword\": \"KJDoaYUBKgdlHOFfqm60\"\r\n        }\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/groups/_search",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"groups",
+								"_search"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "port",
+			"value": "9200"
+		}
+	]
+}

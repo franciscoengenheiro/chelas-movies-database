@@ -3,13 +3,13 @@
 
 'use strict'
 
-import errors from '../errors/errors.mjs'
+import errors from '#errors/errors.mjs'
 
 // Constants
-const IMDB_KEY = "k_jtqnxg0w" // "k_lcs891ko"
+const IMDB_KEY = "k_lcs891ko" // "k_jtqnxg0w"
 export const MOST_POPULAR_MOVIES = `https://imdb-api.com/en/API/Top250Movies/${IMDB_KEY}`
 export const MOVIES_SEARCHED_BY_NAME = `https://imdb-api.com/en/API/SearchMovie/${IMDB_KEY}/`
-export const MOVIES_INFO = `https://imdb-api.com/en/API/Title/${IMDB_KEY}/`
+export const MOVIE_INFO = `https://imdb-api.com/en/API/Title/${IMDB_KEY}/`
 
 /**
  * @param {Function} fetch function that retrieves a resource from a container 
@@ -59,7 +59,7 @@ export default function(fetch) {
     }
 
     async function getMovieDetails(movieId) {
-        let movieObj = await fetch(MOVIES_INFO + movieId)
+        let movieObj = await fetch(MOVIE_INFO + movieId)
 
         let movieDetails = {
             id: movieObj.id,
@@ -82,7 +82,7 @@ export default function(fetch) {
      * @throws ArgumentNotFoundException if the movie does not exist 
      */
     async function addMovieInGroupData(movieId) {
-        let moviesObj = await fetch(MOVIES_INFO + movieId)
+        let moviesObj = await fetch(MOVIE_INFO + movieId)
         if (moviesObj.title == null) {
             throw errors.ARGUMENT_NOT_FOUND("Movie")
         } else {

@@ -3,8 +3,8 @@
 
 'use strict'
 
-import errors from '../errors/errors.mjs'
-import * as File from './file-operations.mjs'
+import errors from '#errors/errors.mjs'
+import * as File from '#data_access/util/file-operations.mjs'
 
 // Constants
 const GROUPS_FILE = './local_data/groups.json'
@@ -82,7 +82,8 @@ export async function getGroupDetailsData(groupId, userId) {
 }
 
 /**
- * Searchs in the group local storage for the received user group and replaces that group for the new one
+ * Searchs in the group local storage for the received user group and replaces 
+ * that group for the new one
  * @param {Number} groupId group identifier
  * @param {*} obj object that has the group details to edit 
  * @param {Number} userId user internal identifier

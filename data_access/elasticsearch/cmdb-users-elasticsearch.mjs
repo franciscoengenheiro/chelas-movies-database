@@ -1,8 +1,7 @@
 'use strict'
-
-import errors from '../errors/errors.mjs'
-import fetch from './node-fetch.mjs'
-import { baseURL, REFRESH } from './cmdb-data-elasticsearch.mjs'
+import crypto from 'crypto'
+import fetch from '#data_access/fetch/node-fetch.mjs'
+import { baseURL, REFRESH } from '#data_access/elasticsearch/cmdb-data-elasticsearch.mjs'
 
 // Constants
 const USERS_BASE_URL = `${baseURL}/users`
@@ -64,7 +63,6 @@ export default function() {
             user = userObj.hits.hits[0]._source
             user.id = userObj.hits.hits[0]._id
         }
-        
         return user
     }
 }

@@ -2,7 +2,7 @@
 
 'use strict'
 
-import errors from '../errors/errors.mjs'
+import errors from '#errors/errors.mjs'
 
 /**
  * @param {*} imdbData module that manages application movies data

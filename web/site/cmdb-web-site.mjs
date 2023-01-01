@@ -5,8 +5,8 @@
 //  - Generate the response in HTML format
 
 import url from 'url'
-import errors from '../../errors/errors.mjs'
-import translateToHTTPResponse from '../http-error-responses.mjs'
+import errors from '#errors/errors.mjs'
+import translateToHTTPResponse from '#web/http-error-responses.mjs'
 
 // Retrieves the relative path to the file
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url)) 
@@ -43,13 +43,13 @@ export default function (cmdbServices) {
     async function getPopularMoviesInternal(req, rsp) {
         const limit = req.query.limit
         const popularMovies = await cmdbServices.getPopularMovies(limit)
-        const viewData = {title: 'Top 250 Most popular movies', movies: popularMovies}
+        const viewData = { title: 'Top 250 Most popular movies', movies: popularMovies }
         return View('popularMovies', viewData)
     }
 
     async function limitForSearch(req, rsp) {
         const movie = req.query.movieName
-        const viewData = {movie: movie}
+        const viewData = { movie: movie }
         rsp.render('limitForSearch', viewData)
     }
 
@@ -57,7 +57,7 @@ export default function (cmdbServices) {
         const movieName = req.query.movieName
         const limit = req.query.limit
         const movies = await cmdbServices.searchMoviesByName(movieName, limit)
-        const viewData = {title: movieName, movies: movies}
+        const viewData = { title: movieName, movies: movies }
         return View('searchMovies', viewData)
     }
 
@@ -68,7 +68,7 @@ export default function (cmdbServices) {
 
     async function createGroupInternal(req, rsp) {
         let newGroup = await cmdbServices.createGroup(req.token, req.body)
-        rsp.redirect('/groups')
+        rsp.redirect('/auth/groups')
     }
 
     async function getNewGroup(req, rsp) {
@@ -77,7 +77,7 @@ export default function (cmdbServices) {
 
     async function getGroupsInternal(req, rsp) {
         const groups = await cmdbServices.getGroups(req.token)
-        const viewData = { title: 'All groups', groups: groups}
+        const viewData = { title: 'All groups', groups: groups }
         return View('groups', viewData)
     }
 
@@ -89,7 +89,7 @@ export default function (cmdbServices) {
     async function editGroupInternal(req, rsp) {
         const groupId = req.params.groupId
         const group = await cmdbServices.editGroup(req.token, groupId, req.body)
-        rsp.redirect(`/groups/${groupId}`)
+        rsp.redirect(`/auth/groups/${groupId}`)
     }
 
     async function getEditGroup(req, rsp) {
@@ -100,7 +100,7 @@ export default function (cmdbServices) {
     async function deleteGroupInternal(req, rsp) {
         const groupId = req.params.groupId
         const group = await cmdbServices.deleteGroup(req.token, groupId)
-        rsp.redirect('/groups')
+        rsp.redirect('/auth/groups/')
     }
 
     async function addMovie(req, rsp) {
@@ -120,7 +120,7 @@ export default function (cmdbServices) {
         const movieId = req.body.movieId
         const groupId = req.params.groupId
         const movie = await cmdbServices.addMovieInGroup(req.token, groupId, movieId)
-        rsp.redirect(`/groups/${groupId}`)
+        rsp.redirect(`/auth/groups/${groupId}`)
     }
 
     async function removeMovieInGroupInternal(req, rsp) {
@@ -130,7 +130,7 @@ export default function (cmdbServices) {
         // Post/Redirect/Get (PRG) is a web development design pattern that lets the page shown 
         // after a form submission be reloaded, shared, or bookmarked without ill effects, such
         // as submitting the form another time.
-        rsp.redirect(`/groups/${groupId}`)
+        rsp.redirect(`/auth/groups/${groupId}`)
     }
     
     async function getGroupDetailsMw(req, rsp) {
@@ -181,7 +181,7 @@ export default function (cmdbServices) {
                 view = View('onError', httpResponse)
             }
             // Wrap the result in HTML format 
-            if(view) rsp.render(view.name , view.data)
+            if(view) rsp.render(view.name, view.data)
         }
     }
 }

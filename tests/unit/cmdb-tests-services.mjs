@@ -1,21 +1,26 @@
-// Test module for the Application services modules
+// Application services unit tests module
 
 'use strict'
 
+// External Imports
 import * as assert from "assert"
-import * as File from "../../data/file-operations.mjs"
 
-import * as cmdbUserServices from '../../services/cmdb-users-services.mjs'
-import cmdbServicesInit from '../../services/cmdb-services.mjs' 
-import * as usersData from '../../data/cmdb-users-data.mjs'
-import * as cmdbData from '../../data/cmdb-data-mem.mjs'
-import imdbDataInit from '../../data/cmdb-movies-data.mjs'
-import fetch from '../../data/local-fetch.mjs'
-import errors from '../../errors/errors.mjs'
+// Internal Imports
+import * as File from "#data_access/util/file-operations.mjs"
+import cmdbUserServicesInit from '#services/cmdb-users-services.mjs'
+import cmdbServicesInit from '#services/cmdb-services.mjs' 
+import * as usersData from '#data_access/internal/cmdb-users-data.mjs'
+import * as cmdbData from '#data_access/internal/cmdb-data-mem.mjs'
+import imdbDataInit from '#data_access/imdb-movies-data.mjs'
+import fetch from '#data_access/fetch/local-fetch.mjs'
+import errors from '#errors/errors.mjs'
 
+// Initializations
 const imdbData = imdbDataInit(fetch)
+const cmdbUserServices = cmdbUserServicesInit(usersData)
 const cmdbServices = cmdbServicesInit(imdbData, cmdbData, usersData)
 
+// Retrieve local files
 const POPULAR_MOVIES_FILE = "./local_data/most-popular-movies.json"
 const SEARCH_MOVIE_BY_NAME_FILE = "./local_data/movies-searched-by-name.json"
 const GET_MOVIE_BY_ID = "./local_data/movie-info.json"
@@ -25,6 +30,7 @@ const GROUPS_FILE = './local_data/groups.json'
 // --------------------------------------- Notes --------------------------------------------------------
 // Before running the tests make sure:
 // - Local fetch is enabled in the server module
+// - Internal memory data access is enabled in the server module
 // - Local_data package files - groups.json and users.json - ID's are matching the current data
 // On error while running tests:
 // - Delete users.json created test user and try again
@@ -32,6 +38,8 @@ const GROUPS_FILE = './local_data/groups.json'
 // Run tests (in root directory) with: npm test tests
 // --------------------------------------- Notes --------------------------------------------------------
 describe("Services modules tests:", function() {
+    const userTestUsername = "userTestUsername"
+    const userTestPassword = "userTestPassword"
     describe("Getting the most popular movies:", function() {
         it("Should return an object with an array of the 250 most popular movies", async function() {
             // Arrange
@@ -162,37 +170,38 @@ describe("Services modules tests:", function() {
         it("Should create a new user", async function() {
             // Arrange
             let originalUsers = await File.read(USERS_FILE)
-            let userTest = "userTest"
             let users = await File.read(USERS_FILE)
 
+            // Act
             users.users.push({
                 id: originalUsers.IDs + 1,
-                name: `User ${originalUsers.IDs + 1}`,
-                token: userTest
+                username: userTestUsername,
+                password: userTestPassword
             })
             users.IDs++
 
-            // Act
-            await cmdbUserServices.createUser(userTest)
-            let newUser = await File.read(USERS_FILE)
+            await cmdbUserServices.createUser(userTestUsername, userTestPassword)
+            let newUsers = await File.read(USERS_FILE)
             await File.write(originalUsers, USERS_FILE)
 
             // Assert
-            assert.deepEqual(newUser, users)
+            assert.deepEqual(users.id, newUsers.id)
+            assert.deepEqual(users.usernames, newUsers.usernames)
+            assert.deepEqual(users.passwords, newUsers.passwords)
+            // Cannot check token as it is randomly given
         })
 
         it("Should not create a new user", async function() {
             // Arrange
             let originalUsers = await File.read(USERS_FILE) 
-            let userTest = "userTest"
 
-            // Create the same user as before but using the function
-            await cmdbUserServices.createUser(userTest)
+            // Create an user 
+            await cmdbUserServices.createUser(userTestUsername, userTestPassword)
             // Try to create the same user again
             try {
-                await cmdbUserServices.createUser(userTest)
+                await cmdbUserServices.createUser(userTestUsername, userTestPassword)
             } catch (e) {
-                assert.deepEqual(e, errors.INVALID_USER("already exists"))
+                assert.deepEqual(e, errors.INVALID_USER("user already exists"))
                 // Restore previous data
                 await File.write(originalUsers, USERS_FILE) 
                 return
@@ -207,7 +216,6 @@ describe("Services modules tests:", function() {
             let originalGroups = await File.read(GROUPS_FILE)
             let originalUsers = await File.read(USERS_FILE)
             let currentGroups = await File.read(GROUPS_FILE)
-            const userTest = "userTest"
             let groupToCreate = {
                 name: "Group Test",
                 description: "Just for test"
@@ -216,8 +224,9 @@ describe("Services modules tests:", function() {
             currentGroups.IDs++
 
             // Act
-            await cmdbUserServices.createUser(userTest)     
-            await cmdbServices.createGroup(userTest, groupToCreate)
+            await cmdbUserServices.createUser(userTestUsername, userTestPassword)
+            let createdUser = await cmdbUserServices.getUser(userTestUsername)
+            await cmdbServices.createGroup(createdUser.token, groupToCreate)
 
             let alteredGroups = await File.read(GROUPS_FILE)
 
@@ -233,18 +242,18 @@ describe("Services modules tests:", function() {
             // Arrange
             let originalGroups = await File.read(GROUPS_FILE)
             let originalUsers = await File.read(USERS_FILE)
-            let userTest = "userTest"
             let invalidGroup = {
                 notAName: "Group 56",
                 description: 1234,
             }
 
             // Act
-            await cmdbUserServices.createUser(userTest)
+            await cmdbUserServices.createUser(userTestUsername, userTestPassword)
+            let createdUser = await cmdbUserServices.getUser(userTestUsername)
 
             // Assert
             try {
-                await cmdbServices.createGroup(userTest, invalidGroup)
+                await cmdbServices.createGroup(createdUser.token, invalidGroup)
             } catch(e) {
                 assert.deepEqual(e, errors.INVALID_ARGUMENT("group missing a valid name and description"))
                 // Retrieve previous data
@@ -261,7 +270,6 @@ describe("Services modules tests:", function() {
             // Arrange
             let originalGroups = await File.read(GROUPS_FILE)
             let originalUsers = await File.read(USERS_FILE)
-            const userTest = "userTest"
             let groupsTest = []
             let group1 = {
                 "id": originalGroups.IDs + 1,
@@ -275,10 +283,12 @@ describe("Services modules tests:", function() {
             }
 
             // Act
-            await cmdbUserServices.createUser(userTest)
+            await cmdbUserServices.createUser(userTestUsername, userTestPassword)
+            let createdUser = await cmdbUserServices.getUser(userTestUsername)
+            
             // Create groups for this user
-            await cmdbServices.createGroup(userTest, group1)
-            await cmdbServices.createGroup(userTest, group2)
+            await cmdbServices.createGroup(createdUser.token, group1)
+            await cmdbServices.createGroup(createdUser.token, group2)
 
             groupsTest.push(group1, group2)
             groupsTest = groupsTest.map(group => {
@@ -290,12 +300,12 @@ describe("Services modules tests:", function() {
             })
 
             // Retrieve the group created
-            let sut = await cmdbServices.getGroups(userTest) 
+            let groups = await cmdbServices.getGroups(createdUser.token) 
             // Restore previous data
             await File.write(originalUsers, USERS_FILE)
             await File.write(originalGroups, GROUPS_FILE)
             // Assert 
-            assert.deepEqual(groupsTest, sut)   
+            assert.deepEqual(groupsTest, groups)   
         })
     })
 
@@ -304,7 +314,6 @@ describe("Services modules tests:", function() {
             // Arrange
             let originalGroups = await File.read(GROUPS_FILE)
             let originalUsers = await File.read(USERS_FILE)
-            const userTest = "userTest"  
             let group = {
                 name: "Test group 1",
                 description: "random"
@@ -312,9 +321,10 @@ describe("Services modules tests:", function() {
             let groupId = originalGroups.IDs + 1
 
             // Act
-            await cmdbUserServices.createUser(userTest)
+            await cmdbUserServices.createUser(userTestUsername, userTestPassword)
+            let createdUser = await cmdbUserServices.getUser(userTestUsername)
             // Create groups for this user
-            await cmdbServices.createGroup(userTest, group)
+            await cmdbServices.createGroup(createdUser.token, group)
             let newGroup = {
                 name: group.name,
                 description: group.description,
@@ -322,20 +332,19 @@ describe("Services modules tests:", function() {
                 moviesTotalDuration: 0
             }
             // Retrieve the group created
-            let sut = await cmdbServices.getGroupDetails(userTest, groupId) 
+            let createdGroup = await cmdbServices.getGroupDetails(createdUser.token, groupId) 
             // Restore previous data
             await File.write(originalUsers, USERS_FILE)
             await File.write(originalGroups, GROUPS_FILE)
 
             // Assert 
-            assert.deepEqual(newGroup, sut)   
+            assert.deepEqual(newGroup, createdGroup)   
         })
 
         it("Should throw an error if the group Id does not exist", async function() {
             // Arrange
             let originalGroups = await File.read(GROUPS_FILE)
             let originalUsers = await File.read(USERS_FILE)
-            const userTest = "userTest"  
             let group = {
                 name: "Test group 1",
                 description: "random"
@@ -343,11 +352,13 @@ describe("Services modules tests:", function() {
             let groupId = -1
 
             // Act
-            await cmdbUserServices.createUser(userTest)
+            await cmdbUserServices.createUser(userTestUsername, userTestPassword)
+            let createdUser = await cmdbUserServices.getUser(userTestUsername)
+
             // Create groups for this user
-            await cmdbServices.createGroup(userTest, group)
+            await cmdbServices.createGroup(createdUser.token, group)
             try {
-                await cmdbServices.getGroupDetails(userTest, groupId) 
+                await cmdbServices.getGroupDetails(createdUser.token, groupId) 
             } catch(e) {
                 assert.deepEqual(e, errors.ARGUMENT_NOT_FOUND("group"))
                 // Restore previous data
@@ -359,35 +370,6 @@ describe("Services modules tests:", function() {
             // Assert
             assert.fail("Should throw an error")
         })
-
-        it("Should throw an error if group Id is invalid", async function() {
-            // Arrange
-            let originalGroups = await File.read(GROUPS_FILE)
-            let originalUsers = await File.read(USERS_FILE)
-            const userTest = "userTest"  
-            let group = {
-                "name": "Test group 1",
-                "description": "random"
-            }
-            let groupId = "abc"
-
-            // Act
-            await cmdbUserServices.createUser(userTest)
-            // Create groups for this user
-            await cmdbServices.createGroup(userTest, group)
-            try {
-                await cmdbServices.getGroupDetails(userTest, groupId) 
-            } catch(e) {
-                assert.deepEqual(e, errors.INVALID_ARGUMENT("groupId"))
-                // Restore previous data
-                await File.write(originalUsers, USERS_FILE)
-                await File.write(originalGroups, GROUPS_FILE)
-                return
-            }
-            
-            //Assert
-            assert.fail("Should throw an error")
-        })
     })
 
     describe("Edit a Group:", function() {
@@ -395,7 +377,6 @@ describe("Services modules tests:", function() {
             // Arrange
             let originalGroups = await File.read(GROUPS_FILE)
             let originalUsers = await File.read(USERS_FILE)
-            const userTest = "userTest"
             const groupBodyTest = {
                 name: "Group Test",
                 description: "Just for test",
@@ -416,9 +397,10 @@ describe("Services modules tests:", function() {
             }
 
             // Act
-            await cmdbUserServices.createUser(userTest)
-            await cmdbServices.createGroup(userTest, groupBodyTest)
-            await cmdbServices.editGroup(userTest, newGroupId, groupBodyUpdatedTest)
+            await cmdbUserServices.createUser(userTestUsername, userTestPassword)
+            let createdUser = await cmdbUserServices.getUser(userTestUsername)
+            await cmdbServices.createGroup(createdUser.token, groupBodyTest)
+            await cmdbServices.editGroup(createdUser.token, newGroupId, groupBodyUpdatedTest)
 
             let cmdb_edit_movie_to_group = await File.read(GROUPS_FILE)
             cmdb_edit_movie_to_group = cmdb_edit_movie_to_group.groups.find(group => group.id == newGroupId)
@@ -430,42 +412,10 @@ describe("Services modules tests:", function() {
             assert.deepEqual(cmdb_edit_movie_to_group, groupTest)
         })
 
-        it("Should throw an error if the groupId is invalid", async function() {
+        it("Should throw an error if the groupId doesn't exist", async function() {
             // Arrange
             let originalGroups = await File.read(GROUPS_FILE)
             let originalUsers = await File.read(USERS_FILE)
-            const userTest = "userTest"
-            const groupBodyTest = {
-                name: "Group Test",
-                description: "Just for test",
-            }
-            const groupBodyUpdatedTest = {
-                name: "New Group Test",
-                description: "Updated group"
-            }
-            
-            // Act
-            try {
-                await cmdbUserServices.createUser(userTest)
-                await cmdbServices.createGroup(userTest, groupBodyTest)
-                await cmdbServices.editGroup(userTest, "AHHHHHHHHHHHH", groupBodyUpdatedTest)
-            } catch(e) {
-                await File.write(originalUsers, USERS_FILE)
-                await File.write(originalGroups, GROUPS_FILE)
-
-                assert.deepEqual(e, errors.INVALID_ARGUMENT("groupId"))
-                return
-            }
-
-            // Assert
-            assert.fail("Should throw an error")
-        })
-
-        it("Should throw an error if the groupId doesnt exist", async function() {
-            // Arrange
-            let originalGroups = await File.read(GROUPS_FILE)
-            let originalUsers = await File.read(USERS_FILE)
-            const userTest = "userTest"
             const groupBodyTest = {
                 name: "Group Test",
                 description: "Just for test",
@@ -478,9 +428,10 @@ describe("Services modules tests:", function() {
 
             // Act
             try {
-                await cmdbUserServices.createUser(userTest)
-                await cmdbServices.createGroup(userTest, groupBodyTest)
-                await cmdbServices.editGroup(userTest, newGroupId, groupBodyUpdatedTest)
+                await cmdbUserServices.createUser(userTestUsername, userTestPassword)
+                let createdUser = await cmdbUserServices.getUser(userTestUsername)
+                await cmdbServices.createGroup(createdUser.token, groupBodyTest)
+                await cmdbServices.editGroup(createdUser.token, newGroupId, groupBodyUpdatedTest)
             } catch(e) {
                 await File.write(originalUsers, USERS_FILE)
                 await File.write(originalGroups, GROUPS_FILE)
@@ -498,7 +449,6 @@ describe("Services modules tests:", function() {
             // Arrange
             let originalGroups = await File.read(GROUPS_FILE)
             let originalUsers = await File.read(USERS_FILE)
-            const userTest = "userTest"
             const groupBodyTest = {
                 name: "Group Test",
                 description: "Just for test",
@@ -508,9 +458,10 @@ describe("Services modules tests:", function() {
             const newGroupId = originalGroups.IDs + 1
 
             // Act
-            await cmdbUserServices.createUser(userTest)
-            await cmdbServices.createGroup(userTest, groupBodyTest)
-            await cmdbServices.deleteGroup(userTest, newGroupId)
+            await cmdbUserServices.createUser(userTestUsername, userTestPassword)
+            let createdUser = await cmdbUserServices.getUser(userTestUsername)
+            await cmdbServices.createGroup(createdUser.token, groupBodyTest)
+            await cmdbServices.deleteGroup(createdUser.token, newGroupId)
 
             let cmdb_remove_movie_to_group = await File.read(GROUPS_FILE)
             cmdb_remove_movie_to_group = cmdb_remove_movie_to_group.groups
@@ -522,38 +473,10 @@ describe("Services modules tests:", function() {
             assert.deepEqual(cmdb_remove_movie_to_group, originalGroups.groups)
         })
 
-        it("Should throw an error if the groupId is invalid", async function() {
+        it("Should throw an error if the groupId doesn't exist", async function() {
             // Arrange
             let originalGroups = await File.read(GROUPS_FILE)
             let originalUsers = await File.read(USERS_FILE)
-            const userTest = "userTest"
-            const groupBodyTest = {
-                name: "Group Test",
-                description: "Just for test",
-            }
-
-            // Act
-            try {
-                await cmdbUserServices.createUser(userTest)
-                await cmdbServices.createGroup(userTest, groupBodyTest)
-                await cmdbServices.deleteGroup(userTest, "AHHHHHHHHHHHHH")
-            } catch(e) {
-                await File.write(originalUsers, USERS_FILE)
-                await File.write(originalGroups, GROUPS_FILE)
-
-                assert.deepEqual(e, errors.INVALID_ARGUMENT("groupId"))
-                return
-            }
-
-            // Assert
-            assert.fail("Should throw an error")
-        })
-
-        it("Should throw an error if the groupId doesnt exist", async function() {
-            // Arrange
-            let originalGroups = await File.read(GROUPS_FILE)
-            let originalUsers = await File.read(USERS_FILE)
-            const userTest = "userTest"
             const groupBodyTest = {
                 name: "Group Test",
                 description: "Just for test",
@@ -561,9 +484,10 @@ describe("Services modules tests:", function() {
 
             //Act
             try {
-                await cmdbUserServices.createUser(userTest)
-                await cmdbServices.createGroup(userTest, groupBodyTest)
-                await cmdbServices.deleteGroup(userTest, -1)
+                await cmdbUserServices.createUser(userTestUsername, userTestPassword)
+                let createdUser = await cmdbUserServices.getUser(userTestUsername)
+                await cmdbServices.createGroup(createdUser.token, groupBodyTest)
+                await cmdbServices.deleteGroup(createdUser.token, -1)
             } catch(e) {
                 await File.write(originalUsers, USERS_FILE)
                 await File.write(originalGroups, GROUPS_FILE)
@@ -582,7 +506,6 @@ describe("Services modules tests:", function() {
             // Arrange
             let originalGroups = await File.read(GROUPS_FILE)
             let originalUsers = await File.read(USERS_FILE)
-            const userTest = "userTest"
             const groupBodyTest = {
                 name: "Group Test",
                 description: "Just for test",
@@ -605,9 +528,10 @@ describe("Services modules tests:", function() {
             })
 
             // Act
-            await cmdbUserServices.createUser(userTest)
-            await cmdbServices.createGroup(userTest, groupBodyTest)
-            await cmdbServices.addMovieInGroup(userTest, newGroupId, "tt0468569")
+            await cmdbUserServices.createUser(userTestUsername, userTestPassword)
+            let createdUser = await cmdbUserServices.getUser(userTestUsername)
+            await cmdbServices.createGroup(createdUser.token, groupBodyTest)
+            await cmdbServices.addMovieInGroup(createdUser.token, newGroupId, "tt0468569")
 
             let cmdb_add_movie_to_group = await File.read(GROUPS_FILE)
             cmdb_add_movie_to_group = cmdb_add_movie_to_group.groups.find(group => group.id == newGroupId)
@@ -619,11 +543,10 @@ describe("Services modules tests:", function() {
             assert.deepEqual(cmdb_add_movie_to_group, groupTest)
         })
 
-        it("Should throw an error if the groupId is invalid", async function() {
+        it("Should throw an error if the groupId doesn't exist", async function() {
             // Arrange
             let originalGroups = await File.read(GROUPS_FILE)
             let originalUsers = await File.read(USERS_FILE)
-            const userTest = "userTest"
             const groupBodyTest = {
                 name: "Group Test",
                 description: "Just for test",
@@ -631,36 +554,10 @@ describe("Services modules tests:", function() {
 
             // Act
             try {
-                await cmdbUserServices.createUser(userTest)
-                await cmdbServices.createGroup(userTest, groupBodyTest)
-                await cmdbServices.addMovieInGroup(userTest, "AHHHHHHHHHHHHHHH", "tt0468569")
-            } catch(e) {
-                await File.write(originalUsers, USERS_FILE)
-                await File.write(originalGroups, GROUPS_FILE)
-
-                assert.deepEqual(e, errors.INVALID_ARGUMENT("groupId"))
-                return
-            }
-
-            //Assert
-            assert.fail("Should throw an error")
-        })
-
-        it("Should throw an error if the groupId doesnt exist", async function() {
-            // Arrange
-            let originalGroups = await File.read(GROUPS_FILE)
-            let originalUsers = await File.read(USERS_FILE)
-            const userTest = "userTest"
-            const groupBodyTest = {
-                name: "Group Test",
-                description: "Just for test",
-            }
-
-            // Act
-            try {
-                await cmdbUserServices.createUser(userTest)
-                await cmdbServices.createGroup(userTest, groupBodyTest)
-                await cmdbServices.addMovieInGroup(userTest, -1, "tt0468569")
+                await cmdbUserServices.createUser(userTestUsername, userTestPassword)
+                let createdUser = await cmdbUserServices.getUser(userTestUsername)
+                await cmdbServices.createGroup(createdUser.token, groupBodyTest)
+                await cmdbServices.addMovieInGroup(createdUser.token, -1, "tt0468569")
             } catch(e) {
                 await File.write(originalUsers, USERS_FILE)
                 await File.write(originalGroups, GROUPS_FILE)
@@ -673,11 +570,10 @@ describe("Services modules tests:", function() {
             assert.fail("Should throw an error")
         })
 
-        it("Should throw an error if the movieId doesnt exist", async function() {
+        it("Should throw an error if the movieId doesn't exist", async function() {
             // Arrange
             let originalGroups = await File.read(GROUPS_FILE)
             let originalUsers = await File.read(USERS_FILE)
-            const userTest = "userTest"
             const groupBodyTest = {
                 name: "Group Test",
                 description: "Just for test",
@@ -686,9 +582,10 @@ describe("Services modules tests:", function() {
 
             // Act
             try {
-                await cmdbUserServices.createUser(userTest)
-                await cmdbServices.createGroup(userTest, groupBodyTest)
-                await cmdbServices.addMovieInGroup(userTest, newGroupId, "468569")
+                await cmdbUserServices.createUser(userTestUsername, userTestPassword)
+                let createdUser = await cmdbUserServices.getUser(userTestUsername)
+                await cmdbServices.createGroup(createdUser.token, groupBodyTest)
+                await cmdbServices.addMovieInGroup(createdUser.token, newGroupId, "468569")
             } catch(e) {
                 await File.write(originalUsers, USERS_FILE)
                 await File.write(originalGroups, GROUPS_FILE)
@@ -707,7 +604,6 @@ describe("Services modules tests:", function() {
             // Arrange
             let originalGroups = await File.read(GROUPS_FILE)
             let originalUsers = await File.read(USERS_FILE)
-            const userTest = "userTest"
             const groupBodyTest = {
                 name: "Group Test",
                 description: "Just for test",
@@ -736,10 +632,11 @@ describe("Services modules tests:", function() {
             })
 
             // Act
-            await cmdbUserServices.createUser(userTest)
-            await cmdbServices.createGroup(userTest, groupBodyTest)
-            await cmdbServices.addMovieInGroup(userTest, newGroupId, "tt0468569")
-            await cmdbServices.removeMovieInGroup(userTest, newGroupId, "tt0468569")
+            await cmdbUserServices.createUser(userTestUsername, userTestPassword)
+            let createdUser = await cmdbUserServices.getUser(userTestUsername)
+            await cmdbServices.createGroup(createdUser.token, groupBodyTest)
+            await cmdbServices.addMovieInGroup(createdUser.token, newGroupId, "tt0468569")
+            await cmdbServices.removeMovieInGroup(createdUser.token, newGroupId, "tt0468569")
 
             let cmdb_remove_movie_to_group = await File.read(GROUPS_FILE)
             cmdb_remove_movie_to_group = cmdb_remove_movie_to_group.groups.find(group => group.id == newGroupId)
@@ -751,40 +648,10 @@ describe("Services modules tests:", function() {
             assert.deepEqual(cmdb_remove_movie_to_group, groupTest)
         })
 
-        it("Should throw an error if the groupId is invalid", async function() {
+        it("Should throw an error if the groupId doesn't exist", async function() {
             // Arrange
             let originalGroups = await File.read(GROUPS_FILE)
             let originalUsers = await File.read(USERS_FILE)
-            const userTest = "userTest"
-            const groupBodyTest = {
-                name: "Group Test",
-                description: "Just for test",
-            }
-            const newGroupId = originalGroups.IDs + 1
-
-            //Act
-            try {
-                await cmdbUserServices.createUser(userTest)
-                await cmdbServices.createGroup(userTest, groupBodyTest)
-                await cmdbServices.addMovieInGroup(userTest, newGroupId, "tt0468569")
-                await cmdbServices.removeMovieInGroup(userTest, "AHHHHHHHHHHHHHHH", "tt0468569")
-            } catch(e) {
-                await File.write(originalUsers, USERS_FILE)
-                await File.write(originalGroups, GROUPS_FILE)
-
-                assert.deepEqual(e, errors.INVALID_ARGUMENT("groupId"))
-                return
-            }
-
-            //Assert
-            assert.fail("Should throw an error")
-        })
-
-        it("Should throw an error if the groupId doesnt exist", async function() {
-            // Arrange
-            let originalGroups = await File.read(GROUPS_FILE)
-            let originalUsers = await File.read(USERS_FILE)
-            const userTest = "userTest"
             const groupBodyTest = {
                 name: "Group Test",
                 description: "Just for test",
@@ -793,10 +660,11 @@ describe("Services modules tests:", function() {
 
             // Act
             try {
-                await cmdbUserServices.createUser(userTest)
-                await cmdbServices.createGroup(userTest, groupBodyTest)
-                await cmdbServices.addMovieInGroup(userTest, newGroupId, "tt0468569")
-                await cmdbServices.removeMovieInGroup(userTest, -1, "tt0468569")
+                await cmdbUserServices.createUser(userTestUsername, userTestPassword)
+                let createdUser = await cmdbUserServices.getUser(userTestUsername)
+                await cmdbServices.createGroup(createdUser.token, groupBodyTest)
+                await cmdbServices.addMovieInGroup(createdUser.token, newGroupId, "tt0468569")
+                await cmdbServices.removeMovieInGroup(createdUser.token, -1, "tt0468569")
             } catch(e) {
                 await File.write(originalUsers, USERS_FILE)
                 await File.write(originalGroups, GROUPS_FILE)
@@ -809,11 +677,10 @@ describe("Services modules tests:", function() {
             assert.fail("Should throw an error")
         })
 
-        it("Should throw an error if the movieId doesnt exist", async function() {
+        it("Should throw an error if the movieId doesn't exist", async function() {
             // Arrange
             let originalGroups = await File.read(GROUPS_FILE)
             let originalUsers = await File.read(USERS_FILE)
-            const userTest = "userTest"
             const groupBodyTest = {
                 name: "Group Test",
                 description: "Just for test",
@@ -822,10 +689,11 @@ describe("Services modules tests:", function() {
 
             // Act
             try {
-                await cmdbUserServices.createUser(userTest)
-                await cmdbServices.createGroup(userTest, groupBodyTest)
-                await cmdbServices.addMovieInGroup(userTest, newGroupId, "tt0468569")
-                await cmdbServices.removeMovieInGroup(userTest, newGroupId, "468569")
+                await cmdbUserServices.createUser(userTestUsername, userTestPassword)
+                let createdUser = await cmdbUserServices.getUser(userTestUsername)
+                await cmdbServices.createGroup(createdUser.token, groupBodyTest)
+                await cmdbServices.addMovieInGroup(createdUser.token, newGroupId, "tt0468569")
+                await cmdbServices.removeMovieInGroup(createdUser.token, newGroupId, "468569")
             } catch(e) {
                 await File.write(originalUsers, USERS_FILE)
                 await File.write(originalGroups, GROUPS_FILE)

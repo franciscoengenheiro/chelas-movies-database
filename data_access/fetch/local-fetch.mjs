@@ -2,15 +2,16 @@
 
 'use strict'
 
-import errors from '../errors/errors.mjs'
-import * as File from './file-operations.mjs'
-import { MOST_POPULAR_MOVIES, MOVIES_SEARCHED_BY_NAME, MOVIES_INFO } from './cmdb-movies-data.mjs'
+import errors from '#errors/errors.mjs'
+import * as File from '#data_access/util/file-operations.mjs'
+import { MOST_POPULAR_MOVIES, MOVIES_SEARCHED_BY_NAME, MOVIE_INFO } 
+    from '#data_access/imdb-movies-data.mjs'
 
-// Object that maps actual URLs to internal paths to files
+// Object that maps actual URLs to paths to local files
 const data = {
     [MOST_POPULAR_MOVIES]: './local_data/most-popular-movies.json',
     [MOVIES_SEARCHED_BY_NAME + "inception 2010"]: './local_data/movies-searched-by-name.json',
-    [MOVIES_INFO + "tt0468569"]: './local_data/movie-info.json'
+    [MOVIE_INFO + "tt0468569"]: './local_data/movie-info.json'
 }
 
 /**

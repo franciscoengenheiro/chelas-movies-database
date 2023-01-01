@@ -1,11 +1,35 @@
 {
-    "IDs": 1,
+    "IDs": 3,
     "groups": [
         {
-            "name": "Natal Group",
-            "description": "YAY",
+            "name": "top 10 horror movies",
+            "description": "just bloody horror",
             "id": 1,
-            "movies": [],
+            "movies": [
+                {
+                    "id": "tt3065204",
+                    "title": "The Conjuring 2",
+                    "duration": "134"
+                }
+            ],
+            "userId": 2
+        },
+        {
+            "name": "Nostalgia Group",
+            "description": "2005-2012 movies",
+            "id": 2,
+            "movies": [
+                {
+                    "id": "tt0382932",
+                    "title": "Ratatouille",
+                    "duration": "111"
+                },
+                {
+                    "id": "tt0435761",
+                    "title": "Toy Story 3",
+                    "duration": "103"
+                }
+            ],
             "userId": 1
         }
     ]

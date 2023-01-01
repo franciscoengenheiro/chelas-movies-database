@@ -3,18 +3,19 @@
     "users": [
         {
             "id": 1,
-            "name": "User 1",
-            "token": "43539ccc-3912-458f-8dd7-f5e04776398d"
+            "username": "admin",
+            "password": "admin",
+            "token": "28ffed1f-6b51-4388-875c-05e76f60b4a8"
         },
         {
             "id": 2,
-            "name": "User 2",
-            "token": "f56d452b-2103-4717-935d-43ea14b7d704"
+            "username": "guest",
+            "password": "guest",
+            "token": "d4695fcf-6647-492a-9244-bc4b981c63e7"
         },
         {
             "id": 3,
-            "name": "User 3",
-            "token": "e25e23f4-6a13-41ab-9612-40322fd33b0d"
+            "token": "1d051ed5-55ae-4433-8565-3f491f7c68f2"
         }
     ]
 }

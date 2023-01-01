@@ -2,8 +2,8 @@
 
 'use strict'
 
-import * as File from './file-operations.mjs'
-import errors from '../errors/errors.mjs'
+import crypto from 'crypto'
+import * as File from '#data_access/util/file-operations.mjs'
 
 // Constants
 const USERS_FILE = './local_data/users.json'
@@ -12,14 +12,15 @@ const USERS_FILE = './local_data/users.json'
  * Creates a new user and updates user local storage
  * @param {String} userToken token used to identify a user
  */
-export async function createUserData() {
+export async function createUserData(username, password) {
     let usersObj = await File.read(USERS_FILE)
     // Retrieve the new user Id 
     let newUserID = ++usersObj.IDs
     // Create a new user
     let newUser = {
         id: newUserID,
-        name: `User ${newUserID}`,
+        username: username,
+        password: password,
         token: crypto.randomUUID()
     }
     // Store the newly created user
@@ -33,7 +34,7 @@ export async function createUserData() {
  * @param {String} userToken token used to identify a user
  * @returns the user found or undefined
  */
-export async function getUserData(userToken) {
+export async function getUserData(query_value) {
     let usersObj = await File.read(USERS_FILE)
-    return usersObj.users.find(user => user.token == userToken)
+    return usersObj.users.find(user => user.token == query_value || user.username == query_value)
 }

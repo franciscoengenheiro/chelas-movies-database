@@ -7,8 +7,8 @@
 
 'use strict'
 
-import errors from '../../errors/errors.mjs'
-import translateToHTTPResponse from '../http-error-responses.mjs'
+import errors from '#errors/errors.mjs'
+import translateToHTTPResponse from '#web/http-error-responses.mjs'
 
 /**
  * @param {*} cmdbServices module that contains all application services

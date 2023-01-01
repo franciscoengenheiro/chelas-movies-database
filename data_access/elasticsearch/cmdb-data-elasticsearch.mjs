@@ -1,7 +1,7 @@
 'use strict'
 
-import errors from '../errors/errors.mjs'
-import fetch from './node-fetch.mjs'
+import errors from '#errors/errors.mjs'
+import fetch from '#data_access/fetch/node-fetch.mjs'
 
 export const baseURL = 'http://localhost:9200'
 export const REFRESH = '?refresh=wait_for'
@@ -28,7 +28,6 @@ async function createGroupData(obj, userId) {
     // Create properties for the new group
     obj.movies = []
     obj.userId = userId
-
     let options = {
         method: 'POST',
         headers: {
@@ -54,21 +53,16 @@ async function getGroupsData(userId) {
         body: JSON.stringify({
             "query": {
                 "match": {
-                    "userId": {
-                        "query": userId,
-                        "operator": "AND"
-                    }
+                    "userId.keyword": userId
                 }
             }
         })
     }
     let groupsObj = await fetch(GROUPS_BASE_URL + '/_search', options)
-    if(groupsObj.hits.hits.length == 0){
-        throw errors.ARGUMENT_NOT_FOUND("groups")
-    }
     // Retrieve only the groups that belong to the user and modify each group object
     // to only show selected properties
-    groupsObj.hits.hits = groupsObj.hits.hits
+
+    let retrievedGroups = groupsObj.hits.hits
         .map(group => {
             return {
                 id: group._id,
@@ -76,7 +70,7 @@ async function getGroupsData(userId) {
                 description: group._source.description
             }
         })
-    return groupsObj.hits.hits
+    return retrievedGroups
 }
 
 /**
