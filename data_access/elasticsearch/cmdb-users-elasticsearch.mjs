@@ -41,8 +41,6 @@ export default function() {
      * @returns the user found or undefined
      */
     async function getUserData(query_value) {
-        if(query_value == undefined) return undefined
-
         const options = {
             method: 'POST',
             headers: {

@@ -726,7 +726,7 @@ describe("API integration tests:", function() {
 		        .expect(201)
 
             routeToTest = `/api/groups/${groupA_id}/movies/${invalidGroupId}`
-
+            
             // Try to delete the movie in group A
             response = await request(app)
                 .delete(routeToTest)

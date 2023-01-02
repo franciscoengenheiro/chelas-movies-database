@@ -1,17 +1,4 @@
 {
-    "IDs": 2,
-    "users": [
-        {
-            "id": 1,
-            "username": "admin",
-            "password": "admin",
-            "token": "09faa257-d2f2-4b75-80f9-185fbd52e108"
-        },
-        {
-            "id": 2,
-            "username": "guest",
-            "password": "guest",
-            "token": "93ad6dd1-09b4-45e8-a06b-e7cf0bc4c4a2"
-        }
-    ]
+    "IDs": 0,
+    "users": []
 }

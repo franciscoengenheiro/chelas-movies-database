@@ -18,8 +18,8 @@ import session from 'express-session'
 
 // Internal imports
 import cmdbUserServicesInit from '#services/cmdb-users-services.mjs'
-// import * as usersData from '#data_access/internal/cmdb-users-data.mjs'
-// import * as cmdbData from '#data_access/internal/cmdb-data-mem.mjs'
+import * as usersData from '#data_access/internal/cmdb-users-data.mjs'
+import * as cmdbData from '#data_access/internal/cmdb-data-mem.mjs'
 import cmdbUsersElastiSearchInit from '#data_access/elasticsearch/cmdb-users-elasticsearch.mjs'
 import cmdbDataElasticSearchInit from '#data_access/elasticsearch/cmdb-data-elasticsearch.mjs'
 import imdbDataInit from '#data_access/imdb-movies-data.mjs'
@@ -29,13 +29,13 @@ import cmdbWebSiteInit from '#web/site/cmdb-web-site.mjs'
 import cmdbUsersWebSiteInit from '#web/site/cmdb-users-web-site.mjs'
 
 // Fetch Modules
-import fetch from '#data_access/fetch/node-fetch.mjs'
-// import fetch from '#data_access/fetch/local-fetch.mjs'
+//import fetch from '#data_access/fetch/node-fetch.mjs'
+ import fetch from '#data_access/fetch/local-fetch.mjs'
 
 export default function() {
     // Initializations 
-    const usersData = cmdbUsersElastiSearchInit()
-    const cmdbData = cmdbDataElasticSearchInit()
+/*     const usersData = cmdbUsersElastiSearchInit()
+    const cmdbData = cmdbDataElasticSearchInit() */
     const imdbData = imdbDataInit(fetch)
     const cmdbServices = cmdbServicesInit(imdbData, cmdbData, usersData)
     const cmdbUserServices = cmdbUserServicesInit(usersData)
