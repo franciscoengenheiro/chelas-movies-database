@@ -39,6 +39,7 @@
     "#errors/*": "./errors/*",
     "#services/*": "./services/*",
     "#tests/*": "./tests/*",
-    "#web/*": "./web/*" 
+    "#web/*": "./web/*" ,
+    "#root/*": "./*"
   }
 }

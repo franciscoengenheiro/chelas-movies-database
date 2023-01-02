@@ -20,12 +20,13 @@ const imdbData = imdbDataInit(fetch)
 const cmdbUserServices = cmdbUserServicesInit(usersData)
 const cmdbServices = cmdbServicesInit(imdbData, cmdbData, usersData)
 
-// Retrieve local files
+// Paths to local files
 const POPULAR_MOVIES_FILE = "./local_data/most-popular-movies.json"
 const SEARCH_MOVIE_BY_NAME_FILE = "./local_data/movies-searched-by-name.json"
 const GET_MOVIE_BY_ID = "./local_data/movie-info.json"
 const USERS_FILE = './local_data/users.json'
 const GROUPS_FILE = './local_data/groups.json'
+
 
 // --------------------------------------- Notes --------------------------------------------------------
 // Before running the tests make sure:
@@ -38,8 +39,23 @@ const GROUPS_FILE = './local_data/groups.json'
 // Run tests (in root directory) with: npm test tests
 // --------------------------------------- Notes --------------------------------------------------------
 describe("Services modules tests:", function() {
+    // Constants
     const userTestUsername = "userTestUsername"
     const userTestPassword = "userTestPassword"
+    // Global variables
+    let originalUsers
+    let originalGroups
+    // Utility test functions
+    beforeEach(async () => {
+        // Read current data
+        originalUsers = await File.read(USERS_FILE)
+        originalGroups = await File.read(GROUPS_FILE)
+    })
+    afterEach(async () => {
+        // Restore previous data
+        await File.write(originalUsers, USERS_FILE)   
+        await File.write(originalGroups, GROUPS_FILE)               
+    })
     describe("Getting the most popular movies:", function() {
         it("Should return an object with an array of the 250 most popular movies", async function() {
             // Arrange
@@ -144,7 +160,7 @@ describe("Services modules tests:", function() {
         })
     })
 
-    describe("Get movie details by its Id:", function() {
+    describe("Get movie details using a movieId:", function() {
         it("Should return an object with the results from a movie fetch by Id", async function() {
             // Arrange
             let movieObj = await File.read(GET_MOVIE_BY_ID)
@@ -169,7 +185,6 @@ describe("Services modules tests:", function() {
     describe("Create a new user:", function() {
         it("Should create a new user", async function() {
             // Arrange
-            let originalUsers = await File.read(USERS_FILE)
             let users = await File.read(USERS_FILE)
 
             // Act
@@ -182,8 +197,7 @@ describe("Services modules tests:", function() {
 
             await cmdbUserServices.createUser(userTestUsername, userTestPassword)
             let newUsers = await File.read(USERS_FILE)
-            await File.write(originalUsers, USERS_FILE)
-
+            
             // Assert
             assert.deepEqual(users.id, newUsers.id)
             assert.deepEqual(users.usernames, newUsers.usernames)
@@ -191,19 +205,35 @@ describe("Services modules tests:", function() {
             // Cannot check token as it is randomly given
         })
 
-        it("Should not create a new user", async function() {
-            // Arrange
-            let originalUsers = await File.read(USERS_FILE) 
-
+        it("Try to create the same user twice", async function() {
             // Create an user 
             await cmdbUserServices.createUser(userTestUsername, userTestPassword)
             // Try to create the same user again
             try {
                 await cmdbUserServices.createUser(userTestUsername, userTestPassword)
             } catch (e) {
-                assert.deepEqual(e, errors.INVALID_USER("user already exists"))
-                // Restore previous data
-                await File.write(originalUsers, USERS_FILE) 
+                assert.deepEqual(e, errors.INVALID_USER("already exists"))
+                return
+            }
+            assert.fail("Should throw an error")
+        })
+        it("Create an user with an invalid username", async function() {
+
+            try {
+                // Create an user
+                await cmdbUserServices.createUser(1, userTestPassword)
+            } catch (e) {
+                assert.deepEqual(e, errors.INVALID_ARGUMENT("username"))
+                return
+            }
+            assert.fail("Should throw an error")
+        })
+        it("Create an user with an invalid password", async function() {
+            try {
+                // Create an user
+                await cmdbUserServices.createUser(userTestUsername, " a")
+            } catch (e) {
+                assert.deepEqual(e, errors.INVALID_ARGUMENT("password"))
                 return
             }
             assert.fail("Should throw an error")
@@ -213,8 +243,6 @@ describe("Services modules tests:", function() {
     describe("Create a group for an user:", function() {
         it("Should create a new group for the specified user", async function() {
             // Arrange
-            let originalGroups = await File.read(GROUPS_FILE)
-            let originalUsers = await File.read(USERS_FILE)
             let currentGroups = await File.read(GROUPS_FILE)
             let groupToCreate = {
                 name: "Group Test",
@@ -230,18 +258,12 @@ describe("Services modules tests:", function() {
 
             let alteredGroups = await File.read(GROUPS_FILE)
 
-            // Retrieve previous data
-            await File.write(originalUsers, USERS_FILE)
-            await File.write(originalGroups, GROUPS_FILE)
-
             // Assert 
             assert.deepEqual(currentGroups, alteredGroups)
         })
 
         it("Should not create a new group for the specified user", async function() {
             // Arrange
-            let originalGroups = await File.read(GROUPS_FILE)
-            let originalUsers = await File.read(USERS_FILE)
             let invalidGroup = {
                 notAName: "Group 56",
                 description: 1234,
@@ -256,9 +278,6 @@ describe("Services modules tests:", function() {
                 await cmdbServices.createGroup(createdUser.token, invalidGroup)
             } catch(e) {
                 assert.deepEqual(e, errors.INVALID_ARGUMENT("group missing a valid name and description"))
-                // Retrieve previous data
-                await File.write(originalUsers, USERS_FILE)
-                await File.write(originalGroups, GROUPS_FILE)               
                 return
             }
             assert.fail("Should throw an error")
@@ -268,8 +287,6 @@ describe("Services modules tests:", function() {
     describe("Get a group for an user:", function() {
         it("Should get all groups for the specified user", async function() {
             // Arrange
-            let originalGroups = await File.read(GROUPS_FILE)
-            let originalUsers = await File.read(USERS_FILE)
             let groupsTest = []
             let group1 = {
                 "id": originalGroups.IDs + 1,
@@ -301,9 +318,7 @@ describe("Services modules tests:", function() {
 
             // Retrieve the group created
             let groups = await cmdbServices.getGroups(createdUser.token) 
-            // Restore previous data
-            await File.write(originalUsers, USERS_FILE)
-            await File.write(originalGroups, GROUPS_FILE)
+
             // Assert 
             assert.deepEqual(groupsTest, groups)   
         })
@@ -312,8 +327,6 @@ describe("Services modules tests:", function() {
     describe("Get group details for an user:", function() {
         it("Should get all the group details for the specified user", async function() {
             // Arrange
-            let originalGroups = await File.read(GROUPS_FILE)
-            let originalUsers = await File.read(USERS_FILE)
             let group = {
                 name: "Test group 1",
                 description: "random"
@@ -333,18 +346,13 @@ describe("Services modules tests:", function() {
             }
             // Retrieve the group created
             let createdGroup = await cmdbServices.getGroupDetails(createdUser.token, groupId) 
-            // Restore previous data
-            await File.write(originalUsers, USERS_FILE)
-            await File.write(originalGroups, GROUPS_FILE)
-
+           
             // Assert 
             assert.deepEqual(newGroup, createdGroup)   
         })
 
         it("Should throw an error if the group Id does not exist", async function() {
             // Arrange
-            let originalGroups = await File.read(GROUPS_FILE)
-            let originalUsers = await File.read(USERS_FILE)
             let group = {
                 name: "Test group 1",
                 description: "random"
@@ -361,9 +369,6 @@ describe("Services modules tests:", function() {
                 await cmdbServices.getGroupDetails(createdUser.token, groupId) 
             } catch(e) {
                 assert.deepEqual(e, errors.ARGUMENT_NOT_FOUND("group"))
-                // Restore previous data
-                await File.write(originalUsers, USERS_FILE)
-                await File.write(originalGroups, GROUPS_FILE)
                 return
             }
 
@@ -375,8 +380,6 @@ describe("Services modules tests:", function() {
     describe("Edit a Group:", function() {
         it("Should edit a group by Id", async function() {
             // Arrange
-            let originalGroups = await File.read(GROUPS_FILE)
-            let originalUsers = await File.read(USERS_FILE)
             const groupBodyTest = {
                 name: "Group Test",
                 description: "Just for test",
@@ -405,17 +408,12 @@ describe("Services modules tests:", function() {
             let cmdb_edit_movie_to_group = await File.read(GROUPS_FILE)
             cmdb_edit_movie_to_group = cmdb_edit_movie_to_group.groups.find(group => group.id == newGroupId)
 
-            await File.write(originalUsers, USERS_FILE)
-            await File.write(originalGroups, GROUPS_FILE)
-
             // Assert
             assert.deepEqual(cmdb_edit_movie_to_group, groupTest)
         })
 
         it("Should throw an error if the groupId doesn't exist", async function() {
             // Arrange
-            let originalGroups = await File.read(GROUPS_FILE)
-            let originalUsers = await File.read(USERS_FILE)
             const groupBodyTest = {
                 name: "Group Test",
                 description: "Just for test",
@@ -433,8 +431,6 @@ describe("Services modules tests:", function() {
                 await cmdbServices.createGroup(createdUser.token, groupBodyTest)
                 await cmdbServices.editGroup(createdUser.token, newGroupId, groupBodyUpdatedTest)
             } catch(e) {
-                await File.write(originalUsers, USERS_FILE)
-                await File.write(originalGroups, GROUPS_FILE)
                 assert.deepEqual(e, errors.ARGUMENT_NOT_FOUND("group"))
                 return
             }
@@ -447,8 +443,6 @@ describe("Services modules tests:", function() {
     describe("Delete a Group:", function() {
         it("Should delete a group by Id", async function() {
             // Arrange
-            let originalGroups = await File.read(GROUPS_FILE)
-            let originalUsers = await File.read(USERS_FILE)
             const groupBodyTest = {
                 name: "Group Test",
                 description: "Just for test",
@@ -466,17 +460,12 @@ describe("Services modules tests:", function() {
             let cmdb_remove_movie_to_group = await File.read(GROUPS_FILE)
             cmdb_remove_movie_to_group = cmdb_remove_movie_to_group.groups
 
-            await File.write(originalUsers, USERS_FILE)
-            await File.write(originalGroups, GROUPS_FILE)
-
             // Assert
             assert.deepEqual(cmdb_remove_movie_to_group, originalGroups.groups)
         })
 
         it("Should throw an error if the groupId doesn't exist", async function() {
             // Arrange
-            let originalGroups = await File.read(GROUPS_FILE)
-            let originalUsers = await File.read(USERS_FILE)
             const groupBodyTest = {
                 name: "Group Test",
                 description: "Just for test",
@@ -489,9 +478,6 @@ describe("Services modules tests:", function() {
                 await cmdbServices.createGroup(createdUser.token, groupBodyTest)
                 await cmdbServices.deleteGroup(createdUser.token, -1)
             } catch(e) {
-                await File.write(originalUsers, USERS_FILE)
-                await File.write(originalGroups, GROUPS_FILE)
-
                 assert.deepEqual(e, errors.ARGUMENT_NOT_FOUND("group"))
                 return
             }
@@ -502,10 +488,9 @@ describe("Services modules tests:", function() {
     })
 
     describe("Adding a Movie in a Group:", function() {
-        it("Should add a new movie to the group ID given", async function() {
+        
+        it("Should add a new movie to the given group Id", async function() {
             // Arrange
-            let originalGroups = await File.read(GROUPS_FILE)
-            let originalUsers = await File.read(USERS_FILE)
             const groupBodyTest = {
                 name: "Group Test",
                 description: "Just for test",
@@ -536,17 +521,39 @@ describe("Services modules tests:", function() {
             let cmdb_add_movie_to_group = await File.read(GROUPS_FILE)
             cmdb_add_movie_to_group = cmdb_add_movie_to_group.groups.find(group => group.id == newGroupId)
 
-            await File.write(originalUsers, USERS_FILE)
-            await File.write(originalGroups, GROUPS_FILE)
-
             // Assert
             assert.deepEqual(cmdb_add_movie_to_group, groupTest)
         })
 
+        it("Should not add a movie that was already added", async function() {
+            // Arrange
+            const groupBodyTest = {
+                name: "Group Test",
+                description: "Just for test",
+            }
+
+            // Arrange
+            const newGroupId = originalGroups.IDs + 1
+
+            try {
+                await cmdbUserServices.createUser(userTestUsername, userTestPassword)
+                let createdUser = await cmdbUserServices.getUser(userTestUsername)
+                await cmdbServices.createGroup(createdUser.token, groupBodyTest)
+                // Add movie to the group
+                await cmdbServices.addMovieInGroup(createdUser.token, newGroupId, "tt0468569")
+                // Try to add the same movie to the group
+                await cmdbServices.addMovieInGroup(createdUser.token, newGroupId, "tt0468569")
+            } catch(e) {
+                assert.deepEqual(e, errors.INVALID_ARGUMENT("movie already exists in this group"))
+                return
+            }
+            // Assert
+            assert.fail("Should throw an error")
+
+        })
+
         it("Should throw an error if the groupId doesn't exist", async function() {
             // Arrange
-            let originalGroups = await File.read(GROUPS_FILE)
-            let originalUsers = await File.read(USERS_FILE)
             const groupBodyTest = {
                 name: "Group Test",
                 description: "Just for test",
@@ -559,9 +566,6 @@ describe("Services modules tests:", function() {
                 await cmdbServices.createGroup(createdUser.token, groupBodyTest)
                 await cmdbServices.addMovieInGroup(createdUser.token, -1, "tt0468569")
             } catch(e) {
-                await File.write(originalUsers, USERS_FILE)
-                await File.write(originalGroups, GROUPS_FILE)
-
                 assert.deepEqual(e, errors.ARGUMENT_NOT_FOUND("group"))
                 return
             }
@@ -572,8 +576,6 @@ describe("Services modules tests:", function() {
 
         it("Should throw an error if the movieId doesn't exist", async function() {
             // Arrange
-            let originalGroups = await File.read(GROUPS_FILE)
-            let originalUsers = await File.read(USERS_FILE)
             const groupBodyTest = {
                 name: "Group Test",
                 description: "Just for test",
@@ -587,9 +589,6 @@ describe("Services modules tests:", function() {
                 await cmdbServices.createGroup(createdUser.token, groupBodyTest)
                 await cmdbServices.addMovieInGroup(createdUser.token, newGroupId, "468569")
             } catch(e) {
-                await File.write(originalUsers, USERS_FILE)
-                await File.write(originalGroups, GROUPS_FILE)
-
                 assert.deepEqual(e, errors.ARGUMENT_NOT_FOUND("Movie"))
                 return
             }
@@ -602,8 +601,6 @@ describe("Services modules tests:", function() {
     describe("Removing a Movie in a Group:", function() {
         it("Should remove a movie from the group ID given", async function() {
             // Arrange
-            let originalGroups = await File.read(GROUPS_FILE)
-            let originalUsers = await File.read(USERS_FILE)
             const groupBodyTest = {
                 name: "Group Test",
                 description: "Just for test",
@@ -641,17 +638,12 @@ describe("Services modules tests:", function() {
             let cmdb_remove_movie_to_group = await File.read(GROUPS_FILE)
             cmdb_remove_movie_to_group = cmdb_remove_movie_to_group.groups.find(group => group.id == newGroupId)
 
-            await File.write(originalUsers, USERS_FILE)
-            await File.write(originalGroups, GROUPS_FILE)
-
             // Assert
             assert.deepEqual(cmdb_remove_movie_to_group, groupTest)
         })
 
         it("Should throw an error if the groupId doesn't exist", async function() {
             // Arrange
-            let originalGroups = await File.read(GROUPS_FILE)
-            let originalUsers = await File.read(USERS_FILE)
             const groupBodyTest = {
                 name: "Group Test",
                 description: "Just for test",
@@ -666,9 +658,6 @@ describe("Services modules tests:", function() {
                 await cmdbServices.addMovieInGroup(createdUser.token, newGroupId, "tt0468569")
                 await cmdbServices.removeMovieInGroup(createdUser.token, -1, "tt0468569")
             } catch(e) {
-                await File.write(originalUsers, USERS_FILE)
-                await File.write(originalGroups, GROUPS_FILE)
-
                 assert.deepEqual(e, errors.ARGUMENT_NOT_FOUND("group"))
                 return
             }
@@ -679,8 +668,6 @@ describe("Services modules tests:", function() {
 
         it("Should throw an error if the movieId doesn't exist", async function() {
             // Arrange
-            let originalGroups = await File.read(GROUPS_FILE)
-            let originalUsers = await File.read(USERS_FILE)
             const groupBodyTest = {
                 name: "Group Test",
                 description: "Just for test",
@@ -695,8 +682,6 @@ describe("Services modules tests:", function() {
                 await cmdbServices.addMovieInGroup(createdUser.token, newGroupId, "tt0468569")
                 await cmdbServices.removeMovieInGroup(createdUser.token, newGroupId, "468569")
             } catch(e) {
-                await File.write(originalUsers, USERS_FILE)
-                await File.write(originalGroups, GROUPS_FILE)
                 assert.deepEqual(e, errors.ARGUMENT_NOT_FOUND("movie"))
                 return
             }

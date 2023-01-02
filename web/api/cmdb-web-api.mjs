@@ -40,7 +40,7 @@ export default function(cmdbServices, cmdbUserServices) {
 
     // Functions:
     async function createUserInternal(req, rsp) {
-        let newUser = await cmdbUserServices.createUser()
+        let newUser = await cmdbUserServices.createUser(req.body.username, req.body.password)
         rsp.status(201)
         return {
             message: `User created`,

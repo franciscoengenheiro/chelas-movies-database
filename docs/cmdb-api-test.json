@@ -7,7 +7,7 @@
 	},
 	"item": [
 		{
-			"name": "POST /users",
+			"name": "Users",
 			"item": [
 				{
 					"name": "Create User",
@@ -29,10 +29,33 @@
 					},
 					"response": []
 				}
+			],
+			"auth": {
+				"type": "noauth"
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
 			]
 		},
 		{
-			"name": "GET /movies",
+			"name": "Search",
 			"item": [
 				{
 					"name": "Get popular movies",
@@ -72,53 +95,13 @@
 							"query": [
 								{
 									"key": "limit",
-									"value": "10",
-									"disabled": true
-								},
-								{
-									"key": "limit",
 									"value": "5"
 								}
 							]
 						}
 					},
 					"response": []
-				}
-			],
-			"auth": {
-				"type": "bearer",
-				"bearer": [
-					{
-						"key": "token",
-						"value": "asdasdadadadawqe",
-						"type": "string"
-					}
-				]
-			},
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							""
-						]
-					}
 				},
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							""
-						]
-					}
-				}
-			]
-		},
-		{
-			"name": "GET /movies/{moviesName}",
-			"item": [
 				{
 					"name": "Search movies by name",
 					"request": {
@@ -146,17 +129,32 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get movie details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/movies/find/tt0468569",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"movies",
+								"find",
+								"tt0468569"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"auth": {
-				"type": "bearer",
-				"bearer": [
-					{
-						"key": "token",
-						"value": "asdasdadadadawqe",
-						"type": "string"
-					}
-				]
+				"type": "noauth"
 			},
 			"event": [
 				{
@@ -180,58 +178,11 @@
 			]
 		},
 		{
-			"name": "GET /movies{movieid}",
-			"item": [
-				{
-					"name": "Get movie details",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "asdasdadadadawqe",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://{{host}}:{{port}}/api/movies/find/tt0468569",
-							"protocol": "http",
-							"host": [
-								"{{host}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"api",
-								"movies",
-								"find",
-								"tt0468569"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "POST /groups",
+			"name": "Groups",
 			"item": [
 				{
 					"name": "Create Group",
 					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "1d051ed5-55ae-4433-8565-3f491f7c68f2",
-									"type": "string"
-								}
-							]
-						},
 						"method": "POST",
 						"header": [],
 						"body": {
@@ -257,124 +208,14 @@
 						}
 					},
 					"response": []
-				}
-			],
-			"auth": {
-				"type": "bearer",
-				"bearer": [
-					{
-						"key": "token",
-						"value": "asdasdadadadawqe",
-						"type": "string"
-					}
-				]
-			},
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							""
-						]
-					}
 				},
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							""
-						]
-					}
-				}
-			]
-		},
-		{
-			"name": "GET /groups",
-			"item": [
 				{
 					"name": "Get all groups",
 					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "1d051ed5-55ae-4433-8565-3f491f7c68f2",
-									"type": "string"
-								}
-							]
-						},
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{host}}:{{port}}/api/groups",
-							"protocol": "http",
-							"host": [
-								"{{host}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"api",
-								"groups"
-							]
-						}
-					},
-					"response": []
-				}
-			],
-			"auth": {
-				"type": "bearer",
-				"bearer": [
-					{
-						"key": "token",
-						"value": "asdasdadadadawqe",
-						"type": "string"
-					}
-				]
-			},
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							""
-						]
-					}
-				},
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							""
-						]
-					}
-				}
-			]
-		},
-		{
-			"name": "GET /groups/{groupId}",
-			"item": [
-				{
-					"name": "Get group details",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "1d051ed5-55ae-4433-8565-3f491f7c68f2",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://{{host}}:{{port}}/api/groups/3",
+							"raw": "http://{{host}}:{{port}}/api/groups/",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
@@ -383,65 +224,41 @@
 							"path": [
 								"api",
 								"groups",
-								"3"
+								""
 							]
 						}
 					},
 					"response": []
-				}
-			],
-			"auth": {
-				"type": "bearer",
-				"bearer": [
-					{
-						"key": "token",
-						"value": "asdasdadadadawqe",
-						"type": "string"
-					}
-				]
-			},
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							""
-						]
-					}
 				},
 				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							""
-						]
-					}
-				}
-			]
-		},
-		{
-			"name": "PUT /groups/{groupId}",
-			"item": [
+					"name": "Get group details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/groups/2",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"groups",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
 				{
 					"name": "Update group",
 					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "1d051ed5-55ae-4433-8565-3f491f7c68f2",
-									"type": "string"
-								}
-							]
-						},
 						"method": "PUT",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Updated Group\",\r\n    \"description\": \"Top 10 horror movies\"\r\n}",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -449,7 +266,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{host}}:{{port}}/api/groups/3",
+							"raw": "http://{{host}}:{{port}}/api/groups/1",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
@@ -458,64 +275,19 @@
 							"path": [
 								"api",
 								"groups",
-								"3"
+								"1"
 							]
 						}
 					},
 					"response": []
-				}
-			],
-			"auth": {
-				"type": "bearer",
-				"bearer": [
-					{
-						"key": "token",
-						"value": "asdasdadadadawqe",
-						"type": "string"
-					}
-				]
-			},
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							""
-						]
-					}
 				},
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							""
-						]
-					}
-				}
-			]
-		},
-		{
-			"name": "DELETE /groups/{groupId}",
-			"item": [
 				{
 					"name": "Delete group",
 					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "1d051ed5-55ae-4433-8565-3f491f7c68f2",
-									"type": "string"
-								}
-							]
-						},
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://{{host}}:{{port}}/api/groups/3",
+							"raw": "http://{{host}}:{{port}}/api/groups/3.4",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
@@ -524,64 +296,19 @@
 							"path": [
 								"api",
 								"groups",
-								"3"
+								"3.4"
 							]
 						}
 					},
 					"response": []
-				}
-			],
-			"auth": {
-				"type": "bearer",
-				"bearer": [
-					{
-						"key": "token",
-						"value": "asdasdadadadawqe",
-						"type": "string"
-					}
-				]
-			},
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							""
-						]
-					}
 				},
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							""
-						]
-					}
-				}
-			]
-		},
-		{
-			"name": "PUT /groups/{groupId}/movies/{movieId}",
-			"item": [
 				{
 					"name": "Add a movie to a group",
 					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "1d051ed5-55ae-4433-8565-3f491f7c68f2",
-									"type": "string"
-								}
-							]
-						},
 						"method": "PUT",
 						"header": [],
 						"url": {
-							"raw": "http://{{host}}:{{port}}/api/groups/3/movies/tt0468569",
+							"raw": "http://{{host}}:{{port}}/api/groups/1/movies/tt0468569",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
@@ -590,62 +317,17 @@
 							"path": [
 								"api",
 								"groups",
-								"3",
+								"1",
 								"movies",
 								"tt0468569"
 							]
 						}
 					},
 					"response": []
-				}
-			],
-			"auth": {
-				"type": "bearer",
-				"bearer": [
-					{
-						"key": "token",
-						"value": "asdasdadadadawqe",
-						"type": "string"
-					}
-				]
-			},
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							""
-						]
-					}
 				},
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							""
-						]
-					}
-				}
-			]
-		},
-		{
-			"name": "DELETE /groups/{groupId}/movies/{movieId}",
-			"item": [
 				{
 					"name": "Remove a movie from a group",
 					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "1d051ed5-55ae-4433-8565-3f491f7c68f2",
-									"type": "string"
-								}
-							]
-						},
 						"method": "DELETE",
 						"header": [],
 						"url": {
@@ -672,7 +354,7 @@
 				"bearer": [
 					{
 						"key": "token",
-						"value": "asdasdadadadawqe",
+						"value": "d385ae54-b109-44da-abba-8abed4712fd1",
 						"type": "string"
 					}
 				]

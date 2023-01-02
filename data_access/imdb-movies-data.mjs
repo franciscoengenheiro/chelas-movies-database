@@ -6,7 +6,7 @@
 import errors from '#errors/errors.mjs'
 
 // Constants
-const IMDB_KEY = "k_lcs891ko" // "k_jtqnxg0w"
+const IMDB_KEY = "k_lcs891ko" // "k_jtqnxg0w" 
 export const MOST_POPULAR_MOVIES = `https://imdb-api.com/en/API/Top250Movies/${IMDB_KEY}`
 export const MOVIES_SEARCHED_BY_NAME = `https://imdb-api.com/en/API/SearchMovie/${IMDB_KEY}/`
 export const MOVIE_INFO = `https://imdb-api.com/en/API/Title/${IMDB_KEY}/`
@@ -70,7 +70,6 @@ export default function(fetch) {
             director: movieObj.directors,
             actors_names: movieObj.stars
         }
-
         return movieDetails
     }
 
@@ -84,7 +83,7 @@ export default function(fetch) {
     async function addMovieInGroupData(movieId) {
         let moviesObj = await fetch(MOVIE_INFO + movieId)
         if (moviesObj.title == null) {
-            throw errors.ARGUMENT_NOT_FOUND("Movie")
+            throw errors.ARGUMENT_NOT_FOUND("movie")
         } else {
             return moviesObj
         }

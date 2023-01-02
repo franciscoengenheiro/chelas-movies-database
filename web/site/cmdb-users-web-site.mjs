@@ -1,3 +1,6 @@
+// Module that contains the functions that handle all HTTP Requests that are user related 
+
+
 'use strict'
 
 import errors from "#errors/errors.mjs"
@@ -52,8 +55,8 @@ export default function(userServices) {
         let user = await validateUser(req.body.username, req.body.password)
         if(user) {
             // Represents a user in the CMDB application
-            // Passport saves this object in session, and when the request arrives and while the 
-            // session for this user is active, the data can be accessed in req.user
+            // Passport saves this object in session, and when the request arrives, and while the 
+            // session for this user is active (cookie in client), the data can be accessed in req.user
             req.login({
                 username: user.username,
                 token: user.token
@@ -64,6 +67,7 @@ export default function(userServices) {
     function verifyAuthenticatedInternal(req, rsp, next) {
         // The user is only authenticated if req.user != undefined
         if(req.user) {
+            // Call next middleware in the stack
             return next()
         }
         rsp.redirect('/login')

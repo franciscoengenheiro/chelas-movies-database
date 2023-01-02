@@ -4,12 +4,8 @@
 //  - Invoke the corresponding operation on services
 //  - Generate the response in HTML format
 
-import url from 'url'
 import errors from '#errors/errors.mjs'
 import translateToHTTPResponse from '#web/http-error-responses.mjs'
-
-// Retrieves the relative path to the file
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url)) 
 
 export default function (cmdbServices) {
     // Validate if all the received services exist
@@ -138,16 +134,6 @@ export default function (cmdbServices) {
         const group = await cmdbServices.getGroupDetails(req.token, groupId)
         return {id: groupId, group: group}
     }
-
-    /**
-     * Sends a file from the location given by filename current directory
-     * @param {String} fileName end segment of the file path
-     * @param {*} rsp response object
-     */  
-    function sendFile(fileName, rsp) {
-        const fileLocation = __dirname + 'public/' + fileName
-        rsp.sendFile(fileLocation)
-    }
   
     /** 
      * Constructs a new View with the given name and data to send to response render function
@@ -164,9 +150,7 @@ export default function (cmdbServices) {
     function verifyAuthentication(handler){
         return async function(req, rsp){
             req.token = req.user.token
-
             let requestHandler = handleRequestInHTML(handler)
-
             requestHandler(req, rsp)
         }
     }
