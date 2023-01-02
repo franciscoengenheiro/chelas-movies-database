@@ -12,9 +12,6 @@ import yaml from 'yamljs' // Yaml is similar to JSON but uses indentation to inf
 import hbs from 'hbs'
 import path from 'path'
 import url from 'url'
-import cookieParser from 'cookie-parser'
-import passport from 'passport'
-import session from 'express-session'
 
 // Internal imports
 import cmdbUserServicesInit from '#services/cmdb-users-services.mjs'
@@ -26,22 +23,20 @@ import imdbDataInit from '#data_access/imdb-movies-data.mjs'
 import cmdbServicesInit from '#services/cmdb-services.mjs' 
 import cmdbWebApiInit from '#web/api/cmdb-web-api.mjs'
 import cmdbWebSiteInit from '#web/site/cmdb-web-site.mjs'
-import cmdbUsersWebSiteInit from '#web/site/cmdb-users-web-site.mjs'
 
 // Fetch Modules
-//import fetch from '#data_access/fetch/node-fetch.mjs'
- import fetch from '#data_access/fetch/local-fetch.mjs'
+import fetch from '#data_access/fetch/node-fetch.mjs'
+//import fetch from '#data_access/fetch/local-fetch.mjs'
 
 export default function() {
     // Initializations 
-/*     const usersData = cmdbUsersElastiSearchInit()
-    const cmdbData = cmdbDataElasticSearchInit() */
+    const usersData = cmdbUsersElastiSearchInit()
+    const cmdbData = cmdbDataElasticSearchInit()
     const imdbData = imdbDataInit(fetch)
     const cmdbServices = cmdbServicesInit(imdbData, cmdbData, usersData)
     const cmdbUserServices = cmdbUserServicesInit(usersData)
     const cmdbWebApi = cmdbWebApiInit(cmdbServices, cmdbUserServices)
     const cmdbWebSite = cmdbWebSiteInit(cmdbServices)
-    const cmdbUserWebSite = cmdbUsersWebSiteInit(cmdbUserServices)
 
     let app = express() // Instance of the application
     
@@ -66,51 +61,28 @@ export default function() {
                             // Content-Type of the request header matches this option 
     app.use(express.urlencoded( { extended: false})) // Parses incoming requests with urlencoded payloads if the
                                 // Content-Type of the request header matches this option 
-    app.use(cookieParser()) // Parses Cookie Header and populates req.cookies with an object 
-                            // keyed by the cookie names
 
-    passport.serializeUser((userInfo, done) => { done(null, userInfo); });
-    passport.deserializeUser((userInfo, done) => { done(null, userInfo); });
-    app.use(session({
-        secret: 'leic-ipw-g06',
-        cookie:{_expires : 10800000}, // time im ms (corresponds to 3 hours)
-        resave: false,
-        saveUninitialized: false
-    }));
-    app.use(passport.session()) // Passport initialization
-    app.use(passport.initialize())
     app.use(express.static(path.join(__dirname, 'web', 'site')));
-    app.use('/auth', cmdbUserWebSite.verifyAuthenticated)
     // ------------------------------------ Middlewares --------------------------------------------
 
-    // ----------------------------------- Public Website -----------------------------------------
-    app.get('/home', cmdbUserWebSite.homeNotAuthenticated)
-    app.get('/login', cmdbUserWebSite.loginForm)
-    app.post('/login', cmdbUserWebSite.validateLogin)
-    app.get('/register',cmdbUserWebSite.newUser)
-    app.post('/register', cmdbUserWebSite.createUser)
+    // ----------------------------------- Website -------------------------------------------------
+    app.get('/home', cmdbWebSite.getHome)
     app.get('/movies', cmdbWebSite.getPopularMovies)
     app.get('/movies/limit', cmdbWebSite.limitForMovies)
     app.get('/movies/search/limit', cmdbWebSite.limitForSearch)
     app.get('/movies/search/:movieName', cmdbWebSite.searchMoviesByName)
     app.get('/movies/find/:movieId', cmdbWebSite.getMovieDetails)
-    // ----------------------------------- Public Website -----------------------------------------
-
-    // ----------------------------------- Private Website -----------------------------------------
-    app.post('/logout', cmdbUserWebSite.logout)
-    app.get('/auth/home', cmdbUserWebSite.homeAuthenticated)
-    app.get('/auth/groups', cmdbWebSite.getGroups)
-    app.post('/auth/groups', cmdbWebSite.createGroup)
-    app.get('/auth/groups/newGroup', cmdbWebSite.getNewGroup)
-    app.get('/auth/groups/:groupId', cmdbWebSite.getGroupDetails)
-    app.get('/auth/groups/:groupId/editGroup', cmdbWebSite.getEditGroup)
-    app.post('/auth/groups/:groupId/edit', cmdbWebSite.editGroup)
-    app.post('/auth/groups/:groupId/delete', cmdbWebSite.deleteGroup)
-    app.get('/auth/groups/:groupId/movies/addMovie', cmdbWebSite.addMovie)
-    app.get('/auth/groups/:groupId/movies/searchTheMovie', cmdbWebSite.searchMovieToAdd)
-    app.post('/auth/groups/:groupId/movies', cmdbWebSite.addMovieInGroup)
-    app.post('/auth/groups/:groupId/movies/:movieId', cmdbWebSite.removeMovieInGroup)
-    // ----------------------------------- Private Website -----------------------------------------
+    app.get('/groups', cmdbWebSite.getGroups)
+    app.post('/groups', cmdbWebSite.createGroup)
+    app.get('/groups/newGroup', cmdbWebSite.getNewGroup)
+    app.get('/groups/:groupId', cmdbWebSite.getGroupDetails)
+    app.get('/groups/:groupId/editGroup', cmdbWebSite.getEditGroup)
+    app.post('/groups/:groupId/edit', cmdbWebSite.editGroup)
+    app.post('/groups/:groupId/delete', cmdbWebSite.deleteGroup)
+    app.get('/groups/:groupId/movies/addMovie', cmdbWebSite.addMovie)
+    app.get('/groups/:groupId/movies/searchTheMovie', cmdbWebSite.searchMovieToAdd)
+    app.post('/groups/:groupId/movies', cmdbWebSite.addMovieInGroup)
+    app.post('/groups/:groupId/movies/:movieId', cmdbWebSite.removeMovieInGroup)
 
     // -------------------------------------- WebApi -----------------------------------------------
     app.post('/api/users', cmdbWebApi.createUser)

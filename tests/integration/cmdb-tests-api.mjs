@@ -47,12 +47,12 @@ describe("API integration tests:", function() {
         "description": 123 
     }
     const invalidUsernameUser = {
-        "username": 1, // Not a tring
+        "username": 1, // Not a string
         "password": 'a'
     }
     const invalidPasswordUser = {
         "username": "1",
-        "password": 'a  ' // At least one space char
+        "password": [123,21] // Not a string
     }
     // Global variables
     let originalGroups
@@ -128,7 +128,7 @@ describe("API integration tests:", function() {
             expect(response.status).to.equal(400)
             expect(response.body).to.be.a('String')
             expect(response.body).to.equal(
-                errors.INVALID_ARGUMENT("username").description
+                errors.INVALID_ARGUMENT("username or password").description
             )
         })
         it('Create an user with an invalid password', async function() {
@@ -141,7 +141,7 @@ describe("API integration tests:", function() {
             expect(response.status).to.equal(400)
             expect(response.body).to.be.a('String')
             expect(response.body).to.equal(
-                errors.INVALID_ARGUMENT("password").description
+                errors.INVALID_ARGUMENT("username or password").description
             )
         })
     })

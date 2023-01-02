@@ -1,11 +1,11 @@
 <input type="button" value="Back" onclick='history.back()'>
 
-<h1>Search results for: {{title}}</h1>
+<h4>Search results for: {{title}}</h4>
 <ul>
   {{#each movies}}
     <li>
         <h2>{{title}}</h2>
-        <form action="/auth/groups/{{../groupId}}/movies" method="POST">
+        <form action="/groups/{{../groupId}}/movies" method="POST">
             <input type="hidden" value={{id}} name="movieId">
             <input type="submit" value="Add Movie">
         </form>

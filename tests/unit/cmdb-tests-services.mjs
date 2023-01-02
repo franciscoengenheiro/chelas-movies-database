@@ -223,7 +223,7 @@ describe("Services modules tests:", function() {
                 // Create an user
                 await cmdbUserServices.createUser(1, userTestPassword)
             } catch (e) {
-                assert.deepEqual(e, errors.INVALID_ARGUMENT("username"))
+                assert.deepEqual(e, errors.INVALID_ARGUMENT("username or password"))
                 return
             }
             assert.fail("Should throw an error")
@@ -231,9 +231,9 @@ describe("Services modules tests:", function() {
         it("Create an user with an invalid password", async function() {
             try {
                 // Create an user
-                await cmdbUserServices.createUser(userTestUsername, " a")
+                await cmdbUserServices.createUser(userTestUsername, [12,32,12])
             } catch (e) {
-                assert.deepEqual(e, errors.INVALID_ARGUMENT("password"))
+                assert.deepEqual(e, errors.INVALID_ARGUMENT("username or password"))
                 return
             }
             assert.fail("Should throw an error")

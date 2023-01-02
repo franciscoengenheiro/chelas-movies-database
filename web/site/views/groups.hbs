@@ -1,19 +1,19 @@
-<form action="/auth/home" method="GET">
+<form action="/home" method="GET">
     <input type="submit" value="Back">
 </form>
 
-<h1>{{title}}</h1>
+<h4>{{title}}</h4>
 
-<form action="/auth/groups/newGroup" method="GET">
+<form action="/groups/newGroup" method="GET">
   <input type="submit" value="Create Group">
 </form>
 
 <ul>
   {{#each groups}}
     <li>
-      <h2><a href="/auth/groups/{{id}}">{{name}}</a></h2>
+      <h3><a href="/groups/{{id}}">{{name}}</a></h3>
       <p><b>Description: </b>{{description}}</p>
-      <form action="/auth/groups/{{id}}/delete" method="POST">
+      <form action="/groups/{{id}}/delete" method="POST">
         <input type="submit" value="Delete">
       </form>
     </li>

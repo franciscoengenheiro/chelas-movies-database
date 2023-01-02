@@ -16,6 +16,9 @@ export default function(userData) {
      * @throws InvalidUserException if the user already exists
      */
     async function createUser(username, password) {
+        if(typeof username !== 'string' || typeof password !== 'string' || username.length == 0 || password.length == 0){
+            throw errors.INVALID_ARGUMENT("username or password")
+        }
         // Retrieves user if it exists in users data
         let user = await userData.getUserData(username)
         // If the user already exists:

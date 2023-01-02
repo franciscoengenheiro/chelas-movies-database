@@ -14,6 +14,7 @@ export default function (cmdbServices) {
     }
 
     return {
+        getHome: home,
         limitForMovies: limitForMovies,
         getPopularMovies: handleRequestInHTML(getPopularMoviesInternal),
         limitForSearch: limitForSearch,
@@ -30,6 +31,10 @@ export default function (cmdbServices) {
         searchMovieToAdd: verifyAuthentication(searchMovieToAdd),
         addMovieInGroup: verifyAuthentication(addMovieInGroupInternal),
         removeMovieInGroup: verifyAuthentication(removeMovieInGroupInternal)
+    }
+
+    async function home(req, rsp) {
+        rsp.render('home')
     }
 
     async function limitForMovies(req, rsp) {
@@ -64,7 +69,7 @@ export default function (cmdbServices) {
 
     async function createGroupInternal(req, rsp) {
         let newGroup = await cmdbServices.createGroup(req.token, req.body)
-        rsp.redirect('/auth/groups')
+        rsp.redirect('/groups')
     }
 
     async function getNewGroup(req, rsp) {
@@ -85,7 +90,7 @@ export default function (cmdbServices) {
     async function editGroupInternal(req, rsp) {
         const groupId = req.params.groupId
         const group = await cmdbServices.editGroup(req.token, groupId, req.body)
-        rsp.redirect(`/auth/groups/${groupId}`)
+        rsp.redirect(`/groups/${groupId}`)
     }
 
     async function getEditGroup(req, rsp) {
@@ -96,7 +101,7 @@ export default function (cmdbServices) {
     async function deleteGroupInternal(req, rsp) {
         const groupId = req.params.groupId
         const group = await cmdbServices.deleteGroup(req.token, groupId)
-        rsp.redirect('/auth/groups/')
+        rsp.redirect('/groups/')
     }
 
     async function addMovie(req, rsp) {
@@ -116,7 +121,7 @@ export default function (cmdbServices) {
         const movieId = req.body.movieId
         const groupId = req.params.groupId
         const movie = await cmdbServices.addMovieInGroup(req.token, groupId, movieId)
-        rsp.redirect(`/auth/groups/${groupId}`)
+        rsp.redirect(`/groups/${groupId}`)
     }
 
     async function removeMovieInGroupInternal(req, rsp) {
@@ -126,7 +131,7 @@ export default function (cmdbServices) {
         // Post/Redirect/Get (PRG) is a web development design pattern that lets the page shown 
         // after a form submission be reloaded, shared, or bookmarked without ill effects, such
         // as submitting the form another time.
-        rsp.redirect(`/auth/groups/${groupId}`)
+        rsp.redirect(`/groups/${groupId}`)
     }
     
     async function getGroupDetailsMw(req, rsp) {
@@ -149,7 +154,7 @@ export default function (cmdbServices) {
 
     function verifyAuthentication(handler){
         return async function(req, rsp){
-            req.token = req.user.token
+            req.token = "09faa257-d2f2-4b75-80f9-185fbd52e108" //HAMMERED_TOKEN
             let requestHandler = handleRequestInHTML(handler)
             requestHandler(req, rsp)
         }

@@ -1,4 +1,11 @@
 {
-    "IDs": 0,
-    "users": []
+    "IDs": 1,
+    "users": [
+        {
+            "id": 1,
+            "username": "admin",
+            "password": "admin",
+            "token": "09faa257-d2f2-4b75-80f9-185fbd52e108"
+        }
+    ]
 }
