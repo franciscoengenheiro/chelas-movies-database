@@ -14,6 +14,15 @@
 					"request": {
 						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"admin\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
 							"raw": "http://{{host}}:{{port}}/api/users",
 							"protocol": "http",
@@ -236,7 +245,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{host}}:{{port}}/api/groups/2",
+							"raw": "http://{{host}}:{{port}}/api/groups/KHd_c4UB_jbdiVN0ezv9",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
@@ -245,7 +254,7 @@
 							"path": [
 								"api",
 								"groups",
-								"2"
+								"KHd_c4UB_jbdiVN0ezv9"
 							]
 						}
 					},
@@ -287,7 +296,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://{{host}}:{{port}}/api/groups/3.4",
+							"raw": "http://{{host}}:{{port}}/api/groups/KHd_c4UB_jbdiVN0ezv9",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
@@ -296,7 +305,7 @@
 							"path": [
 								"api",
 								"groups",
-								"3.4"
+								"KHd_c4UB_jbdiVN0ezv9"
 							]
 						}
 					},
@@ -308,7 +317,7 @@
 						"method": "PUT",
 						"header": [],
 						"url": {
-							"raw": "http://{{host}}:{{port}}/api/groups/1/movies/tt0468569",
+							"raw": "http://{{host}}:{{port}}/api/groups/KHd_c4UB_jbdiVN0ezv9/movies/tt0468569",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
@@ -317,7 +326,7 @@
 							"path": [
 								"api",
 								"groups",
-								"1",
+								"KHd_c4UB_jbdiVN0ezv9",
 								"movies",
 								"tt0468569"
 							]
@@ -331,7 +340,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://{{host}}:{{port}}/api/groups/3/movies/tt0468569",
+							"raw": "http://{{host}}:{{port}}/api/groups/KHd_c4UB_jbdiVN0ezv9/movies/tt0468569",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
@@ -340,7 +349,7 @@
 							"path": [
 								"api",
 								"groups",
-								"3",
+								"KHd_c4UB_jbdiVN0ezv9",
 								"movies",
 								"tt0468569"
 							]
@@ -354,7 +363,7 @@
 				"bearer": [
 					{
 						"key": "token",
-						"value": "d385ae54-b109-44da-abba-8abed4712fd1",
+						"value": "ad61ef3a-b263-4cdb-82bc-2c10bc2d9a43",
 						"type": "string"
 					}
 				]

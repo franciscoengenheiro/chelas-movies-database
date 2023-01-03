@@ -1,10 +1,12 @@
+// Module that exports elastic search users data access
+
 'use strict'
 import crypto from 'crypto'
 import fetch from '#data_access/fetch/node-fetch.mjs'
-import { baseURL, REFRESH } from '#data_access/elasticsearch/cmdb-data-elasticsearch.mjs'
+import elasticSearchInit from '#data_access/elasticSearch/elastic-search-util.mjs'
 
 // Constants
-const USERS_BASE_URL = `${baseURL}/users`
+let elasticSearch = elasticSearchInit('users') 
 
 export default function() {
     return {
@@ -13,17 +15,18 @@ export default function() {
     }
 
     /**
-     * Creates a new user and updates user local storage
-     * @param {String} username token used to identify a user
+     * Creates a new user and updates elastic search database.
+     * @param {String} username registration identifier.
+     * @param {String} password login authenticator.
      */
     async function createUserData(username, password) {
         // Create properties for the new user
         let user = {
+            // _id is given by elastic search on creation
             username: username,
             password: password,
             token: crypto.randomUUID()
         }
-
         let options = {
             method: 'POST',
             headers: {  
@@ -31,14 +34,15 @@ export default function() {
             },
             body: JSON.stringify(user)
         }
-        let obj = await fetch(USERS_BASE_URL + '/_doc' + REFRESH, options)
+        await fetch(elasticSearch.createDoc(), options)
         return getUserData(user.token)
     }
 
     /**
-     * Retrieves user data from local storage
-     * @param {String} userToken token used to identify a user
-     * @returns the user found or undefined
+     * Retrieves user data from elastic search database.
+     * @param {String} query_value value to query elastic and retrieve user data. 
+     * This value can either be a username or a user token.
+     * @returns the user found or undefined.
      */
     async function getUserData(query_value) {
         const options = {
@@ -55,11 +59,13 @@ export default function() {
                 }
             })
         }
-        let userObj = await fetch(USERS_BASE_URL + '/_search', options)
+        // Query elastic search
+        let userObj = await fetch(elasticSearch.searchDocs(), options)
         let user = undefined
-        if(userObj.hits.hits.length == 1){
-            user = userObj.hits.hits[0]._source
-            user.id = userObj.hits.hits[0]._id
+        // Check if there was a match (should only be one match, since the query is for exact match)
+        if(userObj.hits.hits.length == 1) {
+            user = userObj.hits.hits[0]._source // Retrieve user mapped data
+            user.id = userObj.hits.hits[0]._id // Retrieve user id
         }
         return user
     }

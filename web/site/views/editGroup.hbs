@@ -1,6 +1,8 @@
 <h2>Edit a Group</h2>
 <form action="/groups/{{id}}/edit" method="POST">
-    <p>Group name: <input type="text" name="name" value='{{group.name}}'></p>
+    <p>
+        Group name: <input type="text" name="name" value='{{group.name}}' maxlength="20">
+    </p>
     <p>
         Group description: <textarea name="description">{{group.description}}</textarea>
     </p>

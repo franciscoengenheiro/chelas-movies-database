@@ -22,6 +22,7 @@ describe("API integration tests:", function() {
     // Start server
     let app = server().listen(1904, () => {})
     // Constants:
+    const invalidUserToken = "    "
     const movieId = 'tt0468569'
     const groupA = {
         "name": "They won't know this is an Integration test group",
@@ -52,7 +53,7 @@ describe("API integration tests:", function() {
     }
     const invalidPasswordUser = {
         "username": "1",
-        "password": [123,21] // Not a string
+        "password": [123, 21] // Not a string
     }
     // Global variables
     let originalGroups
@@ -245,7 +246,7 @@ describe("API integration tests:", function() {
 		    expect(response.status).to.equal(200)
 		    expect(response.body).to.be.an('Object')
 		    expect(response.body.id).to.equal(movieId)
-            expect(response.body.title).to.equal(result.title)
+            expect(response.body.title).to.equal(result.fullTitle)
 		    expect(response.body.description).to.equal(result.plot)
 		    expect(response.body.image_url).to.equal(result.image)
 		    expect(response.body.runtimeMins).to.equal(result.runtimeMins)
@@ -277,6 +278,18 @@ describe("API integration tests:", function() {
                     "movies": [],
                     "userId": userId
                 }
+            })
+        })
+        it('Missing user token', async function() {
+            const response = await request(app)
+                .post(routeToTest)
+                .set('Authorization', `Bearer ${invalidUserToken}`)
+                .expect('Content-Type', /json/)
+
+            expect(response.status).to.equal(401)
+		    expect(response.body).to.be.a('Object')
+            expect(response.body).to.deep.equal({
+                "error": "Invalid authentication token"
             })
         })
         it('Create a group with invalid name or description', async function() {
@@ -338,6 +351,18 @@ describe("API integration tests:", function() {
             })
             expect(response.body).to.deep.equal(userGroups) 
         })
+        it('Missing user token', async function() {
+            const response = await request(app)
+                .get(routeToTest)
+                .set('Authorization', `Bearer ${invalidUserToken}`)
+                .expect('Content-Type', /json/)
+
+            expect(response.status).to.equal(401)
+		    expect(response.body).to.be.a('Object')
+            expect(response.body).to.deep.equal({
+                "error": "Invalid authentication token"
+            })
+        })
     })
     describe("GET /api/groups/:groupId", function() {
         const routeToTest = '/api/groups/'
@@ -363,13 +388,36 @@ describe("API integration tests:", function() {
 
 		    expect(response.status).to.equal(200)
 		    expect(response.body).to.be.an('Object')
-            // Retrieve groupA
+            // Retrieve group A
             let groupAcopy = allGroups.find(group => group.id == groupA_id && group.userId == userId)
             groupAcopy.movies = []
             groupAcopy.moviesTotalDuration = 0
             delete groupAcopy.userId
             delete groupAcopy.id
             expect(response.body).to.deep.equal(groupAcopy)
+        })
+        it('Missing user token', async function() {
+            // Create group A
+            let response = await request(app)
+                .post(routeToTest)
+                .set('Authorization', `Bearer ${userTestToken}`)
+                .set('Accept', 'application/json')
+                .send(groupA)
+                .expect('Content-Type', /json/)
+                .expect(201)
+        
+            const groupA_id = response.body['group'].id        
+
+            response = await request(app)
+                .get(routeToTest + groupA_id)
+                .set('Authorization', `Bearer ${invalidUserToken}`)
+                .expect('Content-Type', /json/)
+            
+            expect(response.status).to.equal(401)
+		    expect(response.body).to.be.a('Object')
+            expect(response.body).to.deep.equal({
+                "error": "Invalid authentication token"
+            })
         })
         it('Get a group for an user with an invalid groupId', async function() {
             // Create group A
@@ -420,6 +468,30 @@ describe("API integration tests:", function() {
 		    expect(response.body).to.be.an('Object')
             expect(response.body).to.deep.equal({
                 "message": "Updated group with success"
+            })
+        })
+        it('Missing user token', async function() {
+            // Create group A
+            let response = await request(app)
+                .post(routeToTest)
+                .set('Authorization', `Bearer ${userTestToken}`)
+                .set('Accept', 'application/json')
+                .send(groupA)
+			    .expect('Content-Type', /json/)
+                .expect(201)
+        
+            const groupA_id = response.body['group'].id
+
+            // Edit group A with group B
+            response = await request(app)
+                .put(routeToTest + groupA_id)
+                .set('Authorization', `Bearer ${invalidUserToken}`)
+                .expect('Content-Type', /json/)
+            
+            expect(response.status).to.equal(401)
+		    expect(response.body).to.be.a('Object')
+            expect(response.body).to.deep.equal({
+                "error": "Invalid authentication token"
             })
         })
         it('Edit a group for an user with an invalid groupId', async function() {
@@ -499,6 +571,30 @@ describe("API integration tests:", function() {
                 "message": "Group deleted with success"
             })
         })
+        it('Missing user token', async function() {
+            // Create group A
+            let response = await request(app)
+                .post(routeToTest)
+                .set('Authorization', `Bearer ${userTestToken}`)
+                .set('Accept', 'application/json')
+                .send(groupA)
+			    .expect('Content-Type', /json/)
+                .expect(201)
+        
+            const groupA_id = response.body['group'].id
+
+            // Delete group A
+            response = await request(app)
+                .put(routeToTest + groupA_id)
+                .set('Authorization', `Bearer ${invalidUserToken}`)
+                .expect('Content-Type', /json/)
+            
+            expect(response.status).to.equal(401)
+		    expect(response.body).to.be.a('Object')
+            expect(response.body).to.deep.equal({
+                "error": "Invalid authentication token"
+            })
+        })
         it('Delete a group for an user with an invalid groupId', async function() {
             // Create group A
             let response = await request(app)
@@ -554,6 +650,31 @@ describe("API integration tests:", function() {
                     "title": result.title,
                     "duration": result.runtimeMins
                 }
+            })
+        })
+        it('Missing user token', async function() {
+            // Create group A
+            let response = await request(app)
+                .post('/api/groups/')
+                .set('Authorization', `Bearer ${userTestToken}`)
+                .set('Accept', 'application/json')
+                .send(groupA)
+			    .expect('Content-Type', /json/)
+                .expect(201)
+        
+            const groupA_id = response.body['group'].id
+            const routeToTest = `/api/groups/${groupA_id}/movies/${movieId}`
+
+            // Add a movie to group A
+            response = await request(app)
+                .put(routeToTest)
+                .set('Authorization', `Bearer ${invalidUserToken}`)
+                .expect('Content-Type', /json/)
+            
+            expect(response.status).to.equal(401)
+		    expect(response.body).to.be.a('Object')
+            expect(response.body).to.deep.equal({
+                "error": "Invalid authentication token"
             })
         })
         it('Add the same movie for an user group', async function() {
@@ -669,6 +790,38 @@ describe("API integration tests:", function() {
 		    expect(response.body).to.be.an('Object')
             expect(response.body).to.deep.equal({
                 "message": "Movie deleted with success"
+            })
+        })
+        it('Missing user token', async function() {
+            // Create group A
+            let response = await request(app)
+                .post('/api/groups/')
+                .set('Authorization', `Bearer ${userTestToken}`)
+                .set('Accept', 'application/json')
+                .send(groupA)
+			    .expect('Content-Type', /json/)
+                .expect(201)
+        
+            const groupA_id = response.body['group'].id
+            const routeToTest = `/api/groups/${groupA_id}/movies/${movieId}`
+
+            // Add a movie to group A
+            response = await request(app)
+                .put(routeToTest)
+                .set('Authorization', `Bearer ${userTestToken}`)
+                .expect('Content-Type', /json/)
+		        .expect(201)
+
+            // Delete the movie in group A
+            response = await request(app)
+                .delete(routeToTest)
+                .set('Authorization', `Bearer ${invalidUserToken}`)
+                .expect('Content-Type', /json/)
+
+            expect(response.status).to.equal(401)
+		    expect(response.body).to.be.a('Object')
+            expect(response.body).to.deep.equal({
+                "error": "Invalid authentication token"
             })
         })
         it('Delete a movie for an user group with an invalid groupId', async function() {

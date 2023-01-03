@@ -3,7 +3,7 @@ info:
   title: CMDB API
   description: This is Chelas Movies Database API
   contact:
-    email: you@your-company.com
+    email: cmdbWebSite@isel.ipl.com
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -25,40 +25,30 @@ paths:
       - Users
       summary: Adds a user to the system
       description: Adds a user to the system
-      operationId: addUser
+      operationId: createUser
       security:
         - bearerAuth: []
+      requestBody:
+        description: user to add
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewUser'
+        required: true
       responses:
         201:
           description: user created
           content:
             application/json:
               schema:
-                required:
-                - user
-                type: object
-                properties:
-                  id:
-                    type: integer
-                  username:
-                    type: string
-                  password:
-                    type: string
-                  token:
-                    type: string
-                    format: uuid
-        401:
+                  $ref: '#/components/schemas/CreatedUser'
+        400:
           description: User already exists
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotAuthorized'
-        400:
-          description: Invalid username or password
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InvalidRequest'
+                example: "Invalid User: already exists"        
       x-codegen-request-body-name: user
   /api/movies:
     get:
@@ -168,11 +158,17 @@ paths:
         - bearerAuth: []
       responses:
         200:
-          description: successful operation
+          description: Successful operation
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Group'
+        401:
+          description: Invalid authentication token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotAuthorized'
     post:
       tags:
       - Group
@@ -202,6 +198,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/InvalidRequest'
                 example: "Invalid Argument: group is missing a valid name and description"
+        401:
+          description: Invalid authentication token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotAuthorized'
   /api/groups/{groupId}:
     get:
       tags:
@@ -232,6 +234,12 @@ paths:
               schema: 
                 $ref: '#/components/schemas/RequestNotFound'
                 example: "Argument not found: group"
+        401:
+          description: Invalid authentication token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotAuthorized'        
     put:
       tags:
       - Group
@@ -281,6 +289,12 @@ paths:
               schema: 
                 $ref: '#/components/schemas/RequestNotFound'
                 example: "Argument not found: group"
+        401:
+          description: Invalid authentication token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotAuthorized'        
     delete:
       tags:
       - Group
@@ -310,6 +324,12 @@ paths:
               schema: 
                 $ref: '#/components/schemas/RequestNotFound'
                 example: "Argument not found: group"
+        401:
+          description: Invalid authentication token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotAuthorized'
   /api/groups/{groupId}/movies/{movieId}:
     put:
       tags:
@@ -353,6 +373,12 @@ paths:
               schema: 
                 $ref: '#/components/schemas/RequestNotFound'
                 example: "Argument not found: movie or group"
+        401:
+          description: Invalid authentication token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotAuthorized'        
     delete:
       tags:
       - Movies in a Group
@@ -388,6 +414,12 @@ paths:
               schema: 
                 $ref: '#/components/schemas/RequestNotFound'
                 example: "Argument not found: movie"          
+        401:
+          description: Invalid authentication token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotAuthorized'        
 components:
   securitySchemes:
     bearerAuth:
@@ -433,13 +465,13 @@ components:
           example: Group description
     NewGroupCreated:
       required:
-      - status
+      - message
       - group
       type: object
       properties:
-        status:
+        message:
           type: string
-          example: Group 1 created with success
+          example: Group created
         group:
           $ref: '#/components/schemas/Group'
     Movie:
@@ -509,12 +541,36 @@ components:
         message:
           type: string
           example: "Removed with success"
+    NewUser:
+      required:
+      - username
+      - password
+      type: object
+      properties:
+        username:
+          type: string
+          example: "guest"
+        password:
+          type: string
+          example: "abcd"  
+    CreatedUser:
+      type: object
+      properties:
+          id: 
+            type: string 
+          username:
+            type: string
+          password:
+            type: string
+          token:
+            type: string
+            format: uuid
     NotAuthorized:
       type: object
       properties:
         error:
           type: string
-          example: "Provided authentication is invalid"
+          example: "Invalid authentication token"
     InvalidRequest:
       type: object
       properties:

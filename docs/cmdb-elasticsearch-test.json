@@ -54,7 +54,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"username\": \"miguel\",\r\n    \"token\": \"ab3e6c33-6e16-4875-beef-2c815f3c4a07\"\r\n}",
+							"raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"admin\",\r\n    \"token\": \"09faa257-d2f2-4b75-80f9-185fbd52e108\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"

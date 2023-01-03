@@ -9,14 +9,13 @@ import express from 'express'
 import cors from 'cors'
 import swaggerUi from 'swagger-ui-express'
 import yaml from 'yamljs' // Yaml is similar to JSON but uses indentation to infer object and properties
-import hbs from 'hbs'
 import path from 'path'
 import url from 'url'
 
 // Internal imports
 import cmdbUserServicesInit from '#services/cmdb-users-services.mjs'
-import * as usersData from '#data_access/internal/cmdb-users-data.mjs'
-import * as cmdbData from '#data_access/internal/cmdb-data-mem.mjs'
+// import * as usersData from '#data_access/internal/cmdb-users-data.mjs'
+// import * as cmdbData from '#data_access/internal/cmdb-data-mem.mjs'
 import cmdbUsersElastiSearchInit from '#data_access/elasticsearch/cmdb-users-elasticsearch.mjs'
 import cmdbDataElasticSearchInit from '#data_access/elasticsearch/cmdb-data-elasticsearch.mjs'
 import imdbDataInit from '#data_access/imdb-movies-data.mjs'
@@ -26,7 +25,7 @@ import cmdbWebSiteInit from '#web/site/cmdb-web-site.mjs'
 
 // Fetch Modules
 import fetch from '#data_access/fetch/node-fetch.mjs'
-//import fetch from '#data_access/fetch/local-fetch.mjs'
+// import fetch from '#data_access/fetch/local-fetch.mjs'
 
 export default function() {
     // Initializations 
@@ -44,7 +43,6 @@ export default function() {
     const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
     app.set('view engine', 'hbs');
     app.set('views', path.join(__dirname, 'web', 'site', 'views'));
-    // hbs.registerPartials(__dirname + '/views/partials')
 
     // ------------------------------------ Middlewares --------------------------------------------
     app.use(cors()) // CORS (Cross Origin Resource Sharing) is an HTTP-header based mechanism that
@@ -57,15 +55,21 @@ export default function() {
     // Establish a way in the application which users can access the OpenAPI HTML specification page.
     app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
-    app.use(express.json()) // Parses incoming requests with JSON payloads if the
-                            // Content-Type of the request header matches this option 
-    app.use(express.urlencoded( { extended: false})) // Parses incoming requests with urlencoded payloads if the
-                                // Content-Type of the request header matches this option 
-
+    // Parses incoming requests with JSON payloads if the Content-Type of the request header
+    // matches this option 
+    app.use(express.json()) 
+    // Parses incoming requests with urlencoded payloads if the Content-Type of the request header 
+    // matches this option. The extended option allows to choose between parsing the URL-encoded 
+    // data with the querystring library (when false) or the qs library (when true). 
+    // The “extended” syntax allows for rich objects and arrays to be encoded into the URL-encoded 
+    // format, allowing for a JSON-like experience with URL-encoded.
+    app.use(express.urlencoded({ extended: false })) 
+    // Parses Cookie Header and populates req.cookies with an object 
+                            // keyed by the cookie names
     app.use(express.static(path.join(__dirname, 'web', 'site')));
-    // ------------------------------------ Middlewares --------------------------------------------
+    // ------------------------------------ Middlewares ----------------------------------------------
 
-    // ----------------------------------- Website -------------------------------------------------
+    // -------------------------------------- Website ------------------------------------------------
     app.get('/home', cmdbWebSite.getHome)
     app.get('/movies', cmdbWebSite.getPopularMovies)
     app.get('/movies/limit', cmdbWebSite.limitForMovies)
@@ -83,8 +87,9 @@ export default function() {
     app.get('/groups/:groupId/movies/searchTheMovie', cmdbWebSite.searchMovieToAdd)
     app.post('/groups/:groupId/movies', cmdbWebSite.addMovieInGroup)
     app.post('/groups/:groupId/movies/:movieId', cmdbWebSite.removeMovieInGroup)
+    // -------------------------------------- Website -----------------------------------------------
 
-    // -------------------------------------- WebApi -----------------------------------------------
+    // -------------------------------------- WebApi ------------------------------------------------
     app.post('/api/users', cmdbWebApi.createUser)
     app.get('/api/movies', cmdbWebApi.getPopularMovies)
     app.get('/api/movies/search/:moviesName', cmdbWebApi.searchMoviesByName)
@@ -97,5 +102,6 @@ export default function() {
     app.put('/api/groups/:groupId/movies/:movieId', cmdbWebApi.addMovieInGroup)
     app.delete('/api/groups/:groupId/movies/:movieId', cmdbWebApi.removeMovieInGroup)
     // -------------------------------------- WebApi -----------------------------------------------
+
     return app
 }

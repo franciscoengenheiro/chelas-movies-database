@@ -78,7 +78,7 @@ export default function (cmdbServices) {
 
     async function getGroupsInternal(req, rsp) {
         const groups = await cmdbServices.getGroups(req.token)
-        const viewData = { title: 'All groups', groups: groups }
+        const viewData = { title: 'My groups', groups: groups }
         return View('groups', viewData)
     }
 
@@ -152,9 +152,9 @@ export default function (cmdbServices) {
         }
     }
 
-    function verifyAuthentication(handler){
-        return async function(req, rsp){
-            req.token = "09faa257-d2f2-4b75-80f9-185fbd52e108" //HAMMERED_TOKEN
+    function verifyAuthentication(handler) {
+        return async function(req, rsp) {
+            req.token = "fe4ac6ab-d6bd-4805-90bd-3a9c053ab625" // HAMMERED_TOKEN
             let requestHandler = handleRequestInHTML(handler)
             requestHandler(req, rsp)
         }

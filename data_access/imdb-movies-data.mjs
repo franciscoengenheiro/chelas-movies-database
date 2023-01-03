@@ -63,7 +63,7 @@ export default function(fetch) {
 
         let movieDetails = {
             id: movieObj.id,
-            title: movieObj.title,
+            title: movieObj.fullTitle,
             description: movieObj.plot,
             image_url: movieObj.image,
             runtimeMins: movieObj.runtimeMins,
