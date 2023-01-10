@@ -1,11 +1,10 @@
 <input type="button" value="Back" onclick='history.back()'>
 
-<h4>Search results for: {{title}}</h4>
-<br>
+<h1>Search results for: {{title}}</h1>
 <ul>
   {{#each movies}}
     <li>
-      <h3><a href="../find/{{id}}">{{title}}</a></h3>
+      <h2><a href="../find/{{id}}">{{title}}</a></h2>
     </li>
   {{/each}}
 </ul>

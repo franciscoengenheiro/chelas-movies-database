@@ -22,6 +22,7 @@ import imdbDataInit from '#data_access/imdb-movies-data.mjs'
 import cmdbServicesInit from '#services/cmdb-services.mjs' 
 import cmdbWebApiInit from '#web/api/cmdb-web-api.mjs'
 import cmdbWebSiteInit from '#web/site/cmdb-web-site.mjs'
+import cmdbUsersWebSiteInit from '#web/site/cmdb-users-web-site.mjs'
 
 // Fetch Modules
 import fetch from '#data_access/fetch/node-fetch.mjs'
@@ -36,6 +37,7 @@ export default function() {
     const cmdbUserServices = cmdbUserServicesInit(usersData)
     const cmdbWebApi = cmdbWebApiInit(cmdbServices, cmdbUserServices)
     const cmdbWebSite = cmdbWebSiteInit(cmdbServices)
+    const cmdbUserWebSite = cmdbUsersWebSiteInit(cmdbUserServices)
 
     let app = express() // Instance of the application
     
@@ -67,41 +69,10 @@ export default function() {
     // Parses Cookie Header and populates req.cookies with an object 
                             // keyed by the cookie names
     app.use(express.static(path.join(__dirname, 'web', 'site')));
+    app.use(cmdbUserWebSite)
+    app.use(cmdbWebSite)
+    app.use('/api', cmdbWebApi)
     // ------------------------------------ Middlewares ----------------------------------------------
-
-    // -------------------------------------- Website ------------------------------------------------
-    app.get('/home', cmdbWebSite.getHome)
-    app.get('/movies', cmdbWebSite.getPopularMovies)
-    app.get('/movies/limit', cmdbWebSite.limitForMovies)
-    app.get('/movies/search/limit', cmdbWebSite.limitForSearch)
-    app.get('/movies/search/:movieName', cmdbWebSite.searchMoviesByName)
-    app.get('/movies/find/:movieId', cmdbWebSite.getMovieDetails)
-    app.get('/groups', cmdbWebSite.getGroups)
-    app.post('/groups', cmdbWebSite.createGroup)
-    app.get('/groups/newGroup', cmdbWebSite.getNewGroup)
-    app.get('/groups/:groupId', cmdbWebSite.getGroupDetails)
-    app.get('/groups/:groupId/editGroup', cmdbWebSite.getEditGroup)
-    app.post('/groups/:groupId/edit', cmdbWebSite.editGroup)
-    app.post('/groups/:groupId/delete', cmdbWebSite.deleteGroup)
-    app.get('/groups/:groupId/movies/addMovie', cmdbWebSite.addMovie)
-    app.get('/groups/:groupId/movies/searchTheMovie', cmdbWebSite.searchMovieToAdd)
-    app.post('/groups/:groupId/movies', cmdbWebSite.addMovieInGroup)
-    app.post('/groups/:groupId/movies/:movieId', cmdbWebSite.removeMovieInGroup)
-    // -------------------------------------- Website -----------------------------------------------
-
-    // -------------------------------------- WebApi ------------------------------------------------
-    app.post('/api/users', cmdbWebApi.createUser)
-    app.get('/api/movies', cmdbWebApi.getPopularMovies)
-    app.get('/api/movies/search/:moviesName', cmdbWebApi.searchMoviesByName)
-    app.get('/api/movies/find/:movieId', cmdbWebApi.getMovieDetails)
-    app.post('/api/groups', cmdbWebApi.createGroup)
-    app.get('/api/groups', cmdbWebApi.getGroups)
-    app.get('/api/groups/:groupId', cmdbWebApi.getGroupDetails)
-    app.put('/api/groups/:groupId', cmdbWebApi.editGroup)
-    app.delete('/api/groups/:groupId', cmdbWebApi.deleteGroup)
-    app.put('/api/groups/:groupId/movies/:movieId', cmdbWebApi.addMovieInGroup)
-    app.delete('/api/groups/:groupId/movies/:movieId', cmdbWebApi.removeMovieInGroup)
-    // -------------------------------------- WebApi -----------------------------------------------
 
     return app
 }

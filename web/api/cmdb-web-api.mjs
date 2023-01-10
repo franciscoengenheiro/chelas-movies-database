@@ -9,6 +9,7 @@
 
 import errors from '#errors/errors.mjs'
 import translateToHTTPResponse from '#web/http-error-responses.mjs'
+import express from 'express'
 
 /**
  * @param {*} cmdbServices module that contains all application services
@@ -24,22 +25,24 @@ export default function(cmdbServices, cmdbUserServices) {
         throw errors.INVALID_ARGUMENT("cmdbUserServices")
     }
 
-    return {
-        createUser: handleRequestInJSON(createUserInternal),
-        getPopularMovies: handleRequestInJSON(getPopularMoviesInternal),
-        searchMoviesByName: handleRequestInJSON(searchMoviesByNameInternal),
-        getMovieDetails: handleRequestInJSON(getMovieDetailsInternal),
-        createGroup: verifyAuthentication(createGroupInternal),
-        getGroups: verifyAuthentication(getGroupsInternal),
-        getGroupDetails: verifyAuthentication(getGroupDetailsInternal),
-        editGroup: verifyAuthentication(editGroupInternal),
-        deleteGroup: verifyAuthentication(deleteGroupInternal),
-        addMovieInGroup: verifyAuthentication(addMovieInGroupInternal),
-        removeMovieInGroup: verifyAuthentication(removeMovieInGroupInternal)
-    }
+    const router = express.Router()
+
+    router.post('/users', handleRequestInJSON(createUser))
+    router.get('/movies', handleRequestInJSON(getPopularMovies))
+    router.get('/movies/search/:moviesName', handleRequestInJSON(searchMoviesByName))
+    router.get('/movies/find/:movieId', handleRequestInJSON(getMovieDetails))
+    router.post('/groups', verifyAuthentication(createGroup))
+    router.get('/groups', verifyAuthentication(getGroups))
+    router.get('/groups/:groupId', verifyAuthentication(getGroupDetails))
+    router.put('/groups/:groupId', verifyAuthentication(editGroup))
+    router.delete('/groups/:groupId', verifyAuthentication(deleteGroup))
+    router.put('/groups/:groupId/movies/:movieId', verifyAuthentication(addMovieInGroup))
+    router.delete('/groups/:groupId/movies/:movieId', verifyAuthentication(removeMovieInGroup))
+
+    return router
 
     // Functions:
-    async function createUserInternal(req, rsp) {
+    async function createUser(req, rsp) {
         let newUser = await cmdbUserServices.createUser(req.body.username, req.body.password)
         rsp.status(201)
         return {
@@ -48,19 +51,19 @@ export default function(cmdbServices, cmdbUserServices) {
         }
     }
 
-    async function getPopularMoviesInternal(req, rsp) {
+    async function getPopularMovies(req, rsp) {
         return cmdbServices.getPopularMovies(req.query.limit)
     }
 
-    async function searchMoviesByNameInternal(req, rsp) {
+    async function searchMoviesByName(req, rsp) {
         return cmdbServices.searchMoviesByName(req.params.moviesName, req.query.limit)
     }
 
-    async function getMovieDetailsInternal(req, rsp) {
+    async function getMovieDetails(req, rsp) {
         return cmdbServices.getMovieDetails(req.params.movieId)
     }
 
-    async function createGroupInternal(req, rsp) {
+    async function createGroup(req, rsp) {
         let newGroup = await cmdbServices.createGroup(req.token, req.body)
         rsp.status(201)
         return {
@@ -69,29 +72,29 @@ export default function(cmdbServices, cmdbUserServices) {
         }
     }
 
-    async function getGroupsInternal(req, rsp) {
+    async function getGroups(req, rsp) {
         return cmdbServices.getGroups(req.token)
     }
 
-    async function getGroupDetailsInternal(req, rsp) {
+    async function getGroupDetails(req, rsp) {
         return cmdbServices.getGroupDetails(req.token, req.params.groupId)
     }
 
-    async function editGroupInternal(req, rsp){
+    async function editGroup(req, rsp){
         await cmdbServices.editGroup(req.token, req.params.groupId, req.body)   
         return {
             message: "Updated group with success"
         }
     }
 
-    async function deleteGroupInternal(req, rsp) {
+    async function deleteGroup(req, rsp) {
         await cmdbServices.deleteGroup(req.token, req.params.groupId)
         return {
             message: `Group deleted with success`
         }    
     }
 
-    async function addMovieInGroupInternal(req, rsp) {
+    async function addMovieInGroup(req, rsp) {
         let newMovie = await cmdbServices.addMovieInGroup(req.token, req.params.groupId, req.params.movieId)
         rsp.status(201)
         return {
@@ -100,7 +103,7 @@ export default function(cmdbServices, cmdbUserServices) {
         }
     }
 
-    async function removeMovieInGroupInternal(req, rsp) {
+    async function removeMovieInGroup(req, rsp) {
         await cmdbServices.removeMovieInGroup(req.token, req.params.groupId, req.params.movieId)   
         return {
             message: `Movie deleted with success`

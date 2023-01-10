@@ -6,6 +6,7 @@
 
 import errors from '#errors/errors.mjs'
 import translateToHTTPResponse from '#web/http-error-responses.mjs'
+import express from 'express'
 
 export default function (cmdbServices) {
     // Validate if all the received services exist
@@ -13,35 +14,33 @@ export default function (cmdbServices) {
         throw errors.INVALID_ARGUMENT("cmdbServices")
     }
 
-    return {
-        getHome: home,
-        limitForMovies: limitForMovies,
-        getPopularMovies: handleRequestInHTML(getPopularMoviesInternal),
-        limitForSearch: limitForSearch,
-        searchMoviesByName: handleRequestInHTML(searchMoviesByNameInternal),
-        getMovieDetails: handleRequestInHTML(getMovieDetailsInternal),
-        createGroup: verifyAuthentication(createGroupInternal),
-        getNewGroup: getNewGroup,
-        getGroups: verifyAuthentication(getGroupsInternal),
-        getGroupDetails: verifyAuthentication(getGroupDetailsInternal),
-        editGroup: verifyAuthentication(editGroupInternal),
-        getEditGroup: verifyAuthentication(getEditGroup),
-        deleteGroup: verifyAuthentication(deleteGroupInternal),
-        addMovie: addMovie,
-        searchMovieToAdd: verifyAuthentication(searchMovieToAdd),
-        addMovieInGroup: verifyAuthentication(addMovieInGroupInternal),
-        removeMovieInGroup: verifyAuthentication(removeMovieInGroupInternal)
-    }
+    const router = express.Router()
 
-    async function home(req, rsp) {
-        rsp.render('home')
-    }
+    router.get('/movies', handleRequestInHTML(getPopularMovies))
+    router.get('/movies/limit', limitForMovies)
+    router.get('/movies/search/limit', limitForSearch)
+    router.get('/movies/search/:movieName', handleRequestInHTML(searchMoviesByName))
+    router.get('/movies/find/:movieId', handleRequestInHTML(getMovieDetails))
+
+    router.post('/auth/groups', verifyAuthentication(createGroup))
+    router.get('/auth/groups', verifyAuthentication(getGroups))
+    router.get('/auth/groups/newGroup', getNewGroup)
+    router.get('/auth/groups/:groupId', verifyAuthentication(getGroupDetails))
+    router.get('/auth/groups/:groupId/editGroup', verifyAuthentication(getEditGroup))
+    router.post('/auth/groups/:groupId/edit', verifyAuthentication(editGroup))
+    router.post('/auth/groups/:groupId/delete', verifyAuthentication(deleteGroup))
+    router.get('/auth/groups/:groupId/movies/addMovie', addMovie)
+    router.get('/auth/groups/:groupId/movies/searchTheMovie', verifyAuthentication(searchMovieToAdd))
+    router.post('/auth/groups/:groupId/movies', verifyAuthentication(addMovieInGroup))
+    router.post('/auth/groups/:groupId/movies/:movieId', verifyAuthentication(removeMovieInGroup))
+
+    return router
 
     async function limitForMovies(req, rsp) {
         rsp.render('limitForMovies')
     }
 
-    async function getPopularMoviesInternal(req, rsp) {
+    async function getPopularMovies(req, rsp) {
         const limit = req.query.limit
         const popularMovies = await cmdbServices.getPopularMovies(limit)
         const viewData = { title: 'Top 250 Most popular movies', movies: popularMovies }
@@ -54,7 +53,7 @@ export default function (cmdbServices) {
         rsp.render('limitForSearch', viewData)
     }
 
-    async function searchMoviesByNameInternal(req, rsp) {
+    async function searchMoviesByName(req, rsp) {
         const movieName = req.query.movieName
         const limit = req.query.limit
         const movies = await cmdbServices.searchMoviesByName(movieName, limit)
@@ -62,35 +61,35 @@ export default function (cmdbServices) {
         return View('searchMovies', viewData)
     }
 
-    async function getMovieDetailsInternal(req, rsp) {
+    async function getMovieDetails(req, rsp) {
         const movie = await cmdbServices.getMovieDetails(req.params.movieId)
         return View('movie', movie)
     }
 
-    async function createGroupInternal(req, rsp) {
+    async function createGroup(req, rsp) {
         let newGroup = await cmdbServices.createGroup(req.token, req.body)
-        rsp.redirect('/groups')
+        rsp.redirect('/auth/groups')
     }
 
     async function getNewGroup(req, rsp) {
         rsp.render('newGroup')
     }
 
-    async function getGroupsInternal(req, rsp) {
+    async function getGroups(req, rsp) {
         const groups = await cmdbServices.getGroups(req.token)
         const viewData = { title: 'My groups', groups: groups }
         return View('groups', viewData)
     }
 
-    async function getGroupDetailsInternal(req, rsp) {
+    async function getGroupDetails(req, rsp) {
         const viewData = await getGroupDetailsMw(req, rsp)
         return View('group', viewData)
     }
 
-    async function editGroupInternal(req, rsp) {
+    async function editGroup(req, rsp) {
         const groupId = req.params.groupId
         const group = await cmdbServices.editGroup(req.token, groupId, req.body)
-        rsp.redirect(`/groups/${groupId}`)
+        rsp.redirect(`/auth/groups/${groupId}`)
     }
 
     async function getEditGroup(req, rsp) {
@@ -98,10 +97,10 @@ export default function (cmdbServices) {
         return View('editGroup', viewData)
     }
 
-    async function deleteGroupInternal(req, rsp) {
+    async function deleteGroup(req, rsp) {
         const groupId = req.params.groupId
         const group = await cmdbServices.deleteGroup(req.token, groupId)
-        rsp.redirect('/groups/')
+        rsp.redirect('/auth/groups/')
     }
 
     async function addMovie(req, rsp) {
@@ -117,21 +116,21 @@ export default function (cmdbServices) {
         return View('searchMoviesToAdd', viewData)
     }
 
-    async function addMovieInGroupInternal(req, rsp) {
+    async function addMovieInGroup(req, rsp) {
         const movieId = req.body.movieId
         const groupId = req.params.groupId
         const movie = await cmdbServices.addMovieInGroup(req.token, groupId, movieId)
-        rsp.redirect(`/groups/${groupId}`)
+        rsp.redirect(`/auth/groups/${groupId}`)
     }
 
-    async function removeMovieInGroupInternal(req, rsp) {
+    async function removeMovieInGroup(req, rsp) {
         const movieId = req.params.movieId
         const groupId = req.params.groupId        
         const group = await cmdbServices.removeMovieInGroup(req.token, groupId, movieId)
         // Post/Redirect/Get (PRG) is a web development design pattern that lets the page shown 
         // after a form submission be reloaded, shared, or bookmarked without ill effects, such
         // as submitting the form another time.
-        rsp.redirect(`/groups/${groupId}`)
+        rsp.redirect(`/auth/groups/${groupId}`)
     }
     
     async function getGroupDetailsMw(req, rsp) {
@@ -154,7 +153,7 @@ export default function (cmdbServices) {
 
     function verifyAuthentication(handler) {
         return async function(req, rsp) {
-            req.token = "fe4ac6ab-d6bd-4805-90bd-3a9c053ab625" // HAMMERED_TOKEN
+            req.token = req.user.token
             let requestHandler = handleRequestInHTML(handler)
             requestHandler(req, rsp)
         }

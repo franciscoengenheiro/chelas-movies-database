@@ -1,12 +1,9 @@
-<h4>Create a new Group</h4>
-<br>
-<form action="/groups" method="POST">
-    <label>Group name:</label>
-    <input type="text" name="name" maxlength="20">
-    <br><br>
-    <label>Group description:</label>
-    <textarea name="description"></textarea>
-    <br><br>
+<h2>Create a new Group</h2>
+<form action="/auth/groups" method="POST">
+    <p>Group name: <input type="text" name="name" maxlength="20"></p>
+    <p>
+        Group description: <textarea name="description" maxlength="500"></textarea>
+    </p>
     <input type="submit" value="Create">
     <input type="button" value="Cancel" onclick='history.back()'>
 </form>

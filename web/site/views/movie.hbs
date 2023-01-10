@@ -1,16 +1,11 @@
 <form method="GET">
     <input type="button" value="Back" onclick='history.back()'>
 </form>
-<br>
-<div style="display:inline-block">
-    <h4>{{title}}</h4>
 
-    <p><b>Movie Id: </b>{{id}}</p>
-    <div class="box">
-        <p><b>Description: </b>{{description}}</p>
-    </div>
-    <p><b>Duration: </b>{{runtimeMins}} mins </p>
-    <p><b>Directors: </b>{{director}}</p>
-    <p><b>Actors: </b>{{actors_names}}</p>
-</div>
-<img class = "moviePoster" src="{{image_url}}" width=10% height=10%/>
+<h2>{{title}}</h2>
+<p><b>Movie Id: </b>{{id}}</p>
+<p><b>Description: </b>{{description}}</p>
+<p><b>Duration: </b>{{runtimeMins}} mins </p>
+<p><b>Directors: </b>{{director}}</p>
+<p><b>Actors: </b>{{actors_names}}</p>
+<img src="{{image_url}}" width=18% height=18%/>
