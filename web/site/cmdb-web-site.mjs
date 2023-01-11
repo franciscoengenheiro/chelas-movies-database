@@ -168,7 +168,7 @@ export default function (cmdbServices) {
                 const httpResponse = translateToHTTPResponse(e)
                 view = View('onError', httpResponse)
             }
-            // Wrap the result in HTML format 
+            // Wrap the result in HTML format
             if(view) rsp.render(view.name, view.data)
         }
     }

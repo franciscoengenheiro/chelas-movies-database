@@ -162,7 +162,7 @@ export default function(imdbData, cmdbData, usersData) {
             let userToken = serviceArgs[0]
             // Verify if the user exists, if there's an error the promise will be rejected and 
             // returned to the top
-            let user = await usersData.getUserData(userToken)
+            let user = await getUserByUserToken(userToken)
             if(!user) {
                 throw errors.USER_NOT_FOUND(userToken)
             }
@@ -173,5 +173,9 @@ export default function(imdbData, cmdbData, usersData) {
             // modification described above
             return service.apply(this, serviceArgs) 
         }
+    }
+
+    async function getUserByUserToken(userToken) {
+        return usersData.getUserData("token", userToken)
     }
 }

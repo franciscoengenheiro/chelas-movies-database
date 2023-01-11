@@ -1,5 +1,5 @@
-body{
-    zoom: 1.5;
+/* body{
+    zoom: 1.0;
     transform: scale(2.5);
     transform-origin: 0 0;
     background-image: url("../images/background.png");
@@ -72,4 +72,4 @@ div.box {
     height: auto;
     text-align: justify;
     word-break: break-word;
-}
+} */

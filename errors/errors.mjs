@@ -9,7 +9,8 @@ export let errorCodes =  {
     INVALID_ARGUMENT_CODE: 1,
     ARGUMENT_NOT_FOUND_CODE: 2,
     INVALID_USER_CODE: 3,
-    USER_NOT_FOUND_CODE: 4
+    USER_NOT_FOUND_CODE: 4,
+    PASSWORDS_DO_NOT_MATCH: 5
 }
 
 /**
@@ -24,7 +25,9 @@ export default {
     INVALID_USER: (argName) => 
         new InternalError(errorCodes.INVALID_USER_CODE, `Invalid user: ${argName}`),
     USER_NOT_FOUND: (argName) => 
-        new InternalError(errorCodes.USER_NOT_FOUND_CODE, `User not found: ${argName}`)
+        new InternalError(errorCodes.USER_NOT_FOUND_CODE, `User not found: ${argName}`),
+    PASSWORDS_DO_NOT_MATCH: () =>
+        new InternalError(errorCodes.PASSWORDS_DO_NOT_MATCH, `Passwords do not match`)
 }
 
 /** 

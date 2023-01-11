@@ -59,7 +59,7 @@ export default function() {
 
     // Parses incoming requests with JSON payloads if the Content-Type of the request header
     // matches this option 
-    app.use(express.json()) 
+    app.use(express.json())
     // Parses incoming requests with urlencoded payloads if the Content-Type of the request header 
     // matches this option. The extended option allows to choose between parsing the URL-encoded 
     // data with the querystring library (when false) or the qs library (when true). 

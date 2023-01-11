@@ -48,8 +48,10 @@ export default function(userServices) {
     async function createUser(req, rsp) {
         const username = req.body.username
         const password = req.body.password
+        const email = req.body.email
+        const passConfirm = req.body.passConfirm
         try {
-            await userServices.createUser(username, password)
+            await userServices.createUser(username, password, email, passConfirm)
             rsp.redirect('/home')
         } catch(e) {
             const httpResponse = translateToHTTPResponse(e)
@@ -71,7 +73,7 @@ export default function(userServices) {
     }
 
     async function validateUser(username, password) {
-        let user = await userServices.getUser(username)
+        let user = await userServices.getUserByUsername(username)
         if (!user || user.password != password) return undefined
         else return user
     }

@@ -3,8 +3,8 @@
 'use strict'
 
 import errors from '#errors/errors.mjs'
-import fetch from '#data_access/fetch/node-fetch.mjs'
 import elasticSearchInit from '#data_access/elasticSearch/elastic-search-util.mjs'
+import {get, post, put, del} from '#data_access/elasticSearch/fetch-wrapper.mjs'
 
 // Constants
 const elasticSearch = elasticSearchInit('groups')
@@ -29,14 +29,7 @@ export default function() {
         // Create properties for the new group
         obj.movies = []
         obj.userId = userId
-        let options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(obj)
-        }
-        await fetch(elasticSearch.createDoc(), options)
+        await post(elasticSearch.createDoc(), obj)
         return obj
     }
 
@@ -47,20 +40,14 @@ export default function() {
      */
     async function getGroupsData(userId) {
         const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                "query": {
-                    "match": {
-                        "userId.keyword": userId
-                    }
+            "query": {
+                "match": {
+                    "userId.keyword": userId
                 }
-            })
+            }
         }
         // Query elastic search
-        let groupsObj = await fetch(elasticSearch.searchDocs(), options)
+        let groupsObj = await post(elasticSearch.searchDocs(), options)
 
         // Retrieve only the groups that belong to the user and modify each group object
         // to only show selected properties
@@ -85,7 +72,7 @@ export default function() {
      */
     async function getGroupDetailsData(groupId, userId) {
         // Retrieve user group
-        let groupsObj = await fetch(elasticSearch.getDoc(groupId))
+        let groupsObj = await get(elasticSearch.getDoc(groupId))
         // Checks if group exists
         if (!groupsObj.found) {
             throw errors.ARGUMENT_NOT_FOUND("group")
@@ -122,7 +109,7 @@ export default function() {
      * @throws InvalidUserException if the user is not found.
      */
     async function editGroupData(groupId, obj, userId) {
-        let groupObj = await fetch(elasticSearch.getDoc(groupId))
+        let groupObj = await get(elasticSearch.getDoc(groupId))
         // Checks if group exists
         if (!groupObj.found) {
             throw errors.ARGUMENT_NOT_FOUND("group")
@@ -134,14 +121,7 @@ export default function() {
         // Override group properties
         groupObj._source.name = obj.name
         groupObj._source.description = obj.description
-        let options = {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(groupObj._source)
-        }
-        groupObj = await fetch(elasticSearch.editDoc(groupId), options)
+        groupObj = await put(elasticSearch.editDoc(groupId), groupObj._source)
         return groupObj._source
     }
 
@@ -153,7 +133,7 @@ export default function() {
      * @throws InvalidUserException if the user is not found.
      */
     async function deleteGroupData(groupId, userId) {
-        let groupsObj = await fetch(elasticSearch.getDoc(groupId))
+        let groupsObj = await get(elasticSearch.getDoc(groupId))
         // Checks if group exists
         if (groupsObj.result == "not found") {
             throw errors.ARGUMENT_NOT_FOUND("group")
@@ -163,7 +143,7 @@ export default function() {
             throw errors.INVALID_USER("userId")
         }
         // Delete group 
-        return fetch(elasticSearch.deleteDoc(groupId), {method: 'DELETE'})
+        return del(elasticSearch.deleteDoc(groupId))
     }
 
     /**
@@ -177,7 +157,7 @@ export default function() {
      * @throws ArgumentNotFoundException if the either the group or movie weren't found.
      */
     async function addMovieInGroupData(groupId, movieId, moviesObj, userId) {
-        let groupObj = await fetch(elasticSearch.getDoc(groupId)) 
+        let groupObj = await get(elasticSearch.getDoc(groupId)) 
         let newMovie = {}
         if (!groupObj.found) {
             throw errors.ARGUMENT_NOT_FOUND("group") 
@@ -197,14 +177,7 @@ export default function() {
             }
             groupObj._source.movies.push(newMovie)
         }        
-        let options = {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(groupObj._source)
-        }
-        await fetch(elasticSearch.editDoc(groupId), options) 
+        await put(elasticSearch.editDoc(groupId), groupObj._source) 
     }
 
     /**
@@ -216,7 +189,7 @@ export default function() {
      * @throws InvalidUserException if the user is not found.
      */
     async function removeMovieInGroupData(groupId, movieId, userId) {
-        let groupsObj = await fetch(elasticSearch.getDoc(groupId))
+        let groupsObj = await get(elasticSearch.getDoc(groupId))
         // Checks if group exists
         if (groupsObj.result == "not found") {
             throw errors.ARGUMENT_NOT_FOUND("group")
@@ -232,14 +205,7 @@ export default function() {
         } else {
             // Remove movie from the movies array 
             groupsObj._source.movies.splice(movieIndex, 1)
-            let options = {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(groupsObj._source)
-            }
-            return fetch(elasticSearch.editDoc(groupId), options)
+            return put(elasticSearch.editDoc(groupId), groupsObj._source)
         }
     }
 }

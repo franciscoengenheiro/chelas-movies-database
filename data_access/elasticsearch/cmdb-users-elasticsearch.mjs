@@ -2,8 +2,8 @@
 
 'use strict'
 import crypto from 'crypto'
-import fetch from '#data_access/fetch/node-fetch.mjs'
 import elasticSearchInit from '#data_access/elasticSearch/elastic-search-util.mjs'
+import {post} from '#data_access/elasticSearch/fetch-wrapper.mjs'
 
 // Constants
 let elasticSearch = elasticSearchInit('users') 
@@ -19,22 +19,16 @@ export default function() {
      * @param {String} username registration identifier.
      * @param {String} password login authenticator.
      */
-    async function createUserData(username, password) {
+    async function createUserData(username, password, email) {
         // Create properties for the new user
         let user = {
             // _id is given by elastic search on creation
             username: username,
             password: password,
+            email: email,
             token: crypto.randomUUID()
         }
-        let options = {
-            method: 'POST',
-            headers: {  
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(user)
-        }
-        await fetch(elasticSearch.createDoc(), options)
+        await post(elasticSearch.createDoc(), user)
         return getUserData(user.token)
     }
 
@@ -44,28 +38,20 @@ export default function() {
      * This value can either be a username or a user token.
      * @returns the user found or undefined.
      */
-    async function getUserData(query_value) {
+    async function getUserData(propName, value) {
         const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                "query": {
-                    "multi_match": {
-                        "query": query_value,
-                        "fields": ["username.keyword", "token.keyword"]
-                    }
+            "query": {
+                "match": {
+                    "username.keyword": value
                 }
-            })
+            }
         }
         // Query elastic search
-        let userObj = await fetch(elasticSearch.searchDocs(), options)
+        let userObj = await post(elasticSearch.searchDocs(), options)
         let user = undefined
         // Check if there was a match (should only be one match, since the query is for exact match)
         if(userObj.hits.hits.length == 1) {
-            user = userObj.hits.hits[0]._source // Retrieve user mapped data
-            user.id = userObj.hits.hits[0]._id // Retrieve user id
+            user = Object.assign({id: userObj.hits.hits[0]._id}, userObj.hits.hits[0]._source) // Build user object
         }
         return user
     }
