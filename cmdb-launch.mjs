@@ -1,5 +1,4 @@
-// Application Entry Point. 
-// This modules launchs the server in a given port 
+// Application Entry Point. This modules launchs the server in a given port 
 
 'use strict'
 

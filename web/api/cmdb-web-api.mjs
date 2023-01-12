@@ -8,13 +8,16 @@
 'use strict'
 
 import errors from '#errors/errors.mjs'
-import translateToHTTPResponse from '#web/http-error-responses.mjs'
 import express from 'express'
+import yaml from 'yamljs' // Yaml is similar to JSON but uses indentation to infer object and properties
+import swaggerUi from 'swagger-ui-express'
+import translateToHTTPResponse from '#web/http-error-responses.mjs'
 
 /**
- * @param {*} cmdbServices module that contains all application services
- * @param {*} cmdbUserServices module that contains all application user services
- * @returns an object with all the functions Express module can call, as properties, when a user makes a request
+ * @param {*} cmdbServices module that contains all application services.
+ * @param {*} cmdbUserServices module that contains all user application services
+ * @returns an object with all the functions Express module calls, as properties, 
+ * when a user makes a request
  */
 export default function(cmdbServices, cmdbUserServices) {
     // Validate if all the received services exist
@@ -25,8 +28,15 @@ export default function(cmdbServices, cmdbUserServices) {
         throw errors.INVALID_ARGUMENT("cmdbUserServices")
     }
 
-    const router = express.Router()
+    // Initialize a router
+    const router = express.Router() 
 
+    // Converts OpenAPI specification in yaml to javascript object
+    const swaggerDocument = yaml.load('./docs/cmdb-api-spec.yaml')
+    // Establish a way in the application which users can access the OpenAPI HTML specification page.
+    router.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
+
+    // Routes defined for the API
     router.post('/users', handleRequestInJSON(createUser))
     router.get('/movies', handleRequestInJSON(getPopularMovies))
     router.get('/movies/search/:moviesName', handleRequestInJSON(searchMoviesByName))
@@ -43,7 +53,9 @@ export default function(cmdbServices, cmdbUserServices) {
 
     // Functions:
     async function createUser(req, rsp) {
-        let newUser = await cmdbUserServices.createUser(req.body.username, req.body.password, req.body.email, req.body.passConfirm)
+        let newUser = await cmdbUserServices.createUser(
+            req.body.username, req.body.password, req.body.email, req.body.passConfirm
+        )
         rsp.status(201)
         return {
             message: `User created`,
@@ -110,7 +122,7 @@ export default function(cmdbServices, cmdbUserServices) {
         } 
     }
 
-    function verifyAuthentication(handler){
+    function verifyAuthentication(handler) {
         return async function(req, rsp){
             const BEARER_STR = "Bearer "
             // Get the value of the Authorization request header
@@ -123,8 +135,8 @@ export default function(cmdbServices, cmdbUserServices) {
                     .json({error: `Invalid authentication token`})
                     return
             }
-            // Retrieve token with the expected format: Bearer <token> and create a property in the 
-            // request object to easily retrieve it
+            // Retrieve token with the expected format: Bearer <token> 
+            // Create a property in the request object to easily retrieve it
             req.token = tokenHeader.split(" ")[1]
     
             const requestHandler = handleRequestInJSON(handler)

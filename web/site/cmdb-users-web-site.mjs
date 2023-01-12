@@ -1,6 +1,5 @@
 // Module that contains the functions that handle all HTTP Requests that are user related 
 
-
 'use strict'
 
 import errors from "#errors/errors.mjs"
@@ -15,10 +14,12 @@ export default function(userServices) {
         throw errors.INVALID_ARGUMENT("userServices")
     }
 
-    const router = express.Router()
-
     passport.serializeUser((userInfo, done) => { done(null, userInfo); });
     passport.deserializeUser((userInfo, done) => { done(null, userInfo); });
+
+    // Initialize a router
+    const router = express.Router()
+
     router.use(session({
         secret: 'leic-ipw-g06',
         cookie:{_expires : 10800000}, // time im ms (corresponds to 3 hours)
@@ -80,24 +81,28 @@ export default function(userServices) {
 
     async function validateLogin(req, rsp) {
         let user = await validateUser(req.body.username, req.body.password)
-        if(user) {
+        if (user) {
             // Represents a user in the CMDB application
-            // Passport saves this object in session, and when the request arrives, and while the 
-            // session for this user is active (cookie in client), the data can be accessed in req.user
+            // Passport saves this object in session and when the request arrives, and while the 
+            // session for this user is active (determined by a cookie), the data can be accessed 
+            // in req.user
             req.login({
                 username: user.username,
                 token: user.token
             }, () => rsp.redirect('/auth/home'))
-        } else rsp.redirect('/login')
+        } else {
+            rsp.redirect('/login')
+        }
     }
     
     function verifyAuthenticated(req, rsp, next) {
         // The user is only authenticated if req.user != undefined
-        if(req.user) {
+        if (req.user) {
             // Call next middleware in the stack
             return next()
+        } else {
+            rsp.redirect('/login')
         }
-        rsp.redirect('/login')
     }
     
     function logout(req, rsp) {

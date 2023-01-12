@@ -36,16 +36,21 @@ const GROUPS_FILE = './local_data/groups.json'
 // On error while running tests:
 // - Delete users.json created test user and try again
 // To run a single test or a set of tests: use it.only or describe.only respectively
-// Run tests (in root directory) with: npm test tests
 // --------------------------------------- Notes --------------------------------------------------------
 describe("Services modules tests:", function() {
     // Constants
-    const userTestUsername = "userTestUsername"
-    const userTestPassword = "userTestPassword"
+    const testUser = {
+        username: "userTestUsername",
+        password: "userTestPassword",
+        passConfirm: "userTestPassword",
+        email: "test@gmail.com"
+    }
+    
     // Global variables
     let originalUsers
     let originalGroups
-    // Utility test functions
+
+    // Utility test functions:
     beforeEach(async () => {
         // Read current data
         originalUsers = await File.read(USERS_FILE)
@@ -56,6 +61,7 @@ describe("Services modules tests:", function() {
         await File.write(originalUsers, USERS_FILE)   
         await File.write(originalGroups, GROUPS_FILE)               
     })
+    
     describe("Getting the most popular movies:", function() {
         it("Should return an object with an array of the 250 most popular movies", async function() {
             // Arrange
@@ -190,12 +196,14 @@ describe("Services modules tests:", function() {
             // Act
             users.users.push({
                 id: originalUsers.IDs + 1,
-                username: userTestUsername,
-                password: userTestPassword
+                username: testUser.username,
+                password: testUser.password
             })
             users.IDs++
 
-            await cmdbUserServices.createUser(userTestUsername, userTestPassword)
+            await cmdbUserServices.createUser(
+                testUser.username, testUser.password, testUser.email, testUser.passConfirm
+            )
             let newUsers = await File.read(USERS_FILE)
             
             // Assert
@@ -207,10 +215,14 @@ describe("Services modules tests:", function() {
 
         it("Try to create the same user twice", async function() {
             // Create an user 
-            await cmdbUserServices.createUser(userTestUsername, userTestPassword)
+            await cmdbUserServices.createUser(
+                testUser.username, testUser.password, testUser.email, testUser.passConfirm
+            )
             // Try to create the same user again
             try {
-                await cmdbUserServices.createUser(userTestUsername, userTestPassword)
+                await cmdbUserServices.createUser(
+                    testUser.username, testUser.password, testUser.email, testUser.passConfirm
+                )
             } catch (e) {
                 assert.deepEqual(e, errors.INVALID_USER("already exists"))
                 return
@@ -221,9 +233,11 @@ describe("Services modules tests:", function() {
 
             try {
                 // Create an user
-                await cmdbUserServices.createUser(1, userTestPassword)
+                await cmdbUserServices.createUser(
+                    1, testUser.password, testUser.email, testUser.passConfirm
+                )
             } catch (e) {
-                assert.deepEqual(e, errors.INVALID_ARGUMENT("username or password"))
+                assert.deepEqual(e, errors.INVALID_ARGUMENT("username, password or email"))
                 return
             }
             assert.fail("Should throw an error")
@@ -231,9 +245,35 @@ describe("Services modules tests:", function() {
         it("Create an user with an invalid password", async function() {
             try {
                 // Create an user
-                await cmdbUserServices.createUser(userTestUsername, [12,32,12])
+                await cmdbUserServices.createUser(
+                    testUser.username, [12, 32, "id"], testUser.email, testUser.passConfirm
+                )
             } catch (e) {
-                assert.deepEqual(e, errors.INVALID_ARGUMENT("username or password"))
+                assert.deepEqual(e, errors.INVALID_ARGUMENT("username, password or email"))
+                return
+            }
+            assert.fail("Should throw an error")
+        })
+        it("Create an user with an invalid email", async function() {
+            try {
+                // Create an user
+                await cmdbUserServices.createUser(
+                    testUser.username, testUser.password, "", testUser.passConfirm
+                )
+            } catch (e) {
+                assert.deepEqual(e, errors.INVALID_ARGUMENT("username, password or email"))
+                return
+            }
+            assert.fail("Should throw an error")
+        })
+        it("Create an user with an invalid confirm password", async function() {
+            try {
+                // Create an user
+                await cmdbUserServices.createUser(
+                    testUser.username, testUser.password, testUser.email, 71
+                )
+            } catch (e) {
+                assert.deepEqual(e, errors.PASSWORDS_DO_NOT_MATCH("passwords do not match"))
                 return
             }
             assert.fail("Should throw an error")
@@ -252,8 +292,10 @@ describe("Services modules tests:", function() {
             currentGroups.IDs++
 
             // Act
-            await cmdbUserServices.createUser(userTestUsername, userTestPassword)
-            let createdUser = await cmdbUserServices.getUser(userTestUsername)
+            await cmdbUserServices.createUser(
+                testUser.username, testUser.password, testUser.email, testUser.passConfirm
+            )
+            const createdUser = await cmdbUserServices.getUserByUsername(testUser.username)
             await cmdbServices.createGroup(createdUser.token, groupToCreate)
 
             let alteredGroups = await File.read(GROUPS_FILE)
@@ -270,8 +312,10 @@ describe("Services modules tests:", function() {
             }
 
             // Act
-            await cmdbUserServices.createUser(userTestUsername, userTestPassword)
-            let createdUser = await cmdbUserServices.getUser(userTestUsername)
+            await cmdbUserServices.createUser(
+                testUser.username, testUser.password, testUser.email, testUser.passConfirm
+            )
+            const createdUser = await cmdbUserServices.getUserByUsername(testUser.username)
 
             // Assert
             try {
@@ -300,8 +344,10 @@ describe("Services modules tests:", function() {
             }
 
             // Act
-            await cmdbUserServices.createUser(userTestUsername, userTestPassword)
-            let createdUser = await cmdbUserServices.getUser(userTestUsername)
+            await cmdbUserServices.createUser(
+                testUser.username, testUser.password, testUser.email, testUser.passConfirm
+            )
+            const createdUser = await cmdbUserServices.getUserByUsername(testUser.username)
             
             // Create groups for this user
             await cmdbServices.createGroup(createdUser.token, group1)
@@ -334,8 +380,11 @@ describe("Services modules tests:", function() {
             let groupId = originalGroups.IDs + 1
 
             // Act
-            await cmdbUserServices.createUser(userTestUsername, userTestPassword)
-            let createdUser = await cmdbUserServices.getUser(userTestUsername)
+            await cmdbUserServices.createUser(
+                testUser.username, testUser.password, testUser.email, testUser.passConfirm
+            )
+            const createdUser = await cmdbUserServices.getUserByUsername(testUser.username)
+
             // Create groups for this user
             await cmdbServices.createGroup(createdUser.token, group)
             let newGroup = {
@@ -360,8 +409,10 @@ describe("Services modules tests:", function() {
             let groupId = -1
 
             // Act
-            await cmdbUserServices.createUser(userTestUsername, userTestPassword)
-            let createdUser = await cmdbUserServices.getUser(userTestUsername)
+            await cmdbUserServices.createUser(
+                testUser.username, testUser.password, testUser.email, testUser.passConfirm
+            )
+            const createdUser = await cmdbUserServices.getUserByUsername(testUser.username)
 
             // Create groups for this user
             await cmdbServices.createGroup(createdUser.token, group)
@@ -400,8 +451,11 @@ describe("Services modules tests:", function() {
             }
 
             // Act
-            await cmdbUserServices.createUser(userTestUsername, userTestPassword)
-            let createdUser = await cmdbUserServices.getUser(userTestUsername)
+            await cmdbUserServices.createUser(
+                testUser.username, testUser.password, testUser.email, testUser.passConfirm
+            )
+            const createdUser = await cmdbUserServices.getUserByUsername(testUser.username)
+
             await cmdbServices.createGroup(createdUser.token, groupBodyTest)
             await cmdbServices.editGroup(createdUser.token, newGroupId, groupBodyUpdatedTest)
 
@@ -426,8 +480,10 @@ describe("Services modules tests:", function() {
 
             // Act
             try {
-                await cmdbUserServices.createUser(userTestUsername, userTestPassword)
-                let createdUser = await cmdbUserServices.getUser(userTestUsername)
+                await cmdbUserServices.createUser(
+                    testUser.username, testUser.password, testUser.email, testUser.passConfirm
+                )
+                const createdUser = await cmdbUserServices.getUserByUsername(testUser.username)
                 await cmdbServices.createGroup(createdUser.token, groupBodyTest)
                 await cmdbServices.editGroup(createdUser.token, newGroupId, groupBodyUpdatedTest)
             } catch(e) {
@@ -452,8 +508,10 @@ describe("Services modules tests:", function() {
             const newGroupId = originalGroups.IDs + 1
 
             // Act
-            await cmdbUserServices.createUser(userTestUsername, userTestPassword)
-            let createdUser = await cmdbUserServices.getUser(userTestUsername)
+            await cmdbUserServices.createUser(
+                testUser.username, testUser.password, testUser.email, testUser.passConfirm
+            )
+            const createdUser = await cmdbUserServices.getUserByUsername(testUser.username)
             await cmdbServices.createGroup(createdUser.token, groupBodyTest)
             await cmdbServices.deleteGroup(createdUser.token, newGroupId)
 
@@ -473,8 +531,10 @@ describe("Services modules tests:", function() {
 
             //Act
             try {
-                await cmdbUserServices.createUser(userTestUsername, userTestPassword)
-                let createdUser = await cmdbUserServices.getUser(userTestUsername)
+                await cmdbUserServices.createUser(
+                    testUser.username, testUser.password, testUser.email, testUser.passConfirm
+                )
+                const createdUser = await cmdbUserServices.getUserByUsername(testUser.username)
                 await cmdbServices.createGroup(createdUser.token, groupBodyTest)
                 await cmdbServices.deleteGroup(createdUser.token, -1)
             } catch(e) {
@@ -513,8 +573,10 @@ describe("Services modules tests:", function() {
             })
 
             // Act
-            await cmdbUserServices.createUser(userTestUsername, userTestPassword)
-            let createdUser = await cmdbUserServices.getUser(userTestUsername)
+            await cmdbUserServices.createUser(
+                testUser.username, testUser.password, testUser.email, testUser.passConfirm
+            )
+            const createdUser = await cmdbUserServices.getUserByUsername(testUser.username)
             await cmdbServices.createGroup(createdUser.token, groupBodyTest)
             await cmdbServices.addMovieInGroup(createdUser.token, newGroupId, "tt0468569")
 
@@ -536,8 +598,10 @@ describe("Services modules tests:", function() {
             const newGroupId = originalGroups.IDs + 1
 
             try {
-                await cmdbUserServices.createUser(userTestUsername, userTestPassword)
-                let createdUser = await cmdbUserServices.getUser(userTestUsername)
+                await cmdbUserServices.createUser(
+                    testUser.username, testUser.password, testUser.email, testUser.passConfirm
+                )
+                const createdUser = await cmdbUserServices.getUserByUsername(testUser.username)
                 await cmdbServices.createGroup(createdUser.token, groupBodyTest)
                 // Add movie to the group
                 await cmdbServices.addMovieInGroup(createdUser.token, newGroupId, "tt0468569")
@@ -561,8 +625,10 @@ describe("Services modules tests:", function() {
 
             // Act
             try {
-                await cmdbUserServices.createUser(userTestUsername, userTestPassword)
-                let createdUser = await cmdbUserServices.getUser(userTestUsername)
+                await cmdbUserServices.createUser(
+                    testUser.username, testUser.password, testUser.email, testUser.passConfirm
+                )
+                const createdUser = await cmdbUserServices.getUserByUsername(testUser.username)
                 await cmdbServices.createGroup(createdUser.token, groupBodyTest)
                 await cmdbServices.addMovieInGroup(createdUser.token, -1, "tt0468569")
             } catch(e) {
@@ -584,8 +650,10 @@ describe("Services modules tests:", function() {
 
             // Act
             try {
-                await cmdbUserServices.createUser(userTestUsername, userTestPassword)
-                let createdUser = await cmdbUserServices.getUser(userTestUsername)
+                await cmdbUserServices.createUser(
+                    testUser.username, testUser.password, testUser.email, testUser.passConfirm
+                )
+                const createdUser = await cmdbUserServices.getUserByUsername(testUser.username)
                 await cmdbServices.createGroup(createdUser.token, groupBodyTest)
                 await cmdbServices.addMovieInGroup(createdUser.token, newGroupId, "468569")
             } catch(e) {
@@ -629,8 +697,10 @@ describe("Services modules tests:", function() {
             })
 
             // Act
-            await cmdbUserServices.createUser(userTestUsername, userTestPassword)
-            let createdUser = await cmdbUserServices.getUser(userTestUsername)
+            await cmdbUserServices.createUser(
+                testUser.username, testUser.password, testUser.email, testUser.passConfirm
+            )
+            const createdUser = await cmdbUserServices.getUserByUsername(testUser.username)
             await cmdbServices.createGroup(createdUser.token, groupBodyTest)
             await cmdbServices.addMovieInGroup(createdUser.token, newGroupId, "tt0468569")
             await cmdbServices.removeMovieInGroup(createdUser.token, newGroupId, "tt0468569")
@@ -652,8 +722,10 @@ describe("Services modules tests:", function() {
 
             // Act
             try {
-                await cmdbUserServices.createUser(userTestUsername, userTestPassword)
-                let createdUser = await cmdbUserServices.getUser(userTestUsername)
+                await cmdbUserServices.createUser(
+                    testUser.username, testUser.password, testUser.email, testUser.passConfirm
+                )
+                const createdUser = await cmdbUserServices.getUserByUsername(testUser.username)
                 await cmdbServices.createGroup(createdUser.token, groupBodyTest)
                 await cmdbServices.addMovieInGroup(createdUser.token, newGroupId, "tt0468569")
                 await cmdbServices.removeMovieInGroup(createdUser.token, -1, "tt0468569")
@@ -676,8 +748,10 @@ describe("Services modules tests:", function() {
 
             // Act
             try {
-                await cmdbUserServices.createUser(userTestUsername, userTestPassword)
-                let createdUser = await cmdbUserServices.getUser(userTestUsername)
+                await cmdbUserServices.createUser(
+                    testUser.username, testUser.password, testUser.email, testUser.passConfirm
+                )
+                const createdUser = await cmdbUserServices.getUserByUsername(testUser.username)
                 await cmdbServices.createGroup(createdUser.token, groupBodyTest)
                 await cmdbServices.addMovieInGroup(createdUser.token, newGroupId, "tt0468569")
                 await cmdbServices.removeMovieInGroup(createdUser.token, newGroupId, "468569")

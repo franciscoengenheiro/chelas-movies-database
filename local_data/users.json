@@ -1,11 +1,19 @@
 {
-    "IDs": 1,
+    "IDs": 2,
     "users": [
         {
             "id": 1,
             "username": "admin",
             "password": "admin",
-            "token": "09faa257-d2f2-4b75-80f9-185fbd52e108"
+            "email": "admin@gmail.com",
+            "token": "2fb0f4e6-b3e3-4902-b362-e47224c727e7"
+        },
+        {
+            "id": 2,
+            "username": "guest",
+            "password": "guest",
+            "email": "guest@gmail.com",
+            "token": "b609341f-27cd-47b3-ae66-70c2c0e55857"
         }
     ]
 }

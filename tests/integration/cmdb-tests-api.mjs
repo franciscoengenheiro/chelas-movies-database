@@ -22,44 +22,65 @@ describe("API integration tests:", function() {
     // Start server
     let app = server().listen(1904, () => {})
     // Constants:
-    const invalidUserToken = "    "
     const movieId = 'tt0468569'
     const groupA = {
-        "name": "They won't know this is an Integration test group",
-        "description": "Am I a description for a group?"
+        name: "They won't know this is an Integration test group",
+        description: "Am I a description for a group?"
     }
     const groupB = {
-        "name": "Don't tell them I'm also an Integration test group",
-        "description": "Hide this description somewhere"
+        name: "Don't tell them I'm also an Integration test group",
+        description: "Hide this description somewhere"
     }
     const newUserA = {
-        "username": "fa55e027f56e4f4cbdb1d03400ad97faUserIntegrationTestA",
-        "password": "fa55e027f56e4f4cbdb1d03400ad97faUserIntegrationTestA",
+        username: "fa55e027f56e4f4cbdb1d03400ad97faUserIntegrationTestA",
+        password: "fa55e027f56e4f4cbdb1d03400ad97faUserIntegrationTestA",
+        email: "f4cbdb1d03400ad97faUserIntegrationTestA@gmail.com",
+        passConfirm: "fa55e027f56e4f4cbdb1d03400ad97faUserIntegrationTestA",
     }
     const newUserB = {
-        "username": "fa55e027f56e4f4cbdb1d03400ad97faUserIntegrationTestB",
-        "password": "fa55e027f56e4f4cbdb1d03400ad97faUserIntegrationTestB",
+        username: "fa55e027f56e4f4cbdb1d03400ad97faUserIntegrationTestB",
+        password: "fa55e027f56e4f4cbdb1d03400ad97faUserIntegrationTestB",
+        email: "f4cbdb1d03400ad97faUserIntegrationTestA@gmail.com",
+        passConfirm: "fa55e027f56e4f4cbdb1d03400ad97faUserIntegrationTestB",
     }
     // Invalid:
     const invalidGroupId = 1.3
     const invalidMovieId = 2.7
+    const invalidUserToken = "    "
     const invalidGroup = {
-        "name": "some invalid name",
-        "description": 123 
+        name: "some invalid name",
+        description: 123 
     }
     const invalidUsernameUser = {
-        "username": 1, // Not a string
-        "password": 'a'
+        username: 1, // Not a string
+        password: "a",
+        email: "b",
+        passConfirm: "a"
     }
     const invalidPasswordUser = {
-        "username": "1",
-        "password": [123, 21] // Not a string
+        username: "1",
+        password: "", // Empty string
+        email: "b",
+        passConfirm: ""
+    }
+    const invalidEmailUser = {
+        username: "1",
+        password: "a",
+        email: {},
+        passConfirm: "a"
+    }
+    const invalidConfirmPasswordUser = {
+        username: "1",
+        password: "a",
+        email: "b",
+        passConfirm: "aa"
     }
     // Global variables
     let originalGroups
     let originalUsers
     let userTestToken
-    // Utility test functions
+
+    // Utility test functions:
     beforeEach(async () => {
         // Read current data
         originalUsers = await File.read(USERS_FILE)
@@ -80,6 +101,7 @@ describe("API integration tests:", function() {
         await File.write(originalUsers, USERS_FILE)   
         await File.write(originalGroups, GROUPS_FILE)               
     })
+
     describe("POST /api/users", function() {
         const routeToTest = '/api/users'
         it('Create a new user', async function() {
@@ -113,12 +135,12 @@ describe("API integration tests:", function() {
                 .send(newUserB)
                 .expect('Content-Type', /json/)
 
-            expect(response.status).to.equal(401)
+            expect(response.status).to.equal(400)
             expect(response.body).to.be.a('String')
             expect(response.body).to.equal(
                 errors.INVALID_USER("already exists").description
             )
-        })
+        }) 
         it('Create an user with an invalid username', async function() {
             let response = await request(app)
                 .post(routeToTest)
@@ -129,7 +151,7 @@ describe("API integration tests:", function() {
             expect(response.status).to.equal(400)
             expect(response.body).to.be.a('String')
             expect(response.body).to.equal(
-                errors.INVALID_ARGUMENT("username or password").description
+                errors.INVALID_ARGUMENT("username, password or email").description
             )
         })
         it('Create an user with an invalid password', async function() {
@@ -142,7 +164,33 @@ describe("API integration tests:", function() {
             expect(response.status).to.equal(400)
             expect(response.body).to.be.a('String')
             expect(response.body).to.equal(
-                errors.INVALID_ARGUMENT("username or password").description
+                errors.INVALID_ARGUMENT("username, password or email").description
+            )
+        })
+        it('Create an user with an invalid email', async function() {
+            let response = await request(app)
+                .post(routeToTest)
+                .set('Accept', 'application/json')
+                .send(invalidEmailUser)
+                .expect('Content-Type', /json/)
+
+            expect(response.status).to.equal(400)
+            expect(response.body).to.be.a('String')
+            expect(response.body).to.equal(
+                errors.INVALID_ARGUMENT("username, password or email").description
+            )
+        })
+        it('Create an user with an invalid confirmation password', async function() {
+            let response = await request(app)
+                .post(routeToTest)
+                .set('Accept', 'application/json')
+                .send(invalidConfirmPasswordUser)
+                .expect('Content-Type', /json/)
+
+            expect(response.status).to.equal(400)
+            expect(response.body).to.be.a('String')
+            expect(response.body).to.equal(
+                errors.PASSWORDS_DO_NOT_MATCH("passwords do not match").description
             )
         })
     })

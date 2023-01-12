@@ -14,6 +14,7 @@ export default function (cmdbServices) {
         throw errors.INVALID_ARGUMENT("cmdbServices")
     }
 
+    // Initialize a router
     const router = express.Router()
 
     router.get('/movies', handleRequestInHTML(getPopularMovies))

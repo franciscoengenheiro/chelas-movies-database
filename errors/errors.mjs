@@ -35,7 +35,9 @@ export default {
  * @param {Int} code - error identifier
  * @param {String} description - message that describes the error
  */
-function InternalError(code, description) {
-    this.code = code
-    this.description = description
+class InternalError {
+    constructor(code, description) {
+        this.code = code
+        this.description = description
+    }
 }

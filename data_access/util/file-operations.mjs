@@ -6,9 +6,9 @@
 import { readFile, writeFile } from 'node:fs/promises'
 
 /**
- * Reads specified file content
- * @param {String} file_name name of the file to read from 
- * @returns a javascript object with the contents of the file
+ * Reads specified file content.
+ * @param {String} file_name name of the file to read from.
+ * @returns a javascript object with the contents of the file.
  */
 export async function read(file_name) {
     let fileContents = await readFile(file_name)
@@ -16,10 +16,10 @@ export async function read(file_name) {
 }
 
 /**
- * Writes to file the received content
- * @param {*} obj represents the content to be written to the file
- * @param {String} file_name name of the file to write to
+ * Writes to file the received content.
+ * @param {Object} obj represents the content to be written to the file.
+ * @param {String} file_name name of the file to write to.
  */
 export async function write(obj, file_name) {
-    return writeFile(file_name, JSON.stringify(obj, null , 4))
+    return writeFile(file_name, JSON.stringify(obj, null, 4))
 }

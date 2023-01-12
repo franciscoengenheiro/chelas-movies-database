@@ -1,19 +1,19 @@
-// Module that manages application movies data.
-// Provides access to the Internet Movies Database (IMDb) API
+// Module that manages application movies data and provides access to the 
+// Internet Movies Database (IMDb) API
 
 'use strict'
 
 import errors from '#errors/errors.mjs'
 
 // Constants
-const IMDB_KEY = "k_lcs891ko" // "k_jtqnxg0w" 
+const IMDB_KEY = "k_o6wzk1u2" // "k_jtqnxg0w" // "k_lcs891ko" 
 export const MOST_POPULAR_MOVIES = `https://imdb-api.com/en/API/Top250Movies/${IMDB_KEY}`
 export const MOVIES_SEARCHED_BY_NAME = `https://imdb-api.com/en/API/SearchMovie/${IMDB_KEY}/`
 export const MOVIE_INFO = `https://imdb-api.com/en/API/Title/${IMDB_KEY}/`
 
 /**
- * @param {Function} fetch function that retrieves a resource from a container 
- * @returns an object with all the avalaible movies data operations as properties
+ * @param {Function} fetch function that retrieves a resource from a container.
+ * @returns an object with all the avalaible movies data operations as properties.
  */
 export default function(fetch) {
     // Validate if the received fetch function exists
@@ -29,9 +29,9 @@ export default function(fetch) {
     }
 
     /**
-     * Retrieves the 250 most popular movies
-     * @param {Number} limit option parameter to limit the search result 
-     * @returns an array with the search result
+     * Retrieves the 250 most popular movies.
+     * @param {Number} limit option parameter to limit the search result.
+     * @returns an array with the search result.
      */
     async function getPopularMoviesData(limit) {
         let moviesObj = await fetch(MOST_POPULAR_MOVIES)
@@ -42,10 +42,10 @@ export default function(fetch) {
     } 
 
     /**
-     * Retrieves the results of a search by a movie name
-     * @param {String} moviesName prefix or name of the movie to search
-     * @param {Number} limit option parameter to limit the search result
-     * @returns an array with the search result
+     * Retrieves the results of a search by a movie name.
+     * @param {String} moviesName prefix or name of the movie to search.
+     * @param {Number} limit option parameter to limit the search result.
+     * @returns an array with the search result.
      */
     async function searchMoviesByNameData(moviesName, limit) {
         let moviesObj = await fetch(MOVIES_SEARCHED_BY_NAME + moviesName)
@@ -58,6 +58,11 @@ export default function(fetch) {
         return moviesObj.results
     }
 
+    /**
+     * Retrieves the details of a movie.
+     * @param {Number} movieId movie identifier.     
+     * @returns an array with the search result.
+     */
     async function getMovieDetails(movieId) {
         let movieObj = await fetch(MOVIE_INFO + movieId)
 
@@ -74,15 +79,13 @@ export default function(fetch) {
     }
 
     /**
-     * Adds a movie in a user specified group
-     * @param {Number} groupId group identifier
-     * @param {Number} movieId movie identifier
-     * @param {Number} userId user internal identifier
-     * @throws ArgumentNotFoundException if the movie does not exist 
+     * Adds a movie in a user specified group.
+     * @param {Number} movieId movie identifier.
+     * @throws ArgumentNotFoundException if the movie does not exist.
      */
     async function addMovieInGroupData(movieId) {
         let moviesObj = await fetch(MOVIE_INFO + movieId)
-        if (moviesObj.title == null) {
+        if (!moviesObj.title) {
             throw errors.ARGUMENT_NOT_FOUND("movie")
         } else {
             return moviesObj
@@ -91,10 +94,10 @@ export default function(fetch) {
 
     // Auxiliary Functions
     /**
-     * Validates the limit and returns a function to apply after
-     * @param {Number} limit parameter to limit the search result
-     * @param {Function} action function to execute
-     * @throws InvalidArgumentException if the received limit is invalid
+     * Validates the limit and returns a function to apply after.
+     * @param {Number} limit parameter to limit the search result.
+     * @param {Function} action function to execute.
+     * @throws InvalidArgumentException if the received limit is invalid.
      */
     function checkLimitAndFilter(limit, action) {
         if (limit != undefined) {

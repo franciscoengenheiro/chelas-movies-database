@@ -1,4 +1,4 @@
-// Module that exports elastic search groups data access
+// Module that handles elastic search data access regarding groups
 
 'use strict'
 
@@ -6,7 +6,7 @@ import errors from '#errors/errors.mjs'
 import elasticSearchInit from '#data_access/elasticSearch/elastic-search-util.mjs'
 import {get, post, put, del} from '#data_access/elasticSearch/fetch-wrapper.mjs'
 
-// Constants
+// Initialize elastic search index
 const elasticSearch = elasticSearchInit('groups')
 
 export default function() {
@@ -22,8 +22,9 @@ export default function() {
     
     /**
      * Creates a new group for an user in the elastic search database.
-     * @param {*} obj object that has the group details to create.
+     * @param {Object} obj object that has the group details to create.
      * @param {Number} userId user internal identifier.
+     * @returns the group created.
      */
     async function createGroupData(obj, userId) {
         // Create properties for the new group
@@ -34,12 +35,12 @@ export default function() {
     }
 
     /**
-     * Searchs all groups of an user
+     * Searchs all groups of an user using a query body.
      * @param {Number} userId user internal identifier.
      * @returns an array with the search result.
      */
     async function getGroupsData(userId) {
-        const options = {
+        const query = {
             "query": {
                 "match": {
                     "userId.keyword": userId
@@ -47,7 +48,7 @@ export default function() {
             }
         }
         // Query elastic search
-        let groupsObj = await post(elasticSearch.searchDocs(), options)
+        let groupsObj = await post(elasticSearch.searchDocs(), query)
 
         // Retrieve only the groups that belong to the user and modify each group object
         // to only show selected properties
@@ -66,7 +67,7 @@ export default function() {
      * Searchs in elastic search database a group details of an user.
      * @param {Number} groupId group identifier.
      * @param {Number} userId user internal identifier.
-     * @returns The group found.
+     * @returns the group found.
      * @throws ArgumentNotFoundException if the group wasn't found.
      * @throws InvalidUserException if the user is not found.
      */
@@ -105,6 +106,7 @@ export default function() {
      * @param {Number} groupId group identifier.
      * @param {Object} obj object that has the group details to edit.
      * @param {Number} userId user internal identifier.
+     * @returns the edited group.
      * @throws ArgumentNotFoundException if the group wasn't found.
      * @throws InvalidUserException if the user is not found.
      */
@@ -129,6 +131,7 @@ export default function() {
      * Deletes a user specified group in the elastic search database.
      * @param {Number} groupId group identifier.
      * @param {Number} userId user internal identifier.
+     * @returns the deleted group.
      * @throws ArgumentNotFoundException if the group wasn't found.
      * @throws InvalidUserException if the user is not found.
      */
@@ -150,7 +153,7 @@ export default function() {
      * Adds a movie in a user specified group in the elastic search database.
      * @param {Number} groupId group identifier.
      * @param {Number} movieId movie identifier.
-     * @param {*} moviesObj object that represents the movie details to add.
+     * @param {Object} moviesObj object that represents the movie details to add.
      * @param {Number} userId user internal identifier.
      * @throws InvalidArgumentException if the movie already exists in the group.
      * @throws InvalidUserException if the user is not found.

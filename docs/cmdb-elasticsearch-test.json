@@ -54,7 +54,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"admin\",\r\n    \"token\": \"09faa257-d2f2-4b75-80f9-185fbd52e108\"\r\n}",
+							"raw": "{\r\n    \"username\": \"guest\",\r\n    \"password\": \"guest\",\r\n    \"email\": \"guest@gmail.com\",\r\n    \"token\": \"b8e57530-8ca5-47b3-8f13-1fbab2385875\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -103,7 +103,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{host}}:{{port}}/users/_doc/SRtEY4UB7uCqhza2VIQX",
+							"raw": "http://{{host}}:{{port}}/users/_doc/ee6aooUBOt7SKC1l8QKq",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
@@ -112,7 +112,7 @@
 							"path": [
 								"users",
 								"_doc",
-								"SRtEY4UB7uCqhza2VIQX"
+								"ee6aooUBOt7SKC1l8QKq"
 							]
 						}
 					},
@@ -124,7 +124,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://{{host}}:{{port}}/users/_doc/L5AmaoUBKgdlHOFfP26d",
+							"raw": "http://{{host}}:{{port}}/users/_doc/EFhiooUBH76naTFYFazl",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
@@ -133,7 +133,7 @@
 							"path": [
 								"users",
 								"_doc",
-								"L5AmaoUBKgdlHOFfP26d"
+								"EFhiooUBH76naTFYFazl"
 							]
 						}
 					},
@@ -165,7 +165,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{host}}:{{port}}/users/_search/?q=token:4c333be4-fdea-4028-9225-030bca3230f1&operator=AND",
+							"raw": "http://{{host}}:{{port}}/users/_search/",
 							"protocol": "http",
 							"host": [
 								"{{host}}"
@@ -179,11 +179,13 @@
 							"query": [
 								{
 									"key": "q",
-									"value": "token:4c333be4-fdea-4028-9225-030bca3230f1"
+									"value": "token:4c333be4-fdea-4028-9225-030bca3230f1",
+									"disabled": true
 								},
 								{
 									"key": "operator",
-									"value": "AND"
+									"value": "AND",
+									"disabled": true
 								}
 							]
 						}
@@ -197,7 +199,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"query\": {\r\n        \"multi_match\": {\r\n            \"query\": \"6f3d9c6c-4305-4442-83a4-f\",\r\n            \"fields\": [\"username.keyword\", \"token.keyword\"]\r\n        }\r\n    }\r\n}",
+							"raw": "{\r\n    \"query\": {\r\n        \"match\": {\r\n            \"token.keyword\": \"e7dc945b-d791-47e6-9b5c-a94216bc8d77\"\r\n        }\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"

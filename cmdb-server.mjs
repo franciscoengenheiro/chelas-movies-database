@@ -8,7 +8,6 @@
 import express from 'express'
 import cors from 'cors'
 import swaggerUi from 'swagger-ui-express'
-import yaml from 'yamljs' // Yaml is similar to JSON but uses indentation to infer object and properties
 import path from 'path'
 import url from 'url'
 
@@ -51,11 +50,6 @@ export default function() {
                     // allows a server to indicate any origins other than its own from which a 
                     // browser should permit loading resources from
                     // New HTTP-header: Access-Control-Allow-Origin: *
-
-    // Converts OpenAPI specification in yaml to javascript object
-    const swaggerDocument = yaml.load('./docs/cmdb-api-spec.yaml')
-    // Establish a way in the application which users can access the OpenAPI HTML specification page.
-    app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
     // Parses incoming requests with JSON payloads if the Content-Type of the request header
     // matches this option 
