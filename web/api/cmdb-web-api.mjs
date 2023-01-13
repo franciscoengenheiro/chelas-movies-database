@@ -11,7 +11,7 @@ import errors from '#errors/errors.mjs'
 import express from 'express'
 import yaml from 'yamljs' // Yaml is similar to JSON but uses indentation to infer object and properties
 import swaggerUi from 'swagger-ui-express'
-import translateToHTTPResponse from '#web/http-error-responses.mjs'
+import handlerRequest from '#web/cmdb-handle-request.mjs'
 
 /**
  * @param {*} cmdbServices module that contains all application services.
@@ -37,17 +37,17 @@ export default function(cmdbServices, cmdbUserServices) {
     router.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
     // Routes defined for the API
-    router.post('/users', handleRequestInJSON(createUser))
-    router.get('/movies', handleRequestInJSON(getPopularMovies))
-    router.get('/movies/search/:moviesName', handleRequestInJSON(searchMoviesByName))
-    router.get('/movies/find/:movieId', handleRequestInJSON(getMovieDetails))
-    router.post('/groups', verifyAuthentication(createGroup))
-    router.get('/groups', verifyAuthentication(getGroups))
-    router.get('/groups/:groupId', verifyAuthentication(getGroupDetails))
-    router.put('/groups/:groupId', verifyAuthentication(editGroup))
-    router.delete('/groups/:groupId', verifyAuthentication(deleteGroup))
-    router.put('/groups/:groupId/movies/:movieId', verifyAuthentication(addMovieInGroup))
-    router.delete('/groups/:groupId/movies/:movieId', verifyAuthentication(removeMovieInGroup))
+    router.post('/users', handlerRequest(createUser, JSONtry, JSONcatch))
+    router.get('/movies', handlerRequest(getPopularMovies, JSONtry, JSONcatch))
+    router.get('/movies/search/:moviesName', handlerRequest(searchMoviesByName, JSONtry, JSONcatch))
+    router.get('/movies/find/:movieId', handlerRequest(getMovieDetails, JSONtry, JSONcatch))
+    router.post('/groups', verifyAuthentication(createGroup, JSONtry, JSONcatch))
+    router.get('/groups', verifyAuthentication(getGroups, JSONtry, JSONcatch))
+    router.get('/groups/:groupId', verifyAuthentication(getGroupDetails, JSONtry, JSONcatch))
+    router.put('/groups/:groupId', verifyAuthentication(editGroup, JSONtry, JSONcatch))
+    router.delete('/groups/:groupId', verifyAuthentication(deleteGroup, JSONtry, JSONcatch))
+    router.put('/groups/:groupId/movies/:movieId', verifyAuthentication(addMovieInGroup, JSONtry, JSONcatch))
+    router.delete('/groups/:groupId/movies/:movieId', verifyAuthentication(removeMovieInGroup, JSONtry, JSONcatch))
 
     return router
 
@@ -122,7 +122,7 @@ export default function(cmdbServices, cmdbUserServices) {
         } 
     }
 
-    function verifyAuthentication(handler) {
+    function verifyAuthentication(handler, JSONtry, JSONcatch) {
         return async function(req, rsp){
             const BEARER_STR = "Bearer "
             // Get the value of the Authorization request header
@@ -139,25 +139,19 @@ export default function(cmdbServices, cmdbUserServices) {
             // Create a property in the request object to easily retrieve it
             req.token = tokenHeader.split(" ")[1]
     
-            const requestHandler = handleRequestInJSON(handler)
+            const requestHandler = handlerRequest(handler, JSONtry, JSONcatch)
 
             return requestHandler(req, rsp)
         }
     }
-    
-    function handleRequestInJSON(handler) {
-        return async function(req, rsp){
-            try {
-                // With a token the actual function can be called
-                let body = await handler(req, rsp)
-                // Wrap the result in JSON format 
-                rsp.json(body) //status code is 200 by default
-            } catch(e) {
-                const httpResponse = translateToHTTPResponse(e)
-                rsp
-                    .status(httpResponse.status)
-                    .json(httpResponse.body)
-            }
-        }
+
+    function JSONtry(body, rsp){
+        rsp.json(body)
+    }
+
+    function JSONcatch(httpResponse, rsp){
+        rsp
+            .status(httpResponse.status)
+            .json(httpResponse.body)
     }
 }

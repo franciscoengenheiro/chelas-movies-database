@@ -1,3 +1,5 @@
+<script type="application/ecmascript" src="/cmdb-user-interface-site.mjs"></script>
+
 <form action="/auth/home" method="GET">
     <input type="submit" value="Back">
 </form>
@@ -16,6 +18,14 @@
       <form action="/auth/groups/{{id}}/delete" method="POST">
         <input type="submit" value="Delete">
       </form>
+
+      <p>Api buttons</p>
+      <input type="button" value="Delete group with client script" id="b1">
+      <script type="application/ecmascript">
+        removeGroup('{{../token}}','{{id}}')
+      </script>
+
+      
     </li>
   {{/each}}
 </ul>

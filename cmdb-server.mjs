@@ -64,7 +64,8 @@ export default function() {
                             // keyed by the cookie names
     app.use(express.static(path.join(__dirname, 'web', 'site')));
     app.use(cmdbUserWebSite)
-    app.use(cmdbWebSite)
+    app.use('/auth', cmdbWebSite.withAuth)
+    app.use(cmdbWebSite.withoutAuth)
     app.use('/api', cmdbWebApi)
     // ------------------------------------ Middlewares ----------------------------------------------
 

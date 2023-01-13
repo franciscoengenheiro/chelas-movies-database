@@ -5,8 +5,8 @@
 //  - Generate the response in HTML format
 
 import errors from '#errors/errors.mjs'
-import translateToHTTPResponse from '#web/http-error-responses.mjs'
 import express from 'express'
+import handlerRequest from '#web/cmdb-handle-request.mjs'
 
 export default function (cmdbServices) {
     // Validate if all the received services exist
@@ -15,27 +15,28 @@ export default function (cmdbServices) {
     }
 
     // Initialize a router
-    const router = express.Router()
+    const router1 = express.Router()
+    const router2 = express.Router()
 
-    router.get('/movies', handleRequestInHTML(getPopularMovies))
-    router.get('/movies/limit', limitForMovies)
-    router.get('/movies/search/limit', limitForSearch)
-    router.get('/movies/search/:movieName', handleRequestInHTML(searchMoviesByName))
-    router.get('/movies/find/:movieId', handleRequestInHTML(getMovieDetails))
+    router1.get('/movies', handlerRequest(getPopularMovies, HTMLtry, HTMLcatch))
+    router1.get('/movies/limit', limitForMovies)
+    router1.get('/movies/search/limit', limitForSearch)
+    router1.get('/movies/search/:movieName', handlerRequest(searchMoviesByName, HTMLtry, HTMLcatch))
+    router1.get('/movies/find/:movieId', handlerRequest(getMovieDetails, HTMLtry, HTMLcatch))
 
-    router.post('/auth/groups', verifyAuthentication(createGroup))
-    router.get('/auth/groups', verifyAuthentication(getGroups))
-    router.get('/auth/groups/newGroup', getNewGroup)
-    router.get('/auth/groups/:groupId', verifyAuthentication(getGroupDetails))
-    router.get('/auth/groups/:groupId/editGroup', verifyAuthentication(getEditGroup))
-    router.post('/auth/groups/:groupId/edit', verifyAuthentication(editGroup))
-    router.post('/auth/groups/:groupId/delete', verifyAuthentication(deleteGroup))
-    router.get('/auth/groups/:groupId/movies/addMovie', addMovie)
-    router.get('/auth/groups/:groupId/movies/searchTheMovie', verifyAuthentication(searchMovieToAdd))
-    router.post('/auth/groups/:groupId/movies', verifyAuthentication(addMovieInGroup))
-    router.post('/auth/groups/:groupId/movies/:movieId', verifyAuthentication(removeMovieInGroup))
-
-    return router
+    router2.post('/groups', handlerRequest(createGroup, HTMLtry, HTMLcatch))
+    router2.get('/groups', handlerRequest(getGroups, HTMLtry, HTMLcatch))
+    router2.get('/groups/newGroup', getNewGroup)
+    router2.get('/groups/:groupId', handlerRequest(getGroupDetails, HTMLtry, HTMLcatch))
+    router2.get('/groups/:groupId/editGroup', handlerRequest(getEditGroup, HTMLtry, HTMLcatch))
+    router2.post('/groups/:groupId/edit', handlerRequest(editGroup, HTMLtry, HTMLcatch))
+    router2.post('/groups/:groupId/delete', handlerRequest(deleteGroup, HTMLtry, HTMLcatch))
+    router2.get('/groups/:groupId/movies/addMovie', addMovie)
+    router2.get('/groups/:groupId/movies/searchTheMovie', handlerRequest(searchMovieToAdd, HTMLtry, HTMLcatch))
+    router2.post('/groups/:groupId/movies', handlerRequest(addMovieInGroup, HTMLtry, HTMLcatch))
+    router2.post('/groups/:groupId/movies/:movieId', handlerRequest(removeMovieInGroup, HTMLtry, HTMLcatch))
+    
+    return {withoutAuth: router1, withAuth: router2}
 
     async function limitForMovies(req, rsp) {
         rsp.render('limitForMovies')
@@ -45,7 +46,7 @@ export default function (cmdbServices) {
         const limit = req.query.limit
         const popularMovies = await cmdbServices.getPopularMovies(limit)
         const viewData = { title: 'Top 250 Most popular movies', movies: popularMovies }
-        return View('popularMovies', viewData)
+        return new View('popularMovies', viewData)
     }
 
     async function limitForSearch(req, rsp) {
@@ -59,16 +60,16 @@ export default function (cmdbServices) {
         const limit = req.query.limit
         const movies = await cmdbServices.searchMoviesByName(movieName, limit)
         const viewData = { title: movieName, movies: movies }
-        return View('searchMovies', viewData)
+        return new View('searchMovies', viewData)
     }
 
     async function getMovieDetails(req, rsp) {
         const movie = await cmdbServices.getMovieDetails(req.params.movieId)
-        return View('movie', movie)
+        return new View('movie', movie)
     }
 
     async function createGroup(req, rsp) {
-        let newGroup = await cmdbServices.createGroup(req.token, req.body)
+        await cmdbServices.createGroup(req.user.token, req.body)
         rsp.redirect('/auth/groups')
     }
 
@@ -77,30 +78,30 @@ export default function (cmdbServices) {
     }
 
     async function getGroups(req, rsp) {
-        const groups = await cmdbServices.getGroups(req.token)
-        const viewData = { title: 'My groups', groups: groups }
-        return View('groups', viewData)
+        const groups = await cmdbServices.getGroups(req.user.token)
+        const viewData = {token: req.user.token, title: 'My groups', groups: groups }
+        return new View('groups', viewData)
     }
 
     async function getGroupDetails(req, rsp) {
         const viewData = await getGroupDetailsMw(req, rsp)
-        return View('group', viewData)
+        return new View('group', viewData)
     }
 
     async function editGroup(req, rsp) {
         const groupId = req.params.groupId
-        const group = await cmdbServices.editGroup(req.token, groupId, req.body)
+        await cmdbServices.editGroup(req.user.token, groupId, req.body)
         rsp.redirect(`/auth/groups/${groupId}`)
     }
 
     async function getEditGroup(req, rsp) {
         const viewData = await getGroupDetailsMw(req, rsp)
-        return View('editGroup', viewData)
+        return new View('editGroup', viewData)
     }
 
     async function deleteGroup(req, rsp) {
         const groupId = req.params.groupId
-        const group = await cmdbServices.deleteGroup(req.token, groupId)
+        await cmdbServices.deleteGroup(req.user.token, groupId)
         rsp.redirect('/auth/groups/')
     }
 
@@ -114,20 +115,20 @@ export default function (cmdbServices) {
         const movieName = req.query.movieName
         const movies = await cmdbServices.searchMoviesByName(movieName, req.query.limit)
         const viewData = {title: movieName, movies: movies, groupId: groupId}
-        return View('searchMoviesToAdd', viewData)
+        return new View('searchMoviesToAdd', viewData)
     }
 
     async function addMovieInGroup(req, rsp) {
         const movieId = req.body.movieId
         const groupId = req.params.groupId
-        const movie = await cmdbServices.addMovieInGroup(req.token, groupId, movieId)
+        await cmdbServices.addMovieInGroup(req.user.token, groupId, movieId)
         rsp.redirect(`/auth/groups/${groupId}`)
     }
 
     async function removeMovieInGroup(req, rsp) {
         const movieId = req.params.movieId
         const groupId = req.params.groupId        
-        const group = await cmdbServices.removeMovieInGroup(req.token, groupId, movieId)
+        await cmdbServices.removeMovieInGroup(req.user.token, groupId, movieId)
         // Post/Redirect/Get (PRG) is a web development design pattern that lets the page shown 
         // after a form submission be reloaded, shared, or bookmarked without ill effects, such
         // as submitting the form another time.
@@ -136,7 +137,7 @@ export default function (cmdbServices) {
     
     async function getGroupDetailsMw(req, rsp) {
         const groupId = req.params.groupId
-        const group = await cmdbServices.getGroupDetails(req.token, groupId)
+        const group = await cmdbServices.getGroupDetails(req.user.token, groupId)
         return {id: groupId, group: group}
     }
   
@@ -152,25 +153,12 @@ export default function (cmdbServices) {
         }
     }
 
-    function verifyAuthentication(handler) {
-        return async function(req, rsp) {
-            req.token = req.user.token
-            let requestHandler = handleRequestInHTML(handler)
-            requestHandler(req, rsp)
-        }
+    function HTMLtry(view, rsp){
+        if(view) rsp.render(view.name, view.data)
     }
 
-    function handleRequestInHTML(handler) {
-        return async function(req, rsp) {
-            let view
-            try {
-                view = await handler(req, rsp)
-            } catch(e) {
-                const httpResponse = translateToHTTPResponse(e)
-                view = View('onError', httpResponse)
-            }
-            // Wrap the result in HTML format
-            if(view) rsp.render(view.name, view.data)
-        }
+    function HTMLcatch(httpResponse, rsp){
+        let view = View('onError', httpResponse)
+        if(view) rsp.render(view.name, view.data)
     }
 }
