@@ -544,12 +544,16 @@ components:
     NewUser:
       required:
       - username
+      - email
       - password
       type: object
       properties:
         username:
           type: string
           example: "guest"
+        email:
+          type: string
+          example: "guest@gmail.com"
         password:
           type: string
           example: "abcd"  
@@ -560,6 +564,9 @@ components:
             type: string 
           username:
             type: string
+          email:
+            type: string
+            example: "guest@gmail.com"
           password:
             type: string
           token:
