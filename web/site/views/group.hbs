@@ -1,3 +1,6 @@
+<script type="application/ecmascript" src="/cmdb-user-interface-site.mjs"></script>
+
+
 <form action="/auth/groups" method="GET">
     <input type="submit" value="Back">
 </form>
@@ -7,9 +10,16 @@
 <form action="/auth/groups/{{id}}/editGroup" method="GET">
   <input type="submit" value="Edit">
 </form>
+
+<input type="button" value="Delete group via client script" id="b1">
+<script type="application/ecmascript">
+  removeGroup('#b1', '{{token}}','{{id}}', true)
+</script>
+
 <form action="/auth/groups/{{id}}/delete" method="POST">
   <input type="submit" value="Delete">
 </form>
+
 
 <p><b>Description: </b>{{group.description}}</p>
 <p><b>Movies total duration: </b>{{group.moviesTotalDuration}} mins</p>
@@ -21,6 +31,11 @@
       <form action="/auth/groups/{{../id}}/movies/{{id}}" method="POST">
         <input type="submit" value="Remove">
       </form>
+
+      <input type="button" value="Remove movie via client script" id="b{{@index}}">
+      <script type="application/ecmascript">
+        removeMovieInGroup('#b{{@index}}', '{{../token}}','{{../id}}', '{{id}}')
+      </script>
     </li>
   {{/each}}
 </ul>

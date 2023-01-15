@@ -1,11 +1,20 @@
+<script type="application/ecmascript" src="/cmdb-user-interface-site.mjs"></script>
+
+
 <h2>Edit a Group</h2>
 <form action="/auth/groups/{{id}}/edit" method="POST">
     <p>
-        Group name: <input type="text" name="name" value='{{group.name}}' maxlength="20">
+        Group name: <input type="text" name="name" value='{{group.name}}' maxlength="20" id="name">
     </p>
     <p>
-        Group description: <textarea name="description">{{group.description}}</textarea>
+        Group description: <textarea name="description" id="description">{{group.description}}</textarea>
     </p>
+
     <input type="submit" value="Edit">
     <input type="button" value="Cancel" onclick='history.back()'>
 </form>
+
+<input type="button" value="Edit group via client script" id="b1">
+<script type="application/ecmascript">
+    editGroup('#b1', '{{token}}','{{id}}', '#name', '#description')
+</script>

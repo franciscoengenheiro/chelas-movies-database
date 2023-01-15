@@ -114,7 +114,7 @@ export default function (cmdbServices) {
         const groupId = req.query.groupId
         const movieName = req.query.movieName
         const movies = await cmdbServices.searchMoviesByName(movieName, req.query.limit)
-        const viewData = {title: movieName, movies: movies, groupId: groupId}
+        const viewData = {token: req.user.token, title: movieName, movies: movies, groupId: groupId}
         return new View('searchMoviesToAdd', viewData)
     }
 
@@ -138,7 +138,7 @@ export default function (cmdbServices) {
     async function getGroupDetailsMw(req, rsp) {
         const groupId = req.params.groupId
         const group = await cmdbServices.getGroupDetails(req.user.token, groupId)
-        return {id: groupId, group: group}
+        return {token: req.user.token, id: groupId, group: group}
     }
   
     /** 

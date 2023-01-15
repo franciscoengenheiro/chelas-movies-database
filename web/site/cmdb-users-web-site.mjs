@@ -53,7 +53,7 @@ export default function(userServices) {
         const passConfirm = req.body.passConfirm
         try {
             await userServices.createUser(username, password, email, passConfirm)
-            rsp.redirect('/home')
+            await validateLogin(req, rsp)
         } catch(e) {
             const httpResponse = translateToHTTPResponse(e)
             rsp.render('onError', httpResponse)
