@@ -125,7 +125,7 @@ paths:
   /api/movies/find/{movieId}:
     get:
       tags:
-      - Movie
+      - Movies
       summary: Get movie details by id
       description: Given an id retrieve movie details
       operationId: getMovieDetails
@@ -345,7 +345,7 @@ paths:
         description: Group of movies
         required: true
         schema:
-          type: integer
+          type: string
       - name: movieId
         in: path
         description: A single Movie

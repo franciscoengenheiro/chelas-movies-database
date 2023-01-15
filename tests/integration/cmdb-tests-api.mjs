@@ -40,7 +40,7 @@ describe("API integration tests:", function() {
     const newUserB = {
         username: "fa55e027f56e4f4cbdb1d03400ad97faUserIntegrationTestB",
         password: "fa55e027f56e4f4cbdb1d03400ad97faUserIntegrationTestB",
-        email: "f4cbdb1d03400ad97faUserIntegrationTestA@gmail.com",
+        email: "fa55e027f56e4f4cbdb1d03400ad97fa@gmail.com", // email has to be unique
         passConfirm: "fa55e027f56e4f4cbdb1d03400ad97faUserIntegrationTestB",
     }
     // Invalid:

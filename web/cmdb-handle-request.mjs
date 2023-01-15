@@ -1,3 +1,5 @@
+'use strict'
+
 import translateToHTTPResponse from '#web/http-error-responses.mjs'
 
 export default function(handler, handlerTry, handlerCatch) {

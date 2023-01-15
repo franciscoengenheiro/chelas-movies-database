@@ -53,7 +53,7 @@ export default function(userServices) {
         const passConfirm = req.body.passConfirm
         try {
             await userServices.createUser(username, password, email, passConfirm)
-            await validateLogin(req, rsp)
+            await validateLogin(req, rsp) // Enables login on registration
         } catch(e) {
             const httpResponse = translateToHTTPResponse(e)
             rsp.render('onError', httpResponse)

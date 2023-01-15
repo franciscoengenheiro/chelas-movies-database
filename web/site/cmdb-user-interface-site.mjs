@@ -1,3 +1,7 @@
+// TODO()
+
+'use strict'
+
 function removeGroup(buttonId, usertoken, groupId, insideBool) {
     const btn = document.querySelector(buttonId)
     btn.onclick = handleClick

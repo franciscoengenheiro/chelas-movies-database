@@ -1,4 +1,4 @@
-// This module registers all HTTP routes
+// This module registers all HTTP routes // TODO()
 
 // This directive is necessary to ensure that common programmer type errors cause exceptions,
 // making the code easier to debug
@@ -7,7 +7,6 @@
 // External imports
 import express from 'express'
 import cors from 'cors'
-import swaggerUi from 'swagger-ui-express'
 import path from 'path'
 import url from 'url'
 

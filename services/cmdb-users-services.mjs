@@ -5,7 +5,6 @@
 import errors from '#errors/errors.mjs'
 import { validate } from 'deep-email-validator'
 
-
 /**
  * @param {*} usersData module that manages application users data.
  * @returns an object with all the avalaible application user services as properties.
@@ -73,6 +72,7 @@ function validateString(field) {
     return typeof field === 'string' && field.length != 0
 }
 
+// Todo - write comment
 async function validateEmail(email){
     return (await validate({
         email: email,
