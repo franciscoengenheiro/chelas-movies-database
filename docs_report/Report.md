@@ -108,7 +108,7 @@ For a visual representation and example of usage of these data storage designs, 
 
 >The following image depicts a mapping between elastic search and our internal data structure on the left and right, respectively.
 
-![Elastic Mapping](docs/images/elastic-mapping.png)
+![Elastic Mapping](/docs_report/images/elastic-mapping.png)
 
 # Server API Documentation
 
