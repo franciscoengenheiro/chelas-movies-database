@@ -3,12 +3,16 @@
 {{#if user.username}}
 <h1>Welcome to Chelas Movies: {{user.username}}</h1>
 
+<br>
+
 <form action="/logout" method="POST">
     <input type="submit" value="Logout">
 </form>
 
 {{else}}
 <h1>Welcome to Chelas Movies</h1>
+
+<br>
 
 <form action="/register" method="GET">
     <input type="submit" value="Register">
@@ -18,9 +22,14 @@
 </form>
 {{/if}}
 
+<br>
+
 <h2><a href="/movies/limit">Popular Movies</a></h2>
 <h2><a href="/auth/groups">My Groups</a></h2>
+
+<br>
+
 <form action="/movies/search/limit" method="GET">
-    <h3>Search a movie: <input type="text" name="movieName" maxlength="20"></h3>
+    <h2>Search a movie: <input type="text" name="movieName" maxlength="20"></h2>
     <input type="submit" value="Search">
 </form>

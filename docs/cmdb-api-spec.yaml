@@ -546,6 +546,7 @@ components:
       - username
       - email
       - password
+      - passConfirm
       type: object
       properties:
         username:
@@ -557,6 +558,9 @@ components:
         password:
           type: string
           example: "abcd"  
+        passConfirm:
+          type: string
+          example: "abcd"
     CreatedUser:
       type: object
       properties:

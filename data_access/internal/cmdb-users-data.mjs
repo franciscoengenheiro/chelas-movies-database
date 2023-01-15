@@ -49,6 +49,10 @@ export async function getUserByUserToken(userToken) {
     return getUserData("token", userToken)
 }
 
+export async function getUserByEmail(email){
+    return getUserData("email", email)
+}
+
 /**
  * Retrieves user data from the local user storage.
  * @param {String} propName object key to search the value for.

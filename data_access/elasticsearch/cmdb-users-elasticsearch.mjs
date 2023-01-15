@@ -16,7 +16,8 @@ export default function() {
     return {
         createUserData: createUserData,
         getUserByUserToken: getUserByUserToken,
-        getUserByUsername: getUserByUsername
+        getUserByUsername: getUserByUsername,
+        getUserByEmail: getUserByEmail
     }
 
     /**
@@ -79,5 +80,9 @@ export default function() {
      */
     async function getUserByUserToken(userToken) {
         return getUserData("token", userToken)
+    }
+
+    async function getUserByEmail(email){
+        return getUserData("email", email)
     }
 }

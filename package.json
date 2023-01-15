@@ -21,6 +21,8 @@
   "dependencies": {
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
+    "deep-email-validator": "^0.1.21",
+    "deep-email-validator-extended": "^0.2.0",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
     "hbs": "^4.2.0",
@@ -32,14 +34,14 @@
     "swagger-ui-express": "^4.6.0",
     "yamljs": "^0.3.0"
   },
-  "imports": { 
+  "imports": {
     "#data_access/*": "./data_access/*",
     "#local_data/*": "./local_data/*",
     "#docs/*": "./docs/*",
     "#errors/*": "./errors/*",
     "#services/*": "./services/*",
     "#tests/*": "./tests/*",
-    "#web/*": "./web/*" ,
+    "#web/*": "./web/*",
     "#root/*": "./*"
   }
 }

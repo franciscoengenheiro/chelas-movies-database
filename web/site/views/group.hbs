@@ -5,10 +5,16 @@
     <input type="submit" value="Back">
 </form>
 
-<h2>{{group.name}}</h2>
+<br>
+
+<h4>{{group.name}}</h4>
 
 <form action="/auth/groups/{{id}}/editGroup" method="GET">
   <input type="submit" value="Edit">
+</form>
+
+<form action="/auth/groups/{{id}}/delete" method="POST">
+  <input type="submit" value="Delete">
 </form>
 
 <input type="button" value="Delete group via client script" id="b1">
@@ -16,18 +22,13 @@
   removeGroup('#b1', '{{token}}','{{id}}', true)
 </script>
 
-<form action="/auth/groups/{{id}}/delete" method="POST">
-  <input type="submit" value="Delete">
-</form>
-
-
 <p><b>Description: </b>{{group.description}}</p>
 <p><b>Movies total duration: </b>{{group.moviesTotalDuration}} mins</p>
 <ul>
-    <h2>Movies</h2>
+    <h4>Movies</h4>
   {{#each group.movies}}
     <li>
-      <h4><a href="/movies/find/{{id}}">{{title}}</a></h4>
+      <h3><a href="/movies/find/{{id}}">{{title}}</a></h3> 
       <form action="/auth/groups/{{../id}}/movies/{{id}}" method="POST">
         <input type="submit" value="Remove">
       </form>

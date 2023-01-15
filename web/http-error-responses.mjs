@@ -31,7 +31,8 @@ let errors = {
     [errorCodes.ARGUMENT_NOT_FOUND_CODE]: (description) => new HTTPResponse(404, description),
     [errorCodes.INVALID_USER_CODE]: (description) => new HTTPResponse(400, description),
     [errorCodes.USER_NOT_FOUND_CODE]: (description) => new HTTPResponse(404, description),
-    [errorCodes.PASSWORDS_DO_NOT_MATCH]: (description) => new HTTPResponse(400, description)
+    [errorCodes.PASSWORDS_DO_NOT_MATCH]: (description) => new HTTPResponse(400, description),
+    [errorCodes.EMAIL_IS_NOT_VALID]: (description) => new HTTPResponse(400, description)
 }
 
 /** 

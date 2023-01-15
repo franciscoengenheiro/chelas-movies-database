@@ -3,6 +3,8 @@
 'use strict'
 
 import errors from '#errors/errors.mjs'
+import { validate } from 'deep-email-validator'
+
 
 /**
  * @param {*} usersData module that manages application users data.
@@ -38,8 +40,12 @@ export default function(usersData) {
         if (password != passConfirm) {
             throw errors.PASSWORDS_DO_NOT_MATCH()
         }
+    
+        if (!await validateEmail(email)) {
+            throw errors.EMAIL_IS_NOT_VALID()
+        }
         // Retrieves user if it exists in users data
-        let user = await usersData.getUserByUsername(username)
+        let user = (await usersData.getUserByUsername(username)) ? true : (await usersData.getUserByEmail(email))
         // If the user already exists:
         if (user != undefined) {
             throw errors.INVALID_USER("already exists")
@@ -65,4 +71,11 @@ export default function(usersData) {
  */
 function validateString(field) {
     return typeof field === 'string' && field.length != 0
+}
+
+async function validateEmail(email){
+    return (await validate({
+        email: email,
+        validateSMTP: false,
+      })).valid
 }
