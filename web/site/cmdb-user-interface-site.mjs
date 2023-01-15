@@ -1,4 +1,6 @@
-// TODO()
+// Module that contains all the functions used in the Application HTML scripts to allow 
+// the usage of the PUT and DELETE methods instead of only POST and GET, by accessing the 
+// Web API operations.
 
 'use strict'
 
@@ -120,7 +122,6 @@ function optionsPutGroup(usertoken, name, description) {
             name: name,
             description: description 
         })
-
     }
 }
 

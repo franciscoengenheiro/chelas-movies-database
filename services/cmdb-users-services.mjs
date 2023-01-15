@@ -21,7 +21,7 @@ export default function(usersData) {
     }
 
     /**
-     * Creates a new user with a given token.
+     * Creates a new user.
      * @param {String} username registration identifier.
      * @param {String} password login authenticator.
      * @param {String} email user email address.
@@ -29,6 +29,7 @@ export default function(usersData) {
      * @throws InvalidArgumentException if the username or password is incorrect.
      * @throws InvalidUserException if the user already exists.
      * @throws PasswordsDoNotMatchException if the password and it's confirmation do not match.
+     * @throws EmailIsNotValidException if the user did not provide a valid domain name for email address.
      */
     async function createUser(username, password, email, passConfirm) {
         // Validate receive fields
@@ -43,12 +44,14 @@ export default function(usersData) {
         if (!await validateEmail(email)) {
             throw errors.EMAIL_IS_NOT_VALID()
         }
-        // Retrieves user if it exists in users data
+        // Checks if a user with the provided username exists, and if so if the provided email
+        // has already been used by another user
         let user = (await usersData.getUserByUsername(username)) ? true : (await usersData.getUserByEmail(email))
         // If the user already exists:
         if (user != undefined) {
             throw errors.INVALID_USER("already exists")
         }
+        // If not:
         return usersData.createUserData(username, password, email)
     }
 
@@ -61,8 +64,6 @@ export default function(usersData) {
     }
 }
 
-
-
 // Auxiliary functions:
 /**
  * Validates if the received field is a non-empty string.
@@ -72,10 +73,14 @@ function validateString(field) {
     return typeof field === 'string' && field.length != 0
 }
 
-// Todo - write comment
-async function validateEmail(email){
+/**
+ * Validates if the received email has a valid domain name. The left segment is not validated and
+ * a confirmation email is not sent, since that option is disabled in this function.
+ * @param {*} email email address to validate.
+ */
+async function validateEmail(email) {
     return (await validate({
         email: email,
-        validateSMTP: false,
+        validateSMTP: false, // Do not send a confirmation email to the user provided email
       })).valid
 }

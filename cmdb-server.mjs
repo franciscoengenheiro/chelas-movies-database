@@ -1,4 +1,6 @@
-// This module registers all HTTP routes // TODO()
+// This module creates an Express node application, initializes all of its modules, 
+// including data access, services and web, and registers middlewares used within the 
+// application's sub-modules routes. It is also possible to specify which fetch module to use.
 
 // This directive is necessary to ensure that common programmer type errors cause exceptions,
 // making the code easier to debug

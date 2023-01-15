@@ -454,6 +454,158 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Add Test Data",
+			"item": [
+				{
+					"name": "Create user A",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"William\",\r\n    \"password\": \"JohnnyBoy\",\r\n    \"email\": \"william.jenkins@hotmail.com\",\r\n    \"token\": \"b8e57530-8ca5-47b3-8f13-1fbab2385875\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/users/_doc/ouhvuhvOUHVouhcJLC",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"users",
+								"_doc",
+								"ouhvuhvOUHVouhcJLC"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create user B",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"George\",\r\n    \"password\": \"feijaodobom\",\r\n    \"email\": \"jorginho.jorge@gmail.com\",\r\n    \"token\": \"b8e53210-8fa5-47b3-8r43-1fbab2236875\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/users/_doc/IUVYHivhIHVvIVviviIB",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"users",
+								"_doc",
+								"IUVYHivhIHVvIVviviIB"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create group A for user A",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"My movies\",\r\n    \"description\": \"my movies\",\r\n    \"movies\": [\r\n        {\r\n            \"id\": \"tt0489270\",\r\n            \"title\": \"Saw III\",\r\n            \"duration\": \"108\"\r\n        }\r\n    ],\r\n    \"userId\": \"ouhvuhvOUHVouhcJLC\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/groups/_doc",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"groups",
+								"_doc"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create group A for user B",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Batman Collection\",\r\n    \"description\": \"A collection of batman movies\",\r\n    \"movies\": [\r\n        {\r\n            \"id\": \"tt0468569\",\r\n            \"title\": \"The Dark Knight\",\r\n            \"duration\": \"152\"\r\n        }\r\n    ],\r\n    \"userId\": \"IUVYHivhIHVvIVviviIB\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/groups/_doc",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"groups",
+								"_doc"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create group B for user B",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Batman Collection\",\r\n    \"description\": \"A collection of batman movies\",\r\n    \"movies\": [\r\n        {\r\n            \"id\": \"tt0111161\",\r\n            \"title\": \"The Shawshank Redemption\",\r\n            \"duration\": \"142\"\r\n        }\r\n    ],\r\n    \"userId\": \"IUVYHivhIHVvIVviviIB\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/groups/_doc",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"groups",
+								"_doc"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"variable": [

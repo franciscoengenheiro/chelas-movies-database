@@ -1,12 +1,19 @@
 {
-    "IDs": 1,
+    "IDs": 2,
     "users": [
         {
             "id": 1,
             "username": "guest",
             "password": "guest",
-            "email": "franciscoengenheiro.195@gmail.com",
+            "email": "somevalidemail@gmail.com",
             "token": "6024846e-8015-4667-96ae-cf2d5614d7bb"
+        },
+        {
+            "id": 2,
+            "username": "admin",
+            "password": "admin",
+            "email": "admin@hotmail.com",
+            "token": "9a215dee-3b8b-445a-83d3-1574e65529f6"
         }
     ]
 }

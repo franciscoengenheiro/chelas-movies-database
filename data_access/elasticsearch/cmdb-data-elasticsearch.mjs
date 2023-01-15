@@ -1,5 +1,4 @@
-// Module that handles elastic search data access regarding groups
-
+// Module that handles elastic search data access and manipulation regarding the groups
 'use strict'
 
 import errors from '#errors/errors.mjs'

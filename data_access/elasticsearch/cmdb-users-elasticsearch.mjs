@@ -1,4 +1,4 @@
-// Module that handles elastic search data access regarding users
+// Module that handles elastic search data access and manipulation regarding the users
 
 'use strict'
 import crypto from 'crypto'
@@ -82,7 +82,11 @@ export default function() {
         return getUserData("token", userToken)
     }
 
-    async function getUserByEmail(email){
+    /**
+     * Retrieves an user by it's email.
+     * @param {String} email user email address.
+     */
+    async function getUserByEmail(email) {
         return getUserData("email", email)
     }
 }

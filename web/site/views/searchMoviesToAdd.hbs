@@ -8,7 +8,7 @@
   {{#each movies}}
     <li>
         <h2><a href="/movies/find/{{id}}">{{title}}</a></h2>
-        <p>Descrição: {{description}}</p>
+        <p>Description: {{description}}</p>
         <form action="/auth/groups/{{../groupId}}/movies" method="POST">
             <input type="hidden" value={{id}} name="movieId">
             <input type="submit" value="Add Movie">

@@ -84,7 +84,7 @@ export default function(userServices) {
         if (user) {
             // Represents a user in the CMDB application
             // Passport saves this object in session and when the request arrives, and while the 
-            // session for this user is active (determined by a cookie), the data can be accessed 
+            // session for this user is active (determined by a HTTP cookie), the data can be accessed 
             // in req.user
             req.login({
                 username: user.username,

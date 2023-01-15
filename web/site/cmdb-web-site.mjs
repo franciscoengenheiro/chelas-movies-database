@@ -16,13 +16,15 @@ export default function (cmdbServices) {
 
     // Initialize a router
     const router1 = express.Router()
-    const router2 = express.Router()
 
     router1.get('/movies', handlerRequest(getPopularMovies, HTMLtry, HTMLcatch))
     router1.get('/movies/limit', limitForMovies)
     router1.get('/movies/search/limit', limitForSearch)
     router1.get('/movies/search/:movieName', handlerRequest(searchMoviesByName, HTMLtry, HTMLcatch))
     router1.get('/movies/find/:movieId', handlerRequest(getMovieDetails, HTMLtry, HTMLcatch))
+
+    // Initialize another router
+    const router2 = express.Router()
 
     router2.post('/groups', handlerRequest(createGroup, HTMLtry, HTMLcatch))
     router2.get('/groups', handlerRequest(getGroups, HTMLtry, HTMLcatch))
@@ -36,7 +38,7 @@ export default function (cmdbServices) {
     router2.post('/groups/:groupId/movies', handlerRequest(addMovieInGroup, HTMLtry, HTMLcatch))
     router2.post('/groups/:groupId/movies/:movieId', handlerRequest(removeMovieInGroup, HTMLtry, HTMLcatch))
     
-    return {withoutAuth: router1, withAuth: router2}
+    return { withoutAuth: router1, withAuth: router2 }
 
     async function limitForMovies(req, rsp) {
         rsp.render('limitForMovies')

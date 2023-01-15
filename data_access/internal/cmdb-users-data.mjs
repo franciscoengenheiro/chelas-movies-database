@@ -49,7 +49,11 @@ export async function getUserByUserToken(userToken) {
     return getUserData("token", userToken)
 }
 
-export async function getUserByEmail(email){
+/**
+ * Retrieves an user by it's email.
+ * @param {String} email user email address.
+ */
+export async function getUserByEmail(email) {
     return getUserData("email", email)
 }
 

@@ -137,7 +137,7 @@ export default function(imdbData, cmdbData, usersData) {
     // Auxiliary functions:
     /**
      * Middleware that verifies if the userToken is valid before calling a service.
-     * @param {*} service a function that represents a service.
+     * @param {Function} service a function that represents a service.
      * @returns the same function but the first argument which was the usertoken will be replaced
      * by the userId.
      * @throws UserNotFoundException if the user is not found.

@@ -66,7 +66,7 @@ describe("API integration tests:", function() {
     const invalidEmailUser = {
         username: "1",
         password: "a",
-        email: {},
+        email: "guest@wrongdomainhere.com",
         passConfirm: "a"
     }
     const invalidConfirmPasswordUser = {
@@ -177,7 +177,7 @@ describe("API integration tests:", function() {
             expect(response.status).to.equal(400)
             expect(response.body).to.be.a('String')
             expect(response.body).to.equal(
-                errors.INVALID_ARGUMENT("username, password or email").description
+                errors.EMAIL_IS_NOT_VALID("Email is not valid").description
             )
         })
         it('Create an user with an invalid confirmation password', async function() {
@@ -190,7 +190,7 @@ describe("API integration tests:", function() {
             expect(response.status).to.equal(400)
             expect(response.body).to.be.a('String')
             expect(response.body).to.equal(
-                errors.PASSWORDS_DO_NOT_MATCH("passwords do not match").description
+                errors.PASSWORDS_DO_NOT_MATCH("Passwords do not match").description
             )
         })
     })

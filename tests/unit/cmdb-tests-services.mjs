@@ -27,7 +27,6 @@ const GET_MOVIE_BY_ID = "./local_data/movie-info.json"
 const USERS_FILE = './local_data/users.json'
 const GROUPS_FILE = './local_data/groups.json'
 
-
 // --------------------------------------- Notes --------------------------------------------------------
 // Before running the tests make sure:
 // - Local fetch is enabled in the server module
@@ -254,14 +253,14 @@ describe("Services modules tests:", function() {
             }
             assert.fail("Should throw an error")
         })
-        it("Create an user with an invalid email", async function() {
+        it("Create an user with an invalid email domain address", async function() {
             try {
                 // Create an user
                 await cmdbUserServices.createUser(
-                    testUser.username, testUser.password, "", testUser.passConfirm
+                    testUser.username, testUser.password, "adadad@gmaill.com", testUser.passConfirm
                 )
             } catch (e) {
-                assert.deepEqual(e, errors.INVALID_ARGUMENT("username, password or email"))
+                assert.deepEqual(e, errors.EMAIL_IS_NOT_VALID())
                 return
             }
             assert.fail("Should throw an error")
