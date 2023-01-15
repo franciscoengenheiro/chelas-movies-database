@@ -149,7 +149,6 @@ For more information and examples consult the online API documentation that can 
 	- <code>npm install chai --save-dev</code>
 	- <code>npm install mocha --save-dev</code>
 	- <code>npm install supertest --save-dev</code>
-	- <code>nodemon cmdb-launch.mjs -e mjs, hbs</code>
 
 - In the *package.json* file:
     - Change *script* key value - *test*:
@@ -187,7 +186,7 @@ For more information and examples consult the online API documentation that can 
     - Create a workspace in Postman and import our Elastic Search test collection from the *docs/postman* package.
     - On Postman and while on the Elastic Search collection, search for the folder *Add Test Data* and select *Run*.
     - Do not change the run configurations, *Run manually* radio button should be selected along with only 1 iteration.
-    - Click *Run Elastic Search* and the test data will be added to the website.
+    - Click *Run Elastic Search* and the test data will be added to the Elastic Search database.
 
 ### Launch Server
 - **Deployment** - <code>node cmdb-launch.mjs</code>
