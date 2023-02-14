@@ -1,4 +1,4 @@
-// Module that manages application users services
+// Module that manages application users services.
 
 'use strict'
 
@@ -40,7 +40,7 @@ export default function(usersData) {
         if (password != passConfirm) {
             throw errors.PASSWORDS_DO_NOT_MATCH()
         }
-    
+        // Email validation
         if (!await validateEmail(email)) {
             throw errors.EMAIL_IS_NOT_VALID()
         }
@@ -51,7 +51,6 @@ export default function(usersData) {
         if (user != undefined) {
             throw errors.INVALID_USER("already exists")
         }
-        // If not:
         return usersData.createUserData(username, password, email)
     }
 
@@ -74,13 +73,13 @@ function validateString(field) {
 }
 
 /**
- * Validates if the received email has a valid domain name. The left segment is not validated and
- * a confirmation email is not sent, since that option is disabled in this function.
+ * Validates if the received email has a valid domain name. The left segment is not 
+ * validated and a confirmation email is not sent, since that option is disabled.
  * @param {*} email email address to validate.
  */
 async function validateEmail(email) {
     return (await validate({
         email: email,
         validateSMTP: false, // Do not send a confirmation email to the user provided email
-      })).valid
+    })).valid
 }

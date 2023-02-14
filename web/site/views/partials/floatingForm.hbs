@@ -1,0 +1,30 @@
+<div class="form-floating mb-2">
+    <svg class="bi icon" width="32" height="32" fill="currentColor">
+        <use xlink:href="assets/icons/bootstrap-icons.svg#{{icon}}">
+    </svg>
+    <input 
+        type={{type}}
+        class="form-control"
+        id={{id}} 
+        name={{name}}
+        placeholder={{value}}
+        autocomplete="off" 
+        spellcheck="false" 
+        {{#if enableLabel}} aria-describedby="requirements" {{/if}}
+        {{#if minLength}} minLength={{minLength}} {{/if}}
+        {{#if maxLength}} maxLength={{maxLength}} {{/if}}
+        required
+    /> 
+    <label for={{id}}><h6>{{value}}</h6></label>
+    {{#if enableLabel}}
+        {{#if maxLength}}
+            {{#if minLength}}
+                <div class="col-auto">
+                    <span class="form-text text-muted" id="requirements"> 
+                        Must be {{minLength}} - {{maxLength}} characters long. 
+                    </span>
+                </div>
+            {{/if}}
+        {{/if}}
+    {{/if}}
+</div>

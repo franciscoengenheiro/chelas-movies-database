@@ -1,18 +1,44 @@
-<h4>Login</h4>
-<form action="/login" method="POST">
-	<label for="txtUsername">Username:</label>
-	<input type="text" id="txtUsername" name="username">
-	<br><br>
-	<label for="txtPassword">Password:</label>
-	<input type="password" id="txtPassword" name="password">
-	<br><br>
-	<input type="submit" value="Login">
-	<input type="button" value="Cancel" onclick="backHome()">
-</form>
-
-<!-- Function that redirects the user to /home -->
-<script type="application/ecmascript">
-	function backHome() {
-		document.location = "/home"
-	}
-</script>
+<section class="smallerBox-float-right">
+	<div class="col p-4 m-4">
+		<div class="row text-center px-3 mb-4">
+			<h3>Log Into Your Account</h3>
+		</div>
+		<div class="row mb-3">
+			<form action="/login" method="POST">
+				<!-- Username -->
+				<div class="form-floating mb-4">
+					{{> floatingForm 
+						icon="person-fill"
+						type="text"
+						id="floatingUsername"
+						name="username"
+						value="Username"
+					}}
+				</div>
+				<!-- Password -->
+				<div class="form-floating mb-4">
+					{{> floatingForm 
+						icon="shield-lock-fill"
+						type="password"
+						id="floatingPassword"
+						name="password"
+						value="Password"
+					}}
+				</div>
+				<!-- Button -->
+				<input type="submit" value="Login" class="btn btn-warning w-100">
+			</form>
+		</div>
+		<div class="row text-center text-white mt-3">
+			<p class="lead color-gray">Don't have an account?  
+				<a href="/register" tabindex="-1">
+					<b>
+						<span class="text-dark text-marck-script hover-underline-animation">
+							<strong>Sign up for free</strong>
+						</span>
+					</b>
+				</a>
+			</p>
+		</div>
+	</div>
+</section> 

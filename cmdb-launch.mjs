@@ -1,17 +1,36 @@
-// Application Entry Point. This modules launchs the server in a given port
+// Application Entry Point. This modules launchs the server with a set of configurations.
 
 'use strict'
-
-// Constants
-const PORT = 1904
 
 console.log("-------------- Start setting up server --------------")
 
 import server from '#root/cmdb-server.mjs'
+import configInit from '#root/cmdb-config.mjs'
 
-let app = server() // Launch server
+// Server configuration
+const config = await configInit({
+    server: {
+          host: 'localhost',
+          port: 1904,
+    },
+    fetch: 'node', // local, node
+    database: 'internal' // internal, elastic
+})
 
-// Sets the server to listen in a specified port.
-app.listen(PORT, () => console.log(`Server listening in http://localhost:${PORT}`))
+// Launch server application
+let app = server(config)
+
+// Constants
+const port = config.server.port
+const host = config.server.host
+
+// Sets the server to listen in the specified port and host
+app.listen(port, host, (err) => {
+    if (err) {
+        console.log(err)
+        process.exit(1)
+    }
+    console.log(`Server is running on ${host}:${port}`)
+})
 
 console.log("--------------- End setting up server ---------------")

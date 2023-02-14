@@ -1,34 +1,59 @@
-<script type="application/ecmascript" src="/cmdb-user-interface-site.mjs"></script>
-
-<form action="/auth/home" method="GET">
-    <input type="submit" value="Back">
-</form>
-
-<br>
-
-<h4>{{title}}</h4>
-
-<form action="/auth/groups/newGroup" method="GET">
-  <input type="submit" value="Create Group">
-</form>
-
-
-
-<ul>
-  {{#each groups}}
-    <li>
-      <h3><a href="/auth/groups/{{id}}">{{name}}</a></h3>
-      <p><b>Description: </b>{{description}}</p>
-      <form action="/auth/groups/{{id}}/delete" method="POST">
-        <input type="submit" value="Delete">
-      </form>
-
-      <input type="button" value="Delete group via client script" id="b{{@index}}">
-      <script type="application/ecmascript">
-        removeGroup('#b{{@index}}', '{{../token}}','{{id}}')
-      </script>
-
-      
-    </li>
-  {{/each}}
-</ul>
+<section class="regular-box">
+  <div class="container-fluid">
+    <div class="row justify-content-center row-cols-3 gx-3 gy-3 mb-3"> <!-- row-cols-x means x cols per row -->
+      {{#each groups}}
+        <!-- Group ticket -->
+        <div class="col-md-auto align-self-center"> <!-- auto makes column size fit the element -->
+          <!-- Overlap elements -->
+          <div class="relative-container align-items-center">
+            <div class="overlap ticket-resize-group"> 
+              <!-- Centered text -->
+              <div class="color-ticket-light text-center text-marck-script">
+                <!-- ellipsis-x represents the x amount of lines before text to be treated as overflow -->
+                <h2 class="text-overflow-ellipsis-1 fw-bold-hover mt-3">
+                  <a href="/auth/groups/{{id}}">{{name}}</a>
+                </h2>
+                <p class="lead text-overflow-ellipsis-3">{{description}}</p>
+              </div>
+            </div>
+            <!-- Ticket image -->
+            <img 
+              class="img-fluid fade-image border-dark-4 border-rounded" 
+              src="assets/images/ticket.jpeg" 
+              width="450" 
+              height="250">
+            <!-- Fade elements -->
+            <div class="fade-element fade-element-group-bottom">              
+              <!-- Delete Button -->
+              <button 
+                class="btn btn-danger btn-larger" 
+                data-bs-toggle="modal"
+                data-bs-target="#deleteGroupModal">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+        {{> deleteGroupModal this }}
+      {{/each}}
+    </div>
+    <!-- Create Group Button -->
+    <div class="d-grid mx-auto g-2 col-3">
+      <button 
+        class="btn btn-warning btn-lg" 
+        data-bs-toggle="modal"
+        data-bs-target="#groupModal">
+        Create Group
+      </button>
+    </div>
+  </div>
+  <!-- Pagination -->
+  {{> pagination this
+      horizontalArrangement="justify-content-end"
+  }}
+  <!-- Modals -->
+  {{> groupModal this
+      title="Create a New Group"
+      buttonText="Create"
+  }}
+</section>

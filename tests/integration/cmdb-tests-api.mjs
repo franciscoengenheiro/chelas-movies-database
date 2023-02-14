@@ -10,17 +10,27 @@ import { expect } from 'chai'
 import server from '#root/cmdb-server.mjs'
 import * as File from "#data_access/util/file-operations.mjs"
 import errors from '#errors/errors.mjs'
+import configInit from '#root/cmdb-config.mjs'
+
+// Constants
+const DEFAULT_PORT = 1904
 
 // Paths to local files
-const POPULAR_MOVIES_FILE = "./local_data/most-popular-movies.json"
-const SEARCH_MOVIE_BY_NAME_FILE = "./local_data/movies-searched-by-name.json"
-const GET_MOVIE_BY_ID = "./local_data/movie-info.json"
-const USERS_FILE = './local_data/users.json'
-const GROUPS_FILE = './local_data/groups.json'
+const POPULAR_MOVIES_FILE = "./data/local/most-popular-movies.json"
+const SEARCH_MOVIE_BY_NAME_FILE = "./data/local/movies-searched-by-name.json"
+const GET_MOVIE_BY_ID = "./data/local/movie-info.json"
+const USERS_FILE = './data/local/users.json'
+const GROUPS_FILE = './data/local/groups.json'
+
+// Test server configuration
+const config = await configInit({
+    fetch: 'local',
+    database: 'internal'
+})
     
 describe("API integration tests:", function() {
     // Start server
-    let app = server().listen(1904, () => {})
+    let app = server(config).listen(DEFAULT_PORT, () => {})
     // Constants:
     const movieId = 'tt0468569'
     const groupA = {
@@ -200,44 +210,26 @@ describe("API integration tests:", function() {
             let most_popular_movies = (await File.read(POPULAR_MOVIES_FILE)).items
             const response = await request(app)
                 .get(routeToTest)
+                .query({ limit: most_popular_movies.length })
                 .set('Authorization', `Bearer ${userTestToken}`)
                 .expect('Content-Type', /json/)
             
 		    expect(response.status).to.equal(200)
-		    expect(response.body).to.be.an('Array')
-		    expect(response.body.length).to.equal(most_popular_movies.length) // 250
+		    expect(response.body).to.be.an('Object')
+		    expect(response.body.results.length).to.equal(most_popular_movies.length) 
         })
         it('Get the 5 most popular movies', async function() {
             let most_popular_movies = (await File.read(POPULAR_MOVIES_FILE)).items
-            const response = await request(app)
-                .get(routeToTest)
-                .query({ limit: 5 })
-                .set('Authorization', `Bearer ${userTestToken}`)
-                .expect('Content-Type', /json/)
-            
-            expect(response.status).to.equal(200)
-            expect(response.body).to.be.an('Array')
-            expect(response.body).to.deep.equal([ 
-                most_popular_movies[0],
-                most_popular_movies[1],
-                most_popular_movies[2],
-                most_popular_movies[3],
-                most_popular_movies[4]
-            ])
-        })
-        it('Invalid limit value', async function() {
-            let limit = "abc"
+            const limit = 5
             const response = await request(app)
                 .get(routeToTest)
                 .query({ limit: limit })
                 .set('Authorization', `Bearer ${userTestToken}`)
                 .expect('Content-Type', /json/)
             
-		    expect(response.status).to.equal(400)
-            expect(response.body).to.be.a('String')
-            expect(response.body).to.equal(
-                errors.INVALID_ARGUMENT("limit").description
-            )
+            expect(response.status).to.equal(200)
+            expect(response.body).to.be.an('Object')
+            expect(response.body.results).to.deep.equal(most_popular_movies.slice(0, limit))
         })
     })
     describe("GET /api/movies/search/:moviesName", function() {
@@ -251,8 +243,8 @@ describe("API integration tests:", function() {
 			    .expect('Content-Type', /json/)
             
 		    expect(response.status).to.equal(200)
-		    expect(response.body).to.be.an('Array')
-		    expect(response.body).to.deep.equal(results)
+		    expect(response.body).to.be.an('Object')
+		    expect(response.body.results).to.deep.equal(results)
         })
         it('Limit search results', async function() {
             let results = (await File.read(SEARCH_MOVIE_BY_NAME_FILE)).results
@@ -264,22 +256,8 @@ describe("API integration tests:", function() {
                 .expect('Content-Type', /json/)
             
 		    expect(response.status).to.equal(200)
-		    expect(response.body).to.be.an('Array')
-		    expect(response.body).to.deep.equal(results.slice(0,limit))
-        })
-        it('Invalid limit value', async function() {
-            let limit = "abc" 
-            const response = await request(app)
-                .get(routeToTest + expression)
-                .query({ limit: limit })
-                .set('Authorization', `Bearer ${userTestToken}`)
-                .expect('Content-Type', /json/)
-            
-		    expect(response.status).to.equal(400)
-            expect(response.body).to.be.a('String')
-            expect(response.body).to.equal(
-                errors.INVALID_ARGUMENT("limit").description
-            )
+		    expect(response.body).to.be.an('Object')
+		    expect(response.body.results).to.deep.equal(results.slice(0, limit))
         })
     })
     describe("GET /api/movies/find/:movieId", function() {
@@ -294,7 +272,7 @@ describe("API integration tests:", function() {
 		    expect(response.status).to.equal(200)
 		    expect(response.body).to.be.an('Object')
 		    expect(response.body.id).to.equal(movieId)
-            expect(response.body.title).to.equal(result.fullTitle)
+            expect(response.body.title).to.equal(result.title)
 		    expect(response.body.description).to.equal(result.plot)
 		    expect(response.body.image_url).to.equal(result.image)
 		    expect(response.body.runtimeMins).to.equal(result.runtimeMins)
@@ -386,9 +364,9 @@ describe("API integration tests:", function() {
                 .expect('Content-Type', /json/)
                 .expect(200)
 
-		    expect(response.body).to.be.an('Array')
+		    expect(response.body).to.be.an('Object')
             // Filter user groups
-            let userGroups = allGroups.filter(group => group.userId = userId)
+            let userGroups = allGroups.filter(group => group.userId == userId)
             // Map according to data structure
             userGroups = userGroups.map(group => {
                 return {
@@ -397,7 +375,7 @@ describe("API integration tests:", function() {
                     description: group.description
                 }
             })
-            expect(response.body).to.deep.equal(userGroups) 
+            expect(response.body.results).to.deep.equal(userGroups) 
         })
         it('Missing user token', async function() {
             const response = await request(app)
@@ -438,7 +416,7 @@ describe("API integration tests:", function() {
 		    expect(response.body).to.be.an('Object')
             // Retrieve group A
             let groupAcopy = allGroups.find(group => group.id == groupA_id && group.userId == userId)
-            groupAcopy.movies = []
+            groupAcopy.movies = { results: [], totalPages: 0}
             groupAcopy.moviesTotalDuration = 0
             delete groupAcopy.userId
             delete groupAcopy.id
@@ -696,7 +674,7 @@ describe("API integration tests:", function() {
                 "movie": {
                     "id": movieId,
                     "title": result.title,
-                    "duration": result.runtimeMins
+                    "runtimeMins": result.runtimeMins
                 }
             })
         })

@@ -1,0 +1,27 @@
+<nav id="paginationNavBar" 
+    class="p-1 mt-2"
+    aria-label="Page navigation" 
+    data-totalpages={{totalPages}}>
+    <ul class="pagination pagination-lg {{horizontalArrangement}}">
+        <li id="firstPageItem" class="page-item">
+            <button id="firstPageBtn" class="btn page-link shadow-none" aria-label="To first Page">
+                <span aria-hidden="true">&laquo;</span>
+            </button>
+        </li>
+        <li id="prevPageItem" class="page-item">
+            <button id="prevPageBtn" class="btn page-link shadow-none" aria-label="To previous Page">
+                <span aria-hidden="true">&lt;</span>
+            </button>
+        </li>
+        <li id="nextPageItem" class="page-item">
+            <button id="nextPageBtn" class="btn page-link shadow-none" aria-label="To next Page">
+                <span aria-hidden="true">&gt;</span>
+            </button>
+        </li>
+        <li id="lastPageItem" class="page-item">
+            <button id="lastPageBtn" class="btn page-link shadow-none" aria-label="To last Page">
+                <span aria-hidden="true">&raquo;</span>
+            </button>
+        </li>
+    </ul>
+</nav>

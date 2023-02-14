@@ -1,0 +1,432 @@
+/* ------------------------------------- General ------------------------------------- */
+body {
+    font-family: "Open Sans", sans-serif;
+    min-height: 100vh;
+    overflow: overlay;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* ------------------------------------ Element <a> ---------------------------------- */
+a:hover {
+    color: inherit;
+    font-weight: 400;
+}
+
+a.text-decoration:hover {
+    text-decoration: underline;
+    font-weight: bolder;
+    text-shadow: -.25px -.25px 0 black, .25px .25px black;
+}
+
+/* ---------------------------------- Element <input> -------------------------------- */
+input.btn:hover {
+    color: inherit;
+    font-weight: 900;
+}
+
+/* --------------------------------------- Modal ------------------------------------- */
+.modal-header{
+    background-color: #ffc107;
+    color: white;
+}
+
+textarea {
+    height: 100px;
+    resize: none;
+}
+
+/* --------------------------------------- Text -------------------------------------- */
+.text-marck-script {
+    font-family: "Marck Script", sans-serif;
+}
+
+.text-merienda-one {
+    font-family: "Merienda One", Helvetica, sans-serif;
+}
+
+.text-underline {
+    text-decoration: underline;
+}
+
+.text-overflow-ellipsis-1 {
+    overflow-wrap: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1; /* number of lines to show */
+    line-clamp: 1; 
+    -webkit-box-orient: vertical;
+}
+
+.text-overflow-ellipsis-2 {
+    overflow-wrap: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* number of lines to show */
+    line-clamp: 2; 
+    -webkit-box-orient: vertical;
+}
+
+.text-overflow-ellipsis-3 {
+    overflow-wrap: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* number of lines to show */
+    line-clamp: 3; 
+    -webkit-box-orient: vertical;
+}
+
+.text-overflow-ellipsis-4 {
+    overflow-wrap: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 4; /* number of lines to show */
+    line-clamp: 4; 
+    -webkit-box-orient: vertical;
+}
+
+.text-overflow-ellipsis-6 {
+    overflow-wrap: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 6; /* number of lines to show */
+    line-clamp: 6; 
+    -webkit-box-orient: vertical;
+}
+
+.font-medium {
+    font-size: medium;
+}
+
+h2 > a:hover {
+    color: inherit;
+    font-weight: 900;
+}
+
+/* ----------------------------------- Containers ------------------------------------ */
+.relative-container {
+    position: relative;
+    z-index: 0;
+}
+
+.align-items-center {
+    display: grid;
+    place-items: center;
+}
+
+/* ------------------------------------- Boxes --------------------------------------- */
+.regular-box {
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-top: 30px;
+}
+
+.box-float-right {
+    width: 45%;
+    float: right;
+    padding-right: 100px;
+    padding-top: 30px;
+}
+
+.smallerBox-float-right {
+    width: 45%;
+    float: right;
+    padding-right: 220px;
+}
+
+.movie-box-shadow:hover {
+    -webkit-box-shadow: inset 5px -2px 50px 5px black;
+    -moz-box-shadow: inset 5px -2px 50px 5px black;
+    box-shadow: inset 5px -2px 50px 5px black;
+}
+
+/* ------------------------------------- NavBar -------------------------------------- */
+.nav-link, .dropdown-item {
+    position: relative;
+    color: white
+}
+
+.dropdown-item:focus {
+    background-color: inherit;
+}
+
+.dropdown-divider, .dropdown-menu {
+    border-color: white;
+}
+
+.nav-link::after {
+    content: '';
+    height: 3px;
+    width: 0;
+    background-color: #ffc107;
+    position: absolute;
+    left: 0;
+    bottom: -8px;
+    transition: 0.3s;
+}
+
+.nav-link:hover, .nav-link:focus {
+    color: white;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+#nav-item-welcome {
+    color: #ffc107;
+    font-weight: 500;
+    text-decoration: underline;
+}
+
+.scrolled-down{
+    transform: translateY(-100%); 
+    transition: all 0.3s ease-in-out;
+}
+
+.scrolled-up{
+    transform: translateY(0);
+    transition: all 0.3s ease-in-out;
+}
+
+/* ----------------------------------- Backgrounds ----------------------------------- */
+.bg-main {
+    background-image: url('../images/main-bg.png');
+    min-height: 100vh;
+    max-height: 120vh;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.bg-blue-gradient {
+    background: linear-gradient(180deg, white, #00999f);
+}
+
+.bg-red-gradient {
+    background: linear-gradient(180deg, white, #fe6941);
+}
+
+.bg-movie {
+    background-image: url('../images/movieOpening.jpg');
+    min-height: 100vh;
+    max-height: 120vh;
+    background-size: cover;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+/* ------------------------------------- Colors -------------------------------------- */
+.color-red {
+    color: #e13c38;
+}
+
+.color-cyan {
+    color: #00999f;
+}
+
+.color-gray {
+    color: gray
+}
+
+.color-yellow {
+    color: #ffe56a
+}
+
+.color-dark-yellow {
+    color: #ffc107
+}
+
+.color-ticket-light {
+    color: #FEDAB5;
+}
+
+/* --------------------------------- Floating Form ----------------------------------- */
+.form-floating {
+    position: relative;
+}
+
+.form-floating label, .form-floating .form-control {
+    left: 0.5rem;
+    padding-left: 4rem;
+}
+
+.form-control:focus {
+    border-color: black;
+    box-shadow: 0 0 0 0.1rem black
+} 
+
+.icon {
+    position: absolute;
+    top: 0.8rem;
+    left: 1rem;
+}
+
+/* ------------------------------------- Overlap ------------------------------------- */
+.overlap {
+    z-index: 1;
+    position: absolute;
+}
+
+.overlap-0 {
+    z-index: 0;
+    position: absolute;
+}
+
+/* ------------------------------------- Ticket -------------------------------------- */
+.ticket-resize-group {
+    left: 90px;
+    right: 85px;
+    top: 30px;
+    bottom: 45px;
+}
+
+.ticket-resize-movie {
+    left: 85px;
+    right: 75px;
+    top: 45px;
+    bottom: 45px;
+}
+
+.ticket-text {
+    position: relative;
+    left: -10px;
+}
+
+/* ---------------------------------- Fade Elements ---------------------------------- */
+.fade-image {
+    opacity: 1;
+    transition: .5s ease;
+    backface-visibility: hidden;
+}
+
+.fade-element {
+    transition: .5s ease;
+    opacity: 0;
+    position: absolute;
+    display: block;
+    z-index: 2;
+}
+
+.fade-element-group-bottom {
+    bottom: 32px;
+}
+
+.fade-element-ticket-bottom {
+    bottom: 10px;
+    left: 91px;
+}
+
+.relative-container:hover .fade-image, .ticket-overlap {
+    opacity: 0.95;
+}
+  
+.relative-container:hover .fade-element {
+    opacity: 1;
+}
+
+/* ------------------------------------- Buttons ------------------------------------- */
+.btn-larger {
+    width: 200px;
+}
+
+.btn-large {
+    width: 165px;
+}
+
+.btn-medium {
+    width: 100px;
+}
+
+.btn-bottom-center {
+    bottom: 10px;
+    left: 40px;
+}
+
+/* This bootstrap button background color was overriden */
+.btn-success, .btn-success:hover, .btn-success:active, .btn-success:visited {
+    background-color: #81ced4 !important;
+}
+
+.btn-success:hover {
+    filter: brightness(90%);
+}
+
+/* ------------------------------------- Borders ------------------------------------- */
+.border-dark {
+    outline: 1px solid black;  
+}
+
+.border-dark-2 {
+    outline: 2px solid black;  
+}
+
+.border-dark-4 {
+    outline: 4px solid black;  
+}
+
+.border-rounded {
+    border-radius: 50px;
+}
+
+/* ------------------------------- Browser Scrollbar --------------------------------- */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(transparent, #ff6a42, #ffa032);
+    border-radius: 6px
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(transparent, #00999f, #072f60);
+}
+
+/* ----------------------------------- Pagination ------------------------------------ */
+.pagination > li > button {
+    background-color: rgb(199, 199, 199);
+    color: black;
+}
+
+.pagination > li > button:is(:focus, :hover) {
+    color: white;
+    background-color: orange;
+    border-color: black;  
+}
+
+.pagination > li > button:active {
+    background-color: rgb(199, 199, 199) !important
+}
+
+/* ----------------------------- Underline Animation --------------------------------- */
+.hover-underline-animation {
+    display: inline-block;
+    position: relative;
+}
+  
+.hover-underline-animation::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: black;
+    transform-origin: bottom left;
+    transition: transform 0.25s ease-out;
+}
+
+.hover-underline-animation:hover::after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+}

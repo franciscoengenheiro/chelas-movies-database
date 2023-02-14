@@ -1,0 +1,17 @@
+{{#if user}}
+	<span class="navbar-text font-medium px-2">
+		Welcome, <span id="nav-item-welcome">{{user.username}}</span>
+	</span>
+	<form method="POST" action="/logout">
+		<button class="btn btn-outline-light btn-sm" type="submit">Logout</button>
+	</form> 
+{{else}}
+	<div>
+		<a class="btn btn-outline-light btn-sm" href="/register" role="button" tabindex="-1">
+			Register
+		</a>
+		<a class="btn btn-warning btn-sm" href="/login" role="button" tabindex="-1">
+			Login
+		</a>
+	</div>
+{{/if}}

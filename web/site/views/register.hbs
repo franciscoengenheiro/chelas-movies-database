@@ -1,0 +1,54 @@
+<section class="smallerBox-float-right">
+	<div class="col mt-4">
+		<div class="row text-center px-3 mb-3">
+			<h2>Create an account</h2>
+		</div>
+		<div class="col mb-3">
+			<form action="/register" method="POST">
+				<!-- Username -->
+				{{> floatingForm 
+					icon="person-fill"
+					type="text"
+					id="floatingUsername"
+					name="username"
+					value="Username"
+					minLength="5"
+					maxLength="20"
+					enableLabel="true"
+				}}
+				<!-- Email -->
+				{{> floatingForm 
+					icon="envelope-at-fill"
+					type="text"
+					id="floatingEmail"
+					name="email"
+					value="Email"
+				}}
+				<!-- Password -->
+				{{> floatingForm 
+					icon="key-fill"
+					type="password"
+					id="floatingPassword"
+					name="password"
+					value="Password"
+					minLength="8"
+					maxLength="25"
+					enableLabel="true"
+				}}
+				<!-- Confirm Password -->
+				{{> floatingForm 
+					icon="key-fill"
+					type="password"
+					id="floatingConfirmPassword"
+					name="passConfirm"
+					value="Confirm Password"
+					minLength="8"
+					maxLength="25"
+				}}
+				<div class="mt-3">
+					<input type="submit" value="Create" class="btn btn-warning w-75">
+				</div>
+			</form>
+		</div>
+	</div>
+</section> 

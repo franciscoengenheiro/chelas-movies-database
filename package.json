@@ -1,8 +1,8 @@
 {
-  "name": "CMDB-P2",
+  "name": "CMDB",
   "version": "1.0.0",
   "description": "This repo will serve to store and update the software of CMDB project.",
-  "main": "/cmdb-server.mjs",
+  "main": "/cmdb-launch.mjs",
   "scripts": {
     "test": "mocha"
   },
@@ -19,7 +19,7 @@
     "supertest": "^6.3.3"
   },
   "dependencies": {
-    "cookie-parser": "^1.4.6",
+    "bootstrap": "^5.2.3",
     "cors": "^2.8.5",
     "deep-email-validator": "^0.1.21",
     "express": "^4.18.2",
@@ -34,8 +34,9 @@
     "yamljs": "^0.3.0"
   },
   "imports": {
-    "#data_access/*": "./data_access/*",
-    "#local_data/*": "./local_data/*",
+    "#data_access/*": "./data/access/*",
+    "#data_local/*": "./data/local/*",
+    "#data_manipulation/*": "./data/manipulation/*",
     "#docs/*": "./docs/*",
     "#errors/*": "./errors/*",
     "#services/*": "./services/*",

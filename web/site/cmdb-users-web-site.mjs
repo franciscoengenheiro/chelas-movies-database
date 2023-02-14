@@ -14,36 +14,43 @@ export default function(userServices) {
         throw errors.INVALID_ARGUMENT("userServices")
     }
 
-    passport.serializeUser((userInfo, done) => { done(null, userInfo); });
-    passport.deserializeUser((userInfo, done) => { done(null, userInfo); });
+    passport.serializeUser((userInfo, done) => { done(null, userInfo) })
+    passport.deserializeUser((userInfo, done) => { done(null, userInfo) })
 
     // Initialize a router
     const router = express.Router()
 
     router.use(session({
-        secret: 'leic-ipw-g06',
-        cookie:{_expires : 10800000}, // time im ms (corresponds to 3 hours)
-        resave: false,
-        saveUninitialized: false
-    }));
-    router.use(passport.session()) // Passport initialization
-    router.use(passport.initialize())
+        secret: 'leic-ipw-g06', // String to compute hashing
+        cookie: {_expires : 10800000}, // Cookie lifetime im ms (corresponds to 3 hours)
+        resave: false, // For every request to the server, it resets the session cookie
+        saveUninitialized: false // If during the lifetime of the request the session
+                                 // object isn't modified then, at the end of the request 
+                                 // and when saveUninitialized is false, the 
+                                 // (still empty, because unmodified) session object 
+                                 // will not be stored in the session store.
+    }))
+
+    // Passport initializion
+    router.use(passport.session()) 
+    router.use(passport.initialize()) 
 
     router.use('/auth', verifyAuthenticated)
 
-    router.get('/home', homeNotAuthenticated)
-    router.get('/auth/home', homeAuthenticated)
+    router.get('/home', home)
+    router.get('/auth/home', home)
+    router.get('/about', aboutSection)
 
     router.get('/login', loginForm)
     router.post('/login', validateLogin)
-    router.get('/register',newUser)
+    router.get('/register', registrationForm)
     router.post('/register', createUser)
     router.post('/logout', logout)
     
     return router
 
-    function newUser(req, rsp) {
-        rsp.render('newUser')
+    function registrationForm(req, rsp) {
+        rsp.render('register', {user: req.user})
     }
 
     async function createUser(req, rsp) {
@@ -56,21 +63,22 @@ export default function(userServices) {
             await validateLogin(req, rsp) // Enables login on registration
         } catch(e) {
             const httpResponse = translateToHTTPResponse(e)
-            rsp.render('onError', httpResponse)
+            rsp.render('onError', Object.assign({user: req.user}, httpResponse))
         } 
     }
 
-    function homeNotAuthenticated(req, rsp) {
-        rsp.render('home')
+    function aboutSection(req, rsp) {
+        rsp.render('about', {user: req.user})
     }
-        
-    function homeAuthenticated(req, rsp) {
-        const viewData = { user: req.user }
-        rsp.render('home', viewData)
+
+    // Both "home not authenticated" and "home authenticated" were merged since 
+    // it was the same block of code, the only difference is in the presented views.
+    function home(req, rsp) {
+        rsp.render('home', {user: req.user})
     }
     
     function loginForm(req, rsp) {
-        rsp.render('login')
+        rsp.render('login', {user: req.user})
     }
 
     async function validateUser(username, password) {
@@ -106,7 +114,7 @@ export default function(userServices) {
     }
     
     function logout(req, rsp) {
-        // Destroys req.user object and removes it from the session 
+        // Destroys req.user object and removes it from the session
         req.logout((err) => {
             rsp.redirect('/home')
         }) 

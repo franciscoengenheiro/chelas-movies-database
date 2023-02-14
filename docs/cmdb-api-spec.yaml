@@ -9,7 +9,7 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   version: 1.0.0
 servers:
-  - description: Localhost server for testing API
+  - description: Localhost server
     url: http://localhost:1904/
 
 tags:
@@ -23,7 +23,7 @@ paths:
     post:
       tags:
       - Users
-      summary: Adds a user to the system
+      summary: Add a user to the system
       description: Adds a user to the system
       operationId: createUser
       security:
@@ -54,19 +54,24 @@ paths:
     get:
       tags:
       - Movies
-      summary: Get most popular Movies
-      description: Search for the most popular movies with a optional parameter to limit the number of return movies (max 250)
+      summary: Get the most popular movies
+      description: Search for the most popular movies
       operationId: getMovies
       security:
         - bearerAuth: []
       parameters:
       - name: limit
         in: query
-        description: maximum number of movies to return
+        description: maximum number of movies to return per page, has a default value of 10
         schema:
-          maximum: 250
-          minimum: 0
+          minimum: 1
           type: integer
+      - name: page
+        in: query
+        description: page number, has a default value of 1
+        schema:
+          minimum: 1
+          type: integer          
       responses:
         200:
           description: search results matching criteria
@@ -83,12 +88,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/InvalidRequest'
                 example: "Invalid Argument: limit"
+        404:
+          description: argument not found
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestNotFound'
+                example: "Argument not found: page"
   /api/movies/search/{moviesName}:
     get:
       tags:
       - Movies
-      summary: Search Movies by Name
-      description: Search movies by name with a optional parameter to limit the number of return movies (max 250)
+      summary: Search movies by name
+      description: Search movies by name
       operationId: searchMoviesByName
       security:
         - bearerAuth: []
@@ -101,11 +113,16 @@ paths:
           type: string
       - name: limit
         in: query
-        description: maximum number of movies to return
+        description: maximum number of movies to return per page, has a default value of 10
         schema:
-          maximum: 250
-          minimum: 0
+          minimum: 1
           type: integer
+      - name: page
+        in: query
+        description: page number, has a default value of 1
+        schema:
+          minimum: 1
+          type: integer          
       responses:
         200:
           description: search results matching criteria
@@ -122,6 +139,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/InvalidRequest'
                 example: "Invalid Argument: limit"
+        404:
+          description: argument not found
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestNotFound'
+                example: "Argument not found: page"
   /api/movies/find/{movieId}:
     get:
       tags:
@@ -156,6 +180,19 @@ paths:
       operationId: getAllGroups
       security:
         - bearerAuth: []
+      parameters:
+      - name: limit
+        in: query
+        description: maximum number of groups to return per page, has a default value of 6
+        schema:
+          minimum: 1
+          type: integer
+      - name: page
+        in: query
+        description: page number, has a default value of 1
+        schema:
+          minimum: 1
+          type: integer          
       responses:
         200:
           description: Successful operation
@@ -169,10 +206,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotAuthorized'
+        400:
+          description: bad input parameter
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequest'
+                example: "Invalid Argument: limit"
+        404:
+          description: argument not found
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestNotFound'
+                example: "Argument not found: page"
     post:
       tags:
       - Group
-      summary: Adds a new group
+      summary: Add a new group
       description: adds a new group
       operationId: addGroup
       security:
@@ -220,6 +271,18 @@ paths:
         required: true
         schema:
           type: string
+      - name: limit
+        in: query
+        description: maximum number of movies to return per page, has a default value of 9
+        schema:
+          minimum: 1
+          type: integer
+      - name: page
+        in: query
+        description: page number, has a default value of 1
+        schema:
+          minimum: 1
+          type: integer          
       responses:
         200:
           description: successful operation
@@ -334,7 +397,7 @@ paths:
     put:
       tags:
       - Movies in a Group
-      summary: Add a new movie to the group given
+      summary: Add a new movie to a group
       description: add a new movie to the group given
       operationId: addMovie
       security:
@@ -382,7 +445,7 @@ paths:
     delete:
       tags:
       - Movies in a Group
-      summary: Remove a movie in the group given
+      summary: Remove a movie from a group
       description: Remove a movie in the group given
       operationId: removeMovie
       security:
@@ -478,7 +541,7 @@ components:
       required:
       - id
       - name
-      - duration
+      - runtimeMins
       type: object
       properties:
         id:
@@ -487,7 +550,7 @@ components:
         name:
           type: string
           example: Jurassic Park
-        duration:
+        runtimeMins:
           type: integer
           minimum: 0
           example: 180

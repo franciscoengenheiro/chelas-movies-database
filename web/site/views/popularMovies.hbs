@@ -1,12 +1,28 @@
-<input type="button" value="Back" onclick='history.back()'>
-
-<h4>{{title}}</h4>
-<ul>
-  {{#each movies}}
-    <li>
-      <h2><a href="./movies/find/{{id}}">{{fullTitle}}</a></h2>
-      <p><b>Rank: </b>{{rank}}</p>
-      <p><b>Rating: </b>{{imDbRating}}</p>
-    </li>
-  {{/each}}
-</ul>
+<section class="regular-box">
+  <div class="container">
+    <div class="row row-cols-5 gy-2 my-auto">
+      {{#each movies}}
+        <a href="movies/find/{{id}}" 
+          class="col-3-auto bg-blue-gradient movie-box-shadow border-dark-2 text-center">
+          <div class="row">
+            <div class="col-3 bg-danger border-dark-2">
+              #{{rank}}
+            </div>
+            <div class="col-20-auto text-center mt-1">
+              <h5>{{title}}</h5>
+            </div>
+          </div>
+          <img class="img-fluid border-dark mt-1" src="{{image}}" width="50%">
+          <div class="text-bold">
+            <h6 class="font-weight-bold mt-2"><strong>{{year}}</strong></h6>
+            <h6 class="font-weight-bold"><strong>IMDb Rating: </strong>{{imDbRating}}</h6>
+          </div>
+        </a>
+      {{/each}}
+    </div>
+  </div>
+  <!-- Pagination -->
+  {{> pagination this
+      horizontalArrangement="justify-content-center"
+  }}
+</section>

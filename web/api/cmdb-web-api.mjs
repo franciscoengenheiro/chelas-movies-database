@@ -37,17 +37,17 @@ export default function(cmdbServices, cmdbUserServices) {
     router.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
     // Routes defined for the API
-    router.post('/users', handlerRequest(createUser, JSONtry, JSONcatch))
-    router.get('/movies', handlerRequest(getPopularMovies, JSONtry, JSONcatch))
-    router.get('/movies/search/:moviesName', handlerRequest(searchMoviesByName, JSONtry, JSONcatch))
-    router.get('/movies/find/:movieId', handlerRequest(getMovieDetails, JSONtry, JSONcatch))
-    router.post('/groups', verifyAuthentication(createGroup, JSONtry, JSONcatch))
-    router.get('/groups', verifyAuthentication(getGroups, JSONtry, JSONcatch))
-    router.get('/groups/:groupId', verifyAuthentication(getGroupDetails, JSONtry, JSONcatch))
-    router.put('/groups/:groupId', verifyAuthentication(editGroup, JSONtry, JSONcatch))
-    router.delete('/groups/:groupId', verifyAuthentication(deleteGroup, JSONtry, JSONcatch))
-    router.put('/groups/:groupId/movies/:movieId', verifyAuthentication(addMovieInGroup, JSONtry, JSONcatch))
-    router.delete('/groups/:groupId/movies/:movieId', verifyAuthentication(removeMovieInGroup, JSONtry, JSONcatch))
+    router.post('/users', handlerRequestCaller(createUser))
+    router.get('/movies', handlerRequestCaller(getPopularMovies))
+    router.get('/movies/search/:moviesName', handlerRequestCaller(searchMoviesByName))
+    router.get('/movies/find/:movieId', handlerRequestCaller(getMovieDetails))
+    router.post('/groups', verifyAuthentication(createGroup))
+    router.get('/groups', verifyAuthentication(getGroups))
+    router.get('/groups/:groupId', verifyAuthentication(getGroupDetails))
+    router.put('/groups/:groupId', verifyAuthentication(editGroup))
+    router.delete('/groups/:groupId', verifyAuthentication(deleteGroup))
+    router.put('/groups/:groupId/movies/:movieId', verifyAuthentication(addMovieInGroup))
+    router.delete('/groups/:groupId/movies/:movieId', verifyAuthentication(removeMovieInGroup))
 
     return router
 
@@ -64,11 +64,11 @@ export default function(cmdbServices, cmdbUserServices) {
     }
 
     async function getPopularMovies(req, rsp) {
-        return cmdbServices.getPopularMovies(req.query.limit)
+        return cmdbServices.getPopularMovies(req.query.limit, req.query.page)
     }
 
     async function searchMoviesByName(req, rsp) {
-        return cmdbServices.searchMoviesByName(req.params.moviesName, req.query.limit)
+        return cmdbServices.searchMoviesByName(req.params.moviesName, req.query.limit, req.query.page)
     }
 
     async function getMovieDetails(req, rsp) {
@@ -85,14 +85,15 @@ export default function(cmdbServices, cmdbUserServices) {
     }
 
     async function getGroups(req, rsp) {
-        return cmdbServices.getGroups(req.token)
+        return cmdbServices.getGroups(req.token, req.query.limit, req.query.page)
     }
 
     async function getGroupDetails(req, rsp) {
-        return cmdbServices.getGroupDetails(req.token, req.params.groupId)
-    }
+        return cmdbServices.getGroupDetails(
+            req.token, req.params.groupId, req.query.limit, req.query.page
+    )}
 
-    async function editGroup(req, rsp){
+    async function editGroup(req, rsp) {
         await cmdbServices.editGroup(req.token, req.params.groupId, req.body)   
         return {
             message: "Updated group with success"
@@ -122,7 +123,15 @@ export default function(cmdbServices, cmdbUserServices) {
         } 
     }
 
-    function verifyAuthentication(handler, JSONtry, JSONcatch) {
+    /**
+     * Middleware that checks if the authorization token is present in the Bearer HTTP 
+     * request header. If it is present, req.token will have it's value.
+     * On the presence of a valid token, this function also calls the handler request 
+     * function.
+     * @param {Function} handler function that calls a service and returns a response.
+     * @throws InvalidAuthenticationToken if the token received is not valid.
+     */
+    function verifyAuthentication(handler) {
         return async function(req, rsp){
             const BEARER_STR = "Bearer "
             // Get the value of the Authorization request header
@@ -139,17 +148,31 @@ export default function(cmdbServices, cmdbUserServices) {
             // Create a property in the request object to easily retrieve it
             req.token = tokenHeader.split(" ")[1]
     
-            const requestHandler = handlerRequest(handler, JSONtry, JSONcatch)
+            const requestHandler = handlerRequestCaller(handler)
 
             return requestHandler(req, rsp)
         }
     }
 
-    function JSONtry(body, rsp){
+    /**
+     * Assemblies handler request function by passing the handler, along with 
+     * the functions to wrap it's response.
+     */
+    function handlerRequestCaller(handler) {
+        return handlerRequest(handler, JSONtry, JSONcatch) 
+    }
+
+    /**
+     * Wraps response in JSON format, on a valid request.
+     */
+    function JSONtry(body, req, rsp){
         rsp.json(body)
     }
 
-    function JSONcatch(httpResponse, rsp){
+    /**
+     * Wraps response in JSON format, on an error.
+     */
+    function JSONcatch(httpResponse, req, rsp) {
         rsp
             .status(httpResponse.status)
             .json(httpResponse.body)

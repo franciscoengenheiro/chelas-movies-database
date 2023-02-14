@@ -1,46 +1,103 @@
-<script type="application/ecmascript" src="/cmdb-user-interface-site.mjs"></script>
-
-
-<form action="/auth/groups" method="GET">
-    <input type="submit" value="Back">
-</form>
-
-<br>
-
-<h4>{{group.name}}</h4>
-
-<form action="/auth/groups/{{id}}/editGroup" method="GET">
-  <input type="submit" value="Edit">
-</form>
-
-<form action="/auth/groups/{{id}}/delete" method="POST">
-  <input type="submit" value="Delete">
-</form>
-
-<input type="button" value="Delete group via client script" id="b1">
-<script type="application/ecmascript">
-  removeGroup('#b1', '{{token}}','{{id}}', true)
-</script>
-
-<p><b>Description: </b>{{group.description}}</p>
-<p><b>Movies total duration: </b>{{group.moviesTotalDuration}} mins</p>
-<ul>
-    <h4>Movies</h4>
-  {{#each group.movies}}
-    <li>
-      <h3><a href="/movies/find/{{id}}">{{title}}</a></h3> 
-      <form action="/auth/groups/{{../id}}/movies/{{id}}" method="POST">
-        <input type="submit" value="Remove">
-      </form>
-
-      <input type="button" value="Remove movie via client script" id="b{{@index}}">
-      <script type="application/ecmascript">
-        removeMovieInGroup('#b{{@index}}', '{{../token}}','{{../id}}', '{{id}}')
-      </script>
-    </li>
-  {{/each}}
-</ul>
-
-<form action="/auth/groups/{{id}}/movies/addMovie" method="GET">
-    <input type="submit" value="Add Movie">
-</form>
+<section class="regular-box">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Movie Group Banner -->                
+            <div class="col-md-auto">
+                <div class="relative-container text-wrap">
+                    <div class="overlap">
+                        <!-- Main Tittle -->
+                        <div class="color-yellow text-center">
+                            <h4><b><u>Group Details</u></b></h4>
+                        </div>
+                        <!-- Group Details -->
+                        <div class="text-justify mx-3 my-4">
+                            <h5 class="text-overflow-ellipsis-1">Name:
+                                <span class="color-ticket-light">{{group.name}}</span>
+                            </h5>
+                            <h5 class="text-overflow-ellipsis-4">Description:
+                                <span class="color-ticket-light">{{group.description}}</span>
+                            </h5>
+                            <h5>Movies Total Duration:
+                                <span class="color-ticket-light">{{group.moviesTotalDuration}} minutes</span>
+                            </h5>                            
+                        </div>                               
+                    </div>
+                    <!-- Movie Banner Image -->
+                    <img  
+                        class="img-fluid border-dark-4"
+                        src="assets/images/movieBanner.jpg"
+                        height="300"
+                        width="300">
+                    <!-- Buttons -->                    
+                    <div class="overlap btn-bottom-center">
+                        <!-- Delete Button -->
+                        <button 
+                            class="btn btn-danger btn-medium border-dark me-3"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteGroupModal">
+                            Delete
+                        </button>
+                        <!-- Edit Button -->
+                        <button  
+                            class="btn btn-success btn-medium border-dark" 
+                            data-bs-toggle="modal"
+                            data-bs-target="#groupModal">
+                            Edit
+                        </button>
+                    </div>
+                </div>
+            </div>   
+            <!-- Tickets Display -->                
+            <div class="col gy-2">
+                <div class="row row-cols-3 gy-4">
+                    {{#each group.movies.results}}
+                        <div class="col">
+                           <!-- Overlap elements -->
+                            <div class="relative-container align-items-center">
+                                <div class="overlap ticket-resize-movie"> 
+                                <!-- Centered text -->
+                                    <div class="color-ticket-light ticket-text text-center text-marck-script text-overflow-ellipsis-2 py-1">
+                                        <h3><a href="/movies/find/{{id}}">{{title}}</a></h3>
+                                    </div>
+                                </div>
+                                <!-- Movie Ticket image -->
+                                <img  
+                                    class="img-fluid fade-image"
+                                    src="assets/images/movieTicket.png">
+                                <!-- Fade elements -->
+                                <div class="fade-element fade-element-ticket-bottom">              
+                                    <a class="btn btn-danger btn-large" id="b{{@index}}" role="button">Remove</a>
+                                    <script type="application/ecmascript">
+                                        removeMovieInGroup('#b{{@index}}', '{{../user.token}}','{{../id}}', '{{id}}')
+                                    </script>
+                                </div>
+                            </div>
+                        </div>
+                    {{/each}}
+                </div>
+                <!-- Add Movie Button -->
+                <div class="d-grid mx-auto my-2 col-3">
+                    <button  
+                        class="btn btn-warning btn-lg" 
+                        data-bs-toggle="modal"
+                        data-bs-target="#addMovieModal">
+                        Add Movie
+                    </button>
+                </div> 
+            </div>
+        </div>
+    </div>
+    <!-- Pagination -->
+    {{> pagination this
+        horizontalArrangement="justify-content-end"
+    }}
+    <!-- Modals -->
+    {{> groupModal this
+        title="Edit a New Group"
+        onEdit="true"
+        buttonId="b-edit"
+        buttonText="Edit"
+    }}
+    {{> deleteGroupModal this }}
+    {{> addMovieModal this }}
+</section>

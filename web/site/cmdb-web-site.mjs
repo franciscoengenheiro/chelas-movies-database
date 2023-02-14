@@ -4,8 +4,8 @@
 //  - Invoke the corresponding operation on services
 //  - Generate the response in HTML format
 
-import errors from '#errors/errors.mjs'
 import express from 'express'
+import errors from '#errors/errors.mjs'
 import handlerRequest from '#web/cmdb-handle-request.mjs'
 
 export default function (cmdbServices) {
@@ -14,54 +14,57 @@ export default function (cmdbServices) {
         throw errors.INVALID_ARGUMENT("cmdbServices")
     }
 
-    // Initialize a router
+    // Initialize a router for the public site routes
     const router1 = express.Router()
 
-    router1.get('/movies', handlerRequest(getPopularMovies, HTMLtry, HTMLcatch))
-    router1.get('/movies/limit', limitForMovies)
-    router1.get('/movies/search/limit', limitForSearch)
-    router1.get('/movies/search/:movieName', handlerRequest(searchMoviesByName, HTMLtry, HTMLcatch))
-    router1.get('/movies/find/:movieId', handlerRequest(getMovieDetails, HTMLtry, HTMLcatch))
+    router1.get('/movies', handlerRequestCaller(getPopularMovies))
+    router1.get('/movies/search/:movieName', handlerRequestCaller(searchMoviesByName))
+    router1.get('/movies/find/:movieId', handlerRequestCaller(getMovieDetails))
 
-    // Initialize another router
+    // Initialize a router for the private site routes
     const router2 = express.Router()
 
-    router2.post('/groups', handlerRequest(createGroup, HTMLtry, HTMLcatch))
-    router2.get('/groups', handlerRequest(getGroups, HTMLtry, HTMLcatch))
-    router2.get('/groups/newGroup', getNewGroup)
-    router2.get('/groups/:groupId', handlerRequest(getGroupDetails, HTMLtry, HTMLcatch))
-    router2.get('/groups/:groupId/editGroup', handlerRequest(getEditGroup, HTMLtry, HTMLcatch))
-    router2.post('/groups/:groupId/edit', handlerRequest(editGroup, HTMLtry, HTMLcatch))
-    router2.post('/groups/:groupId/delete', handlerRequest(deleteGroup, HTMLtry, HTMLcatch))
-    router2.get('/groups/:groupId/movies/addMovie', addMovie)
-    router2.get('/groups/:groupId/movies/searchTheMovie', handlerRequest(searchMovieToAdd, HTMLtry, HTMLcatch))
-    router2.post('/groups/:groupId/movies', handlerRequest(addMovieInGroup, HTMLtry, HTMLcatch))
-    router2.post('/groups/:groupId/movies/:movieId', handlerRequest(removeMovieInGroup, HTMLtry, HTMLcatch))
+    router2.post('/groups', handlerRequestCaller(createGroup))
+    router2.get('/groups', handlerRequestCaller(getGroups))
+    router2.get('/groups/:groupId', handlerRequestCaller(getGroupDetails))
+    router2.get('/groups/:groupId/movies/searchTheMovie', handlerRequestCaller(searchMoviesByName))
     
     return { withoutAuth: router1, withAuth: router2 }
 
-    async function limitForMovies(req, rsp) {
-        rsp.render('limitForMovies')
-    }
-
     async function getPopularMovies(req, rsp) {
         const limit = req.query.limit
-        const popularMovies = await cmdbServices.getPopularMovies(limit)
-        const viewData = { title: 'Top 250 Most popular movies', movies: popularMovies }
+        const page = req.query.page
+        const popularMovies = await cmdbServices.getPopularMovies(limit, page)
+        const viewData = { 
+            movies: popularMovies.results, 
+            totalPages: popularMovies.totalPages 
+        }
         return new View('popularMovies', viewData)
     }
 
-    async function limitForSearch(req, rsp) {
-        const movie = req.query.movieName
-        const viewData = { movie: movie }
-        rsp.render('limitForSearch', viewData)
-    }
-
     async function searchMoviesByName(req, rsp) {
+        // Retrieve query string values
+        const groupId = req.query.groupId
         const movieName = req.query.movieName
         const limit = req.query.limit
-        const movies = await cmdbServices.searchMoviesByName(movieName, limit)
-        const viewData = { title: movieName, movies: movies }
+        const page = req.query.page
+        // Assert if the search result is eligible to be added to a group or was 
+        // only a regular movies search
+        const movieCanBeAdded = req.path.includes('searchTheMovie') ? true : false 
+        // Retrieve data
+        const movies = await cmdbServices.searchMoviesByName(movieName, limit, page)
+        const viewData = { 
+            expression: movieName, 
+            // This map was added to provide each movie with a mark in order to 
+            // assert if the movie can be added to a group. It was the only found 
+            // way to give that information to a handlebars template inside an array
+            movies: movieCanBeAdded ? movies.results.map(movie => {
+                return Object.assign( { movieCanBeAdded: movieCanBeAdded }, movie)
+            }) : movies.results,
+            // Only create this property if the value exists
+            ...groupId && {groupId: groupId}, 
+            totalPages: movies.totalPages
+        }
         return new View('searchMovies', viewData)
     }
 
@@ -74,79 +77,47 @@ export default function (cmdbServices) {
         await cmdbServices.createGroup(req.user.token, req.body)
         rsp.redirect('/auth/groups')
     }
-
-    async function getNewGroup(req, rsp) {
-        rsp.render('newGroup')
-    }
-
+    
     async function getGroups(req, rsp) {
-        const groups = await cmdbServices.getGroups(req.user.token)
-        const viewData = {token: req.user.token, title: 'My groups', groups: groups }
+        const retrievedGroups = await cmdbServices.getGroups(
+            req.user.token, req.query.limit, req.query.page
+        )
+        // This map was added to provide each group with the user token in order 
+        // to easily retrieve it in a partial view, since in this context 
+        // {{../user.token}} - handlebars template - could not be rendered
+        const groups = retrievedGroups.results.map(group => {
+            // Replicate user object with only token and construct a new object
+            // with the received group properties
+            return Object.assign({
+                user: {
+                    token: req.user.token
+                }
+            }, group)
+        })
+        const viewData = {
+            groups: groups, 
+            totalPages: retrievedGroups.totalPages 
+        }
         return new View('groups', viewData)
     }
 
     async function getGroupDetails(req, rsp) {
-        const viewData = await getGroupDetailsMw(req, rsp)
+        const groupId = req.params.groupId
+        const group = await cmdbServices.getGroupDetails(
+            req.user.token, groupId, req.query.limit, req.query.page
+        )
+        const viewData = { 
+            id: groupId, 
+            group: group,
+            totalPages: group.movies.totalPages 
+        }
         return new View('group', viewData)
     }
-
-    async function editGroup(req, rsp) {
-        const groupId = req.params.groupId
-        await cmdbServices.editGroup(req.user.token, groupId, req.body)
-        rsp.redirect(`/auth/groups/${groupId}`)
-    }
-
-    async function getEditGroup(req, rsp) {
-        const viewData = await getGroupDetailsMw(req, rsp)
-        return new View('editGroup', viewData)
-    }
-
-    async function deleteGroup(req, rsp) {
-        const groupId = req.params.groupId
-        await cmdbServices.deleteGroup(req.user.token, groupId)
-        rsp.redirect('/auth/groups/')
-    }
-
-    async function addMovie(req, rsp) {
-        const groupId = req.params.groupId
-        rsp.render('addMovie', {id: groupId})
-    }
-
-    async function searchMovieToAdd(req, rsp) {
-        const groupId = req.query.groupId
-        const movieName = req.query.movieName
-        const movies = await cmdbServices.searchMoviesByName(movieName, req.query.limit)
-        const viewData = {token: req.user.token, title: movieName, movies: movies, groupId: groupId}
-        return new View('searchMoviesToAdd', viewData)
-    }
-
-    async function addMovieInGroup(req, rsp) {
-        const movieId = req.body.movieId
-        const groupId = req.params.groupId
-        await cmdbServices.addMovieInGroup(req.user.token, groupId, movieId)
-        rsp.redirect(`/auth/groups/${groupId}`)
-    }
-
-    async function removeMovieInGroup(req, rsp) {
-        const movieId = req.params.movieId
-        const groupId = req.params.groupId        
-        await cmdbServices.removeMovieInGroup(req.user.token, groupId, movieId)
-        // Post/Redirect/Get (PRG) is a web development design pattern that lets the page shown 
-        // after a form submission be reloaded, shared, or bookmarked without ill effects, such
-        // as submitting the form another time.
-        rsp.redirect(`/auth/groups/${groupId}`)
-    }
     
-    async function getGroupDetailsMw(req, rsp) {
-        const groupId = req.params.groupId
-        const group = await cmdbServices.getGroupDetails(req.user.token, groupId)
-        return {token: req.user.token, id: groupId, group: group}
-    }
-  
     /** 
-     * Constructs a new View with the given name and data to send to response render function
-     * @param {String} viewName - the name of the html/hbs view file
-     * @param {Object} viewData - object with data to render
+     * Constructs a new View with the given name and data to send to response render function.
+     * @param {String} viewName - the name of the html/hbs view file.
+     * @param {Object} viewData - object with data to render.
      */
     function View(viewName, viewData) {
         return {
@@ -155,12 +126,26 @@ export default function (cmdbServices) {
         }
     }
 
-    function HTMLtry(view, rsp){
-        if(view) rsp.render(view.name, view.data)
+    /**
+     * Assemblies handler request function by passing the handler, along with 
+     * the functions to wrap it's response.
+     */
+    function handlerRequestCaller(handler) {
+        return handlerRequest(handler, HTMLtry, HTMLcatch)
     }
 
-    function HTMLcatch(httpResponse, rsp){
-        let view = View('onError', httpResponse)
-        if(view) rsp.render(view.name, view.data)
+    /**
+     * Wraps response in HTML format, on a valid request.
+     */
+    function HTMLtry(view, req, rsp) {
+        if(view) rsp.render(view.name, Object.assign({user: req.user}, view.data))
     }
+
+    /**
+     * Wraps response in HTML format, on an error.
+     */
+    function HTMLcatch(httpResponse, req, rsp) {
+        let view = View('onError', httpResponse)
+        if(view) rsp.render(view.name, Object.assign({user: req.user}, view.data))
+    }   
 }

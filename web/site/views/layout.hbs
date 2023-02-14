@@ -1,12 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <!-- Meta atributtes -->
     <meta charset="utf-8">
-    <title>Chelas Movies</title>
-    <link rel="icon" type="image/png" href="../images/cmdbIcon.png">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Browser Title -->
+    <title>Chelas Movies Database</title>
+
+    <!-- Domain reference -->
+    <base href="http://localhost:1904/" target="_self">
+
+    <!-- Browser Icon -->
+    <link rel="icon" type="image/png" href="assets/icons/cmdbIcon.png">
+    <!-- Google Api Font -->
+    <link 
+      rel="stylesheet" 
+      href="https://fonts.googleapis.com/css?family=Marck Script|Open Sans|Merienda One&effect=outline">
+    <!-- Bootstrap css -->
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css"/>
+    <!-- Custom css -->
+    <link rel="stylesheet" type="text/css" href="assets/css/custom.css"/>
+    <!-- Custom js -->
+    <script type="application/ecmascript" src="assets/js/api-access.mjs"></script>
+    <script type="application/ecmascript" defer src="assets/js/events.mjs"></script>
   </head>
   <body>
-    <link rel="stylesheet" href="/site.css"></link>
-    {{{body}}}
+    <!-- NavBar -->
+    {{> navBar }}
+    <section>
+      <!-- Showcase with background -->
+      <main class="bg-main">
+        {{{body}}}
+      </main>
+    </section>
+    <!-- Footer -->
+    {{> footer}}
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 
+    <script async src="js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

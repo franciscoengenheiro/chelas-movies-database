@@ -1,11 +1,63 @@
-<input type="button" value="Back" onclick='history.back()'>
-
-<h4>Search results for: {{title}}</h4>
-<ul>
-  {{#each movies}}
-    <li>
-      <h3><a href="../find/{{id}}">{{title}}</a></h3>
-      <p>Description: {{description}}</p>
-    </li>
-  {{/each}}
-</ul>
+<section class="regular-box">
+  <div class="container">
+    <div class="col text-center">
+      <div class="row text-start bg-dark text-white">
+        <!-- Search Result Bar -->
+        <div class="col-3-auto">
+          <h4>Search results for: 
+            <span class="color-dark-yellow">"{{expression}}"</span>
+          </h4>
+        </div>
+      </div>
+      <div class="row row-cols-5 gy-2 my-auto">
+        {{#each movies}}
+            {{#if movieCanBeAdded}}
+                <!-- Movie Box -->
+                <div class="col-3-auto bg-red-gradient border-dark-2 py-3">
+                    <!-- Title -->
+                    <div class="row">
+                        <div class="col-auto mx-auto">
+                            <a href="movies/find/{{id}}" class="text-decoration text-overflow-ellipsis-2">
+                                <h5>{{title}}</h5>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Image -->
+                    <img class="img-fluid border-dark mt-1" src="{{image}}" width="55%" height="65%">
+                    <!-- Add Movie Button -->
+                    <div class="row mt-2">
+                        <div class="col-30 mx-auto">
+                            <button class="btn w-75 btn-warning" id="b{{@index}}">Add Movie</button>
+                            <script type="application/ecmascript">
+                                addMovieToGroup('#b{{@index}}', '{{../user.token}}','{{../groupId}}','{{id}}')
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            {{else}}
+                <!-- Movie Box -->
+                <a href="movies/find/{{id}}"
+                    class="col-3-auto bg-red-gradient movie-box-shadow border-dark-2">
+                    <div class="row">
+                        <!-- Title -->
+                        <div class="col-20-auto text-overflow-ellipsis-2 mt-2">
+                            <h5>{{title}}</h5>
+                        </div>
+                    </div>
+                    <!-- Image -->
+                    <img class="img-fluid border-dark m-2" src="{{image}}" width="55%" height="65%">
+                    <!-- Description -->
+                    <div class="row">
+                        <h6 class="text-overflow-ellipsis-2">{{description}}</h6>
+                    </div>
+                </a>          
+            {{/if}}
+        {{/each}}
+      </div>
+    </div>
+  </div>
+  <!-- Pagination -->
+  {{> pagination this
+      horizontalArrangement="justify-content-center"
+  }}
+</section>

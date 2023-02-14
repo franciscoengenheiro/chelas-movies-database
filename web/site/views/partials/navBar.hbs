@@ -1,0 +1,36 @@
+<nav id="topNavBar" class="navbar-dark sticky-top hide-on-scroll-down bg-dark p-2">
+    <div class="container">
+        <div class="d-flex align-items-center text-merienda-one">
+            <ul class="nav me-lg-auto">
+                <li>
+                    <img
+                        class="d-inline-block align-top"    
+                        src="assets/icons/cmdbIcon.png" 
+                        width="40" 
+                        height="40">
+                </li>
+                <li>
+                    <a href="/home" class="nav-link px-2" tabindex="-1">
+                        <h6>Home</h6>
+                    </a>
+                </li>
+                <li>
+                    <a href="/auth/groups?limit=6&page=1" class="nav-link px-2" tabindex="-1">
+                        <h6>My groups</h6>
+                    </a>
+                </li>
+                <li>
+                    <a href="/movies?limit=10&page=1" class="nav-link px-2" tabindex="-1">
+                        <h6>Popular Movies</h6>
+                    </a>
+                </li>
+                <li>
+                    <a href="/about" class="nav-link" tabindex="-1">
+                        <h6>About</h6>
+                    </a>
+                </li>
+            </ul>        
+            {{> loginLogout }}
+        </div>
+    </div>
+</nav>

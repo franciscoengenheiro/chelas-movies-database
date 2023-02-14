@@ -1,0 +1,60 @@
+<!-- Group Modal -->
+<form id="groupForm" {{#unless onEdit}} action="/auth/groups" method="POST" {{/unless}}>
+    <div class="modal fade" id="groupModal" tabindex="-1" role="dialog" aria-labelledby="modal-title" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-title">{{title}}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="name" class="col-form-label">Name:</label> 
+                        <input 
+                            type="text" 
+                            {{#if onEdit}} value='{{group.name}}' {{/if}}
+                            name="name"
+                            class="form-control" 
+                            minlength="5"
+                            maxlength="25"
+                            autocomplete="off" 
+                            spellcheck="false" 
+                            id="name"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="description" class="col-form-label">Description:</label>
+                        <textarea 
+                            type="textarea" 
+                            name="description" 
+                            class="form-control" 
+                            minlength="10"
+                            maxlength="140"     
+                            autocomplete="off" 
+                            spellcheck="false" 
+                            id="description"
+                            required>{{#if onEdit}}{{group.description}}{{/if}}</textarea>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="reset" class="btn btn-secondary">
+                        {{#if onEdit}} Previous values {{else}} Clear {{/if}}
+                    </button>
+                    <div>
+                        <button class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+                        {{#if onEdit}}
+                            <!-- Edit Button with client script -->
+                            <button class="btn btn-success" id="{{buttonId}}">{{buttonText}}</button>
+                            <script type="application/ecmascript">
+                                editGroup('#{{buttonId}}', '{{user.token}}','{{id}}', '#name', '#description')
+                            </script>
+                        {{else}}
+                            <!-- Create Button -->
+                            <button type="submit" class="btn btn-success">{{buttonText}}</button>
+                        {{/if}}
+                    </div>
+                </div>  
+            </div>
+        </div>
+    </div>
+</form>

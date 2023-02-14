@@ -1,35 +1,30 @@
-<img alt="icon" src="../images/cmdbIcon.png" width="50" height="50">
-
-{{#if user.username}}
-<h1>Welcome to Chelas Movies: {{user.username}}</h1>
-
-<br>
-
-<form action="/logout" method="POST">
-    <input type="submit" value="Logout">
-</form>
-
-{{else}}
-<h1>Welcome to Chelas Movies</h1>
-
-<br>
-
-<form action="/register" method="GET">
-    <input type="submit" value="Register">
-</form>
-<form action="/login" method="GET">
-    <input type="submit" value="Login">
-</form>
-{{/if}}
-
-<br>
-
-<h2><a href="/movies/limit">Popular Movies</a></h2>
-<h2><a href="/auth/groups">My Groups</a></h2>
-
-<br>
-
-<form action="/movies/search/limit" method="GET">
-    <h2>Search a movie: <input type="text" name="movieName" maxlength="20"></h2>
-    <input type="submit" value="Search">
-</form>
+<section class="box-float-right">
+    <div class="col">
+        <div class="row mb-4">
+            <h1 class="display-1">Chelas
+                <span class="color-red">Movies</span>
+                <span class="color-cyan">Database</span>
+            </h1>
+        </div>
+        <div class="row text-white">
+            <h1 class="display-6">Search a 
+                <span class="text-dark">Movie</span>
+            </h1>
+            <!-- Search bar -->
+            <form id="searchMoviesForm" method="GET">
+                <input 
+                    id="movieName"
+                    type="text" 
+                    name="movieName"
+                    maxlength="60"
+                    class="form-control"
+                    placeholder="Type to search..."
+                    autocomplete="off"
+                    spellcheck="false"
+                    aria-label="Search">
+                <!-- The value of this hidden input is hardcoded -->
+                <input type="hidden" value="10" name="limit">
+            </form>  
+        </div>
+    </div>
+</section> 

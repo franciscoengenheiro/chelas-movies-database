@@ -1,0 +1,42 @@
+<!-- Delete Group Modal -->
+<form action="/auth/groups/{{id}}/movies/searchTheMovie" method="GET">
+    <div class="modal fade" id="addMovieModal" tabindex="-1" role="dialog" aria-labelledby="modal-title" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-title">Add a movie to this group</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="name" class="col-form-label">Search by an expression</label> 
+                        <input 
+                            type="text" 
+                            name="movieName" 
+                            placeholder="Type to search..."
+                            class="form-control" 
+                            minlength="3"
+                            maxlength="50"
+                            autocomplete="off" 
+                            spellcheck="false" 
+                            id="name"
+                            required>
+                        <input 
+                            type="hidden" 
+                            value={{id}} 
+                            name="groupId">
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="reset" class="btn btn-secondary">Clear</button>
+                    <div>
+                        <button class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+                        <!-- Create Button -->
+                        <button type="submit" class="btn btn-success">Search</button>
+                    </div>
+                </div>  
+            </div>
+        </div>
+    </div>
+</form>
+

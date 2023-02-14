@@ -15,11 +15,11 @@ export default function(handler, handlerTry, handlerCatch) {
     return async function(req, rsp) {
         try{
             let returnedByHandler = await handler(req, rsp)
-            handlerTry(returnedByHandler, rsp)
+            handlerTry(returnedByHandler, req, rsp)
         } catch(e) {
             // Translates an internal error into a HTTP error response
             const httpResponse = translateToHTTPResponse(e)
-            handlerCatch(httpResponse, rsp)
+            handlerCatch(httpResponse, req, rsp)
         }
     }
 }

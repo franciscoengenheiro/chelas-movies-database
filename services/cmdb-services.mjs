@@ -39,8 +39,8 @@ export default function(imdbData, cmdbData, usersData) {
      * Retrieves the top 250 most popular movies.
      * @param {Number} limit option parameter to limit the search result.
      */
-    async function getPopularMovies(limit) {
-        return imdbData.getPopularMoviesData(limit)
+    async function getPopularMovies(limit, page) {
+        return imdbData.getPopularMoviesData(limit, page)
     }
 
     /**
@@ -48,8 +48,8 @@ export default function(imdbData, cmdbData, usersData) {
      * @param {String} moviesName prefix or name of the movie to search.
      * @param {Number} limit option parameter to limit the search result.
      */
-    async function searchMoviesByName(moviesName, limit) {
-        return imdbData.searchMoviesByNameData(moviesName, limit)
+    async function searchMoviesByName(moviesName, limit, page) {
+        return imdbData.searchMoviesByNameData(moviesName, limit, page)
     }
 
     /**
@@ -76,18 +76,22 @@ export default function(imdbData, cmdbData, usersData) {
     /**
      * Retrieves all groups that belong to a specified user
      * @param {String} userId internal user identifier.
+     * @param {String} limit limits results by n. 
+     * @param {String} page the nth page to retrieve. 
      */
-    async function getGroups(userId) {
-        return cmdbData.getGroupsData(userId)
+    async function getGroups(userId, limit, page) {
+        return cmdbData.getGroupsData(userId, limit, page)
     }
     
     /**
      * Retrieves details for the user specified group.
      * @param {String} userId internal user identifier.
      * @param {Number} groupId group identifier.
+     * @param {String} limit limits results by n. 
+     * @param {String} page the nth page to retrieve.
      */
-    async function getGroupDetails(userId, groupId) {
-        return cmdbData.getGroupDetailsData(groupId, userId)
+    async function getGroupDetails(userId, groupId, limit, page) {
+        return cmdbData.getGroupDetailsData(groupId, userId, limit, page)
     }
 
     /**
@@ -120,7 +124,7 @@ export default function(imdbData, cmdbData, usersData) {
      * @param {Number} movieId movie identifier.
      */
     async function addMovieInGroup(userId, groupId, movieId) {
-        const moviesObj = await imdbData.addMovieInGroupData(movieId)
+        const moviesObj = await imdbData.getMovieDetails(movieId)
         return cmdbData.addMovieInGroupData(groupId, movieId, moviesObj, userId)
     }
 
@@ -171,5 +175,4 @@ export default function(imdbData, cmdbData, usersData) {
     function isAString(value) {
         return typeof value == 'string' && value != ""
     }
-
 }

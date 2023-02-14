@@ -7,36 +7,30 @@ import * as assert from "assert"
 
 // Internal Imports
 import * as File from "#data_access/util/file-operations.mjs"
-import cmdbUserServicesInit from '#services/cmdb-users-services.mjs'
-import cmdbServicesInit from '#services/cmdb-services.mjs' 
-import * as usersData from '#data_access/internal/cmdb-users-data.mjs'
-import * as cmdbData from '#data_access/internal/cmdb-data-mem.mjs'
+import cmdbUsersDataInternalInit from '#data_access/internal/cmdb-users-mem.mjs'
+import cmdbDataInternalInit from '#data_access/internal/cmdb-data-mem.mjs'
 import imdbDataInit from '#data_access/imdb-movies-data.mjs'
+import cmdbUserServicesInit from '#services/cmdb-users-services.mjs'
+import cmdbServicesInit from '#services/cmdb-services.mjs'
 import fetch from '#data_access/fetch/local-fetch.mjs'
 import errors from '#errors/errors.mjs'
+import { Group, GroupDetails, Movie, MovieDetails } from '#data_manipulation/classes.mjs'
 
 // Initializations
+const usersData = cmdbUsersDataInternalInit()
+const cmdbData = cmdbDataInternalInit()
 const imdbData = imdbDataInit(fetch)
 const cmdbUserServices = cmdbUserServicesInit(usersData)
 const cmdbServices = cmdbServicesInit(imdbData, cmdbData, usersData)
 
 // Paths to local files
-const POPULAR_MOVIES_FILE = "./local_data/most-popular-movies.json"
-const SEARCH_MOVIE_BY_NAME_FILE = "./local_data/movies-searched-by-name.json"
-const GET_MOVIE_BY_ID = "./local_data/movie-info.json"
-const USERS_FILE = './local_data/users.json'
-const GROUPS_FILE = './local_data/groups.json'
+const POPULAR_MOVIES_FILE = "./data/local/most-popular-movies.json"
+const SEARCH_MOVIE_BY_NAME_FILE = "./data/local/movies-searched-by-name.json"
+const GET_MOVIE_BY_ID = "./data/local/movie-info.json"
+const USERS_FILE = './data/local/users.json'
+const GROUPS_FILE = './data/local/groups.json'
 
-// --------------------------------------- Notes --------------------------------------------------------
-// Before running the tests make sure:
-// - Local fetch is enabled in the server module
-// - Internal memory data access is enabled in the server module
-// - Local_data package files - groups.json and users.json - ID's are matching the current data
-// On error while running tests:
-// - Delete users.json created test user and try again
-// To run a single test or a set of tests: use it.only or describe.only respectively
-// --------------------------------------- Notes --------------------------------------------------------
-describe("Services modules tests:", function() {
+describe("Services test modules:", function() {
     // Constants
     const testUser = {
         username: "userTestUsername",
@@ -65,13 +59,12 @@ describe("Services modules tests:", function() {
         it("Should return an object with an array of the 250 most popular movies", async function() {
             // Arrange
             let most_popular_movies = await File.read(POPULAR_MOVIES_FILE)
-            most_popular_movies = most_popular_movies.items
 
             // Act
-            let cmdb_most_popular_movies = await cmdbServices.getPopularMovies()
+            let cmdb_most_popular_movies = await cmdbServices.getPopularMovies(250)
 
             // Assert
-            assert.deepEqual(cmdb_most_popular_movies, most_popular_movies)
+            assert.deepEqual(cmdb_most_popular_movies.results, most_popular_movies.items)
         })
 
         it("Should return an object with an array of the most popular movies within a limit", async function() {
@@ -81,9 +74,8 @@ describe("Services modules tests:", function() {
 
             // Act
             let cmdb_most_popular_movies = await cmdbServices.getPopularMovies(5)
-
             // Assert
-            assert.deepEqual(cmdb_most_popular_movies, most_popular_movies)
+            assert.deepEqual(cmdb_most_popular_movies.results, most_popular_movies)
         })
 
         it("Should throw an error if the limit is not a number", async function() {
@@ -94,20 +86,18 @@ describe("Services modules tests:", function() {
                 assert.deepEqual(e, errors.INVALID_ARGUMENT("limit"))
                 return
             }
-
             // Assert
             assert.fail("Should throw an error")
         })
 
-        it("Should throw an error if the limit is a number above 250", async function() {
+        it("Should throw an error if the page is not a number", async function() {
             // Act
             try {
-                await cmdbServices.getPopularMovies(300)
+                await cmdbServices.getPopularMovies(5, "a")
             } catch(e) {
-                assert.deepEqual(e, errors.INVALID_ARGUMENT("limit"))
+                assert.deepEqual(e, errors.ARGUMENT_NOT_FOUND("page"))
                 return
             }
-
             // Assert
             assert.fail("Should throw an error")
         })
@@ -123,7 +113,7 @@ describe("Services modules tests:", function() {
             let cmdb_search_by_name = await cmdbServices.searchMoviesByName("inception 2010")
             
             // Assert
-            assert.deepEqual(cmdb_search_by_name, search_by_name)
+            assert.deepEqual(cmdb_search_by_name.results, search_by_name)
         })
 
         it("Should return an object with the results from a movie's name search within a limit", async function() {
@@ -135,13 +125,13 @@ describe("Services modules tests:", function() {
             let cmdb_search_by_name = await cmdbServices.searchMoviesByName("inception 2010", 5)
 
             // Assert
-            assert.deepEqual(cmdb_search_by_name, search_by_name)
+            assert.deepEqual(cmdb_search_by_name.results, search_by_name)
         })
 
         it("Should throw an error if the limit is not a number", async function() {
             // Act
             try {
-                await cmdbServices.searchMoviesByName("inception 2010", "Benfica")
+                await cmdbServices.searchMoviesByName("inception 2010", "f")
             } catch(e) {
                 assert.deepEqual(e, errors.INVALID_ARGUMENT("limit"))
                 return
@@ -151,12 +141,12 @@ describe("Services modules tests:", function() {
             assert.fail("Should throw an error")
         })
 
-        it("Should throw an error if the limit is a number above 250", async function() {
+        it("Should throw an error if the page is not a number", async function() {
             // Act
             try {
-                await cmdbServices.searchMoviesByName("inception 2010", 300)
+                await cmdbServices.searchMoviesByName("inception 2010", 10, "c")
             } catch(e) {
-                assert.deepEqual(e, errors.INVALID_ARGUMENT("limit"))
+                assert.deepEqual(e, errors.ARGUMENT_NOT_FOUND("page"))
                 return
             }
 
@@ -171,15 +161,7 @@ describe("Services modules tests:", function() {
             let movieObj = await File.read(GET_MOVIE_BY_ID)
                     
             // Act
-            let movie = {
-                id: movieObj.id,
-                title: movieObj.fullTitle,
-                description: movieObj.plot,
-                image_url: movieObj.image,
-                runtimeMins: movieObj.runtimeMins,
-                director: movieObj.directors,
-                actors_names: movieObj.stars
-            }
+            let movie = new MovieDetails(movieObj)
             let cmdb_movie = await cmdbServices.getMovieDetails(movieObj.id)
             
             // Assert
@@ -280,21 +262,22 @@ describe("Services modules tests:", function() {
     })
 
     describe("Create a group for an user:", function() {
-        it("Should create a new group for the specified user", async function() {
-            // Arrange
-            let currentGroups = await File.read(GROUPS_FILE)
-            let groupToCreate = {
-                name: "Group Test",
-                description: "Just for test"
-            }
-            currentGroups.groups.push(groupToCreate)
-            currentGroups.IDs++
-
+        it("Should create a new group for the specified user", async function() {           
             // Act
             await cmdbUserServices.createUser(
                 testUser.username, testUser.password, testUser.email, testUser.passConfirm
             )
             const createdUser = await cmdbUserServices.getUserByUsername(testUser.username)
+            let currentGroups = await File.read(GROUPS_FILE)
+            let groupToCreate = new Group({
+                id: currentGroups.IDs++,
+                name: "Group Test",
+                description: "Just for test",
+                userId: createdUser.id
+            })
+
+            currentGroups.groups.push(groupToCreate)
+
             await cmdbServices.createGroup(createdUser.token, groupToCreate)
 
             let alteredGroups = await File.read(GROUPS_FILE)
@@ -327,19 +310,58 @@ describe("Services modules tests:", function() {
         })
     })
 
-    describe("Get a group for an user:", function() {
+    describe("Get all groups for an user:", function() {
         it("Should get all groups for the specified user", async function() {
             // Arrange
             let groupsTest = []
             let group1 = {
-                "id": originalGroups.IDs + 1,
-                "name": "Test group 1",
-                "description": "random"
+                id: originalGroups.IDs,
+                name: "Test group 1",
+                description: "random"
+            }
+            let group2 = { 
+                id: originalGroups.IDs + 2, 
+                name: "Test group 2",
+                description: "still random"
+            }
+
+            // Act
+            await cmdbUserServices.createUser(
+                testUser.username, testUser.password, testUser.email, testUser.passConfirm
+            )
+            const createdUser = await cmdbUserServices.getUserByUsername(testUser.username)
+            
+            // Create groups for this user
+            await cmdbServices.createGroup(createdUser.token, group1)
+            await cmdbServices.createGroup(createdUser.token, group2)
+
+            groupsTest.push(group1, group2)
+            groupsTest = groupsTest.map(group => { 
+                return {
+                    id: group.id,
+                    name: group.name,
+                    description: group.description
+                }
+            })
+
+            // Retrieve the group created
+            let groups = await cmdbServices.getGroups(createdUser.token) 
+
+            // Assert 
+            assert.deepEqual(groupsTest, groups.results)   
+        })
+        it("Should throw an error if the limit is not a number", async function() {
+            // Arrange
+            let groupsTest = []
+            let group1 = {
+                id: originalGroups.IDs + 1,
+                name: "Test group 1",
+                description: "random"
             }
             let group2 = {
-                "id": originalGroups.IDs + 2,
-                "name": "Test group 2",
-                "description": "still random"
+                id: originalGroups.IDs + 2,
+                name: "Test group 2",
+                description: "still random"
             }
 
             // Act
@@ -361,12 +383,60 @@ describe("Services modules tests:", function() {
                 }
             })
 
-            // Retrieve the group created
-            let groups = await cmdbServices.getGroups(createdUser.token) 
+            // Assert 
+            
+            try {
+                await cmdbServices.getGroups(createdUser.token, "a") 
+            } catch(e) {
+                assert.deepEqual(e, errors.INVALID_ARGUMENT("limit"))
+                return
+            }
+            assert.fail("Should throw an error")
+        })
+
+        it("Should throw an error if the page is not a number", async function() {
+            // Arrange
+            let groupsTest = []
+            let group1 = {
+                id: originalGroups.IDs + 1, 
+                name: "Test group 1",
+                description: "random"
+            }
+            let group2 = {
+                id: originalGroups.IDs + 2,
+                name: "Test group 2",
+                description: "still random"
+            }
+
+            // Act
+            await cmdbUserServices.createUser(
+                testUser.username, testUser.password, testUser.email, testUser.passConfirm
+            )
+            const createdUser = await cmdbUserServices.getUserByUsername(testUser.username)
+            
+            // Create groups for this user
+            await cmdbServices.createGroup(createdUser.token, group1)
+            await cmdbServices.createGroup(createdUser.token, group2)
+
+            groupsTest.push(group1, group2)
+            groupsTest = groupsTest.map(group => {
+                return {
+                    id: group.id,
+                    name: group.name,
+                    description: group.description
+                }
+            })
 
             // Assert 
-            assert.deepEqual(groupsTest, groups)   
+            try {
+                await cmdbServices.getGroups(createdUser.token, 1, {page: "a"}) 
+            } catch(e) {
+                assert.deepEqual(e, errors.ARGUMENT_NOT_FOUND("page"))
+                return
+            }
+            assert.fail("Should throw an error")
         })
+
     })
 
     describe("Get group details for an user:", function() {
@@ -386,17 +456,18 @@ describe("Services modules tests:", function() {
 
             // Create groups for this user
             await cmdbServices.createGroup(createdUser.token, group)
-            let newGroup = {
-                name: group.name,
-                description: group.description,
-                movies: [],
-                moviesTotalDuration: 0
-            }
             // Retrieve the group created
-            let createdGroup = await cmdbServices.getGroupDetails(createdUser.token, groupId) 
+            const sut = await cmdbServices.getGroupDetails(createdUser.token, groupId) 
+            // Create movie object
+            const movies = {
+                results: [], // No movies were added yet
+                totalPages: 0 
+            }
+            // Create the expected group
+            const expected = new GroupDetails(group, movies)
            
             // Assert 
-            assert.deepEqual(newGroup, createdGroup)   
+            assert.deepEqual(sut, expected)
         })
 
         it("Should throw an error if the group Id does not exist", async function() {
@@ -441,13 +512,13 @@ describe("Services modules tests:", function() {
 
             // Arrange
             const newGroupId = originalGroups.IDs + 1
-            const groupTest = {
+            const groupTest = new Group ({
                 name: "New Group Test",
                 description: "Updated group",
                 userId: originalUsers.IDs + 1,
                 id: newGroupId,
                 movies: []
-            }
+            })
 
             // Act
             await cmdbUserServices.createUser(
@@ -547,7 +618,6 @@ describe("Services modules tests:", function() {
     })
 
     describe("Adding a Movie in a Group:", function() {
-        
         it("Should add a new movie to the given group Id", async function() {
             // Arrange
             const groupBodyTest = {
@@ -557,19 +627,19 @@ describe("Services modules tests:", function() {
 
             // Arrange
             const newGroupId = originalGroups.IDs + 1
-            const groupTest = {
+            const groupTest = new Group({
                 name: "Group Test",
                 description: "Just for test",
                 userId: originalUsers.IDs + 1,
                 id: newGroupId,
                 movies: []
-            }
+            })
 
-            groupTest.movies.push({
+            groupTest.movies.push(new Movie({
                 id: "tt0468569",
                 title: "The Dark Knight",
-                duration: "152"
-            })
+                runtimeMins: "152"
+            }))
 
             // Act
             await cmdbUserServices.createUser(
@@ -666,7 +736,7 @@ describe("Services modules tests:", function() {
     })
 
     describe("Removing a Movie in a Group:", function() {
-        it("Should remove a movie from the group ID given", async function() {
+        it("Should remove a movie from the given group Id", async function() {
             // Arrange
             const groupBodyTest = {
                 name: "Group Test",
@@ -675,7 +745,7 @@ describe("Services modules tests:", function() {
 
             // Arrange
             const newGroupId = originalGroups.IDs + 1
-            const groupTest = {
+            const groupTest = new Group({
                 name: "Group Test",
                 description: "Just for test",
                 userId: originalUsers.IDs + 1,
@@ -684,16 +754,16 @@ describe("Services modules tests:", function() {
                     {
                         id: "tt0468569",
                         title: "The Dark Knight",
-                        duration: "152"
+                        runtimeMins: "152"
                     }
                 ]
-            }
+            })
 
-            groupTest.movies.pop({
+            groupTest.movies.pop(new Movie({
                 id: "tt0468569",
                 title: "The Dark Knight",
-                duration: "152"
-            })
+                runtimeMins: "152"
+            }))
 
             // Act
             await cmdbUserServices.createUser(

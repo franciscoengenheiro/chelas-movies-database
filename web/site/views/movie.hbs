@@ -1,16 +1,32 @@
-<form method="GET">
-    <input type="button" value="Back" onclick='history.back()'>
-</form>
-<br>
-<div style="display:inline-block">
-    <h4>{{title}}</h4>
-
-    <p><b>Movie Id: </b>{{id}}</p>
-    <div class="box">
-        <p><b>Description: </b>{{description}}</p>
+<section class="regular-box bg-movie">
+    <div class="container-fluid">
+        <!-- Movie Details Overlap -->
+        <div class="row justify-content-center text-white m-5 p-5">
+            <!-- Movie Details -->
+            <div class="col-4 me-3 mt-5">
+                <p class="lead text-overflow-ellipsis-2">
+                    <strong><span class="text-warning">Title: </span></strong>{{title}}
+                </p>
+                <p class="lead">
+                    <strong><span class="text-warning">Id: </span></strong>{{id}}
+                </p>
+                <p class="lead text-overflow-ellipsis-5">
+                    <strong><span class="text-warning">Description: </span></strong>{{description}}
+                </p>
+                <p class="lead">
+                    <strong><span class="text-warning">Director: </span></strong>{{director}}
+                </p>
+                <p class="lead text-overflow-ellipsis-2">
+                    <strong><span class="text-warning">Actors: </span></strong>{{actors_names}}
+                </p>
+                <p class="lead">
+                    <strong><span class="text-warning">Duration: </span></strong>{{runtimeMins}} minutes
+                </p>
+            </div>
+            <!-- Movie Image -->
+            <div class="col-3 mt-5 py-2">
+                <img class="img-fluid border-dark-4" src="{{image_url}}">
+            </div>
+        </div>
     </div>
-    <p><b>Duration: </b>{{runtimeMins}} mins </p>
-    <p><b>Directors: </b>{{director}}</p>
-    <p><b>Actors: </b>{{actors_names}}</p>
-</div>
-<img class = "moviePoster" src="{{image_url}}" width=10% height=10%/>
+</section>

@@ -1,0 +1,84 @@
+{
+    "IDs": 3,
+    "groups": [
+        {
+            "name": "Nostalgia Group",
+            "description": "Movies from 2005-2012",
+            "id": 1,
+            "movies": [
+                {
+                    "id": "tt0114709",
+                    "title": "Toy Story",
+                    "runtimeMins": "81"
+                },
+                {
+                    "id": "tt0382932",
+                    "title": "Ratatouille",
+                    "runtimeMins": "111"
+                },
+                {
+                    "id": "tt0317705",
+                    "title": "The Incredibles",
+                    "runtimeMins": "115"
+                }
+            ],
+            "userId": 2
+        },
+        {
+            "name": "Horror movies",
+            "description": "Do not watch this on October",
+            "id": 2,
+            "movies": [
+                {
+                    "id": "tt9764362",
+                    "title": "The Menu",
+                    "runtimeMins": "107"
+                },
+                {
+                    "id": "tt3065204",
+                    "title": "The Conjuring 2",
+                    "runtimeMins": "134"
+                },
+                {
+                    "id": "tt5052448",
+                    "title": "Get Out",
+                    "runtimeMins": "104"
+                }
+            ],
+            "userId": 1
+        },
+        {
+            "name": "Nolan movies",
+            "description": "Actual good movies",
+            "id": 3,
+            "movies": [
+                {
+                    "id": "tt0468569",
+                    "title": "The Dark Knight",
+                    "runtimeMins": "152"
+                },
+                {
+                    "id": "tt0816692",
+                    "title": "Interstellar",
+                    "runtimeMins": "169"
+                },
+                {
+                    "id": "tt1375666",
+                    "title": "Inception",
+                    "runtimeMins": "148"
+                },
+                {
+                    "id": "tt6723592",
+                    "title": "Tenet",
+                    "runtimeMins": "150"
+                },
+                {
+                    "id": "tt5013056",
+                    "title": "Dunkirk",
+                    "runtimeMins": "106"
+                }
+            ],
+            "userId": 2
+        }
+    ]
+}

@@ -30,7 +30,7 @@ export default {
     PASSWORDS_DO_NOT_MATCH: () =>
         new InternalError(errorCodes.PASSWORDS_DO_NOT_MATCH, `Passwords do not match`),
     EMAIL_IS_NOT_VALID: () =>
-        new InternalError(errorCodes.PASSWORDS_DO_NOT_MATCH, `Email is not valid`)
+        new InternalError(errorCodes.EMAIL_IS_NOT_VALID, `Email is not valid`)
 }
 
 /** 
