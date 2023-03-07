@@ -3,7 +3,7 @@
 'use strict'
 
 import errors from '#errors/errors.mjs'
-import elasticSearchInit from '#data_access/elasticSearch/elastic-search-util.mjs'
+import elasticSearchInit from '#data_access/elasticSearch/elasticsearch-util.mjs'
 import {get, post, put, del} from '#data_access/elasticSearch/fetch-wrapper.mjs'
 import * as dataManipulation from '#data_manipulation/cmdb-data-man.mjs'
 

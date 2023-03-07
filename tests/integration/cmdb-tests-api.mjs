@@ -11,6 +11,7 @@ import server from '#root/cmdb-server.mjs'
 import * as File from "#data_access/util/file-operations.mjs"
 import errors from '#errors/errors.mjs'
 import configInit from '#root/cmdb-config.mjs'
+import internal from '#data_access/internal/internal.mjs'
 
 // Constants
 const DEFAULT_PORT = 1904
@@ -25,7 +26,7 @@ const GROUPS_FILE = './data/local/groups.json'
 // Test server configuration
 const config = await configInit({
     fetch: 'local',
-    database: 'internal'
+    database: internal
 })
     
 describe("API integration tests:", function() {

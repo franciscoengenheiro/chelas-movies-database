@@ -3,7 +3,7 @@
 
 > This project aims to allow, through our web interface, the ability to create, edit, and delete groups of movies. Groups management, including customization, requires the user to be logged in. Without requiring a valid authentication, the user can search the most popular movies, get the details of a specific movie or search a movie by an expression of their choice instead. 
 
-> Our [API](#server-api-documentation) was built by making use of some of the operations provided by the [IMDb API](https://imdb-api.com/api) and includes all the operations listed above.
+> Our [API](#server-api-documentation) was built by making use of some of the operations provided by the [IMDb API](https://imdb-api.com/api).
 
 > Our server provides data access support for data stored in internal memory or in a elastic search database. 
 
@@ -25,13 +25,13 @@ The application is divided in two major components.
 - The client component is responsible for all the logic surrounding a client interaction, namely logging in or registering a new user.
 
 ## Data Access
-- **Elastic Search** - Provides data access to a [Elastic search](https://www.elastic.co/) database. Consists of several sub-modules that know Elastic Search HTTP API.
+- **Elastic Search** - Provides data access to a [Elastic Search](https://www.elastic.co/) database. Consists of several sub-modules that know Elastic Search HTTP API.
 
 - **Internal Memory** - Provides data access to internal memory stored data in the [local data](#data-local) package files.
 
 - **Fetch** - Provides access to two fetch modules implementations:
-    - ***Local fetch*** - simulates a fetch operation, in order to mimic environmental conditions and work without any limitations. 
-    - ***Node Fetch*** - represents the [node-fetch](https://www.npmjs.com/package/node-fetch) module used to retrieve resources from a container in the web.
+    - **Local fetch** - simulates a fetch operation, in order to mimic environmental conditions and work without any limitations. 
+    - **Node Fetch** - represents the [node-fetch](https://www.npmjs.com/package/node-fetch) module used to retrieve resources from a container in the web.
 
 - **Util** - Provides access to auxiliary functions, including file operations such as asynchronous read and write. The only current format supported is [JSON](https://www.json.org/json-en.html).
 
@@ -93,7 +93,7 @@ const config = {
         port: 1904,
     },
     fetch: 'local', 
-    database: 'elastic' 
+    database: elastic // function 
 }
 ```
 
@@ -231,10 +231,10 @@ For more information and examples consult the online API documentation that can 
 ## Authors
 - **Miguel Raposo** - A49456<br>
 - **Gonçalo Silva** - A49451<br>
-- **Francisco Engenheiro** - 49428
+- **Francisco Engenheiro** - A49428
 
 ---
 
 Instituto Superior de Engenharia de Lisboa<br>
-Introduction to Web Programing<Br>
+Introduction to Web Programing<br>
 Winter Semester of 2022/2023

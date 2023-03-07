@@ -6,6 +6,8 @@ console.log("-------------- Start setting up server --------------")
 
 import server from '#root/cmdb-server.mjs'
 import configInit from '#root/cmdb-config.mjs'
+import internal from '#data_access/internal/internal.mjs'
+import elastic from '#data_access/elasticsearch/elasticsearch.mjs'
 
 // Server configuration
 const config = await configInit({
@@ -14,7 +16,7 @@ const config = await configInit({
           port: 1904,
     },
     fetch: 'node', // local, node
-    database: 'internal' // internal, elastic
+    database: internal // internal, elastic
 })
 
 // Launch server application

@@ -2,7 +2,7 @@
 
 'use strict'
 
-import elasticSearchInit from '#data_access/elasticSearch/elastic-search-util.mjs'
+import elasticSearchInit from '#data_access/elasticSearch/elasticsearch-util.mjs'
 import * as dataManipulation from '#data_manipulation/cmdb-users-man.mjs'
 import userRetrieval from '#data_access/util/user-retrieval.mjs'
 import { post } from '#data_access/elasticSearch/fetch-wrapper.mjs'
