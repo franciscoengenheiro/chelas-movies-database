@@ -93,7 +93,7 @@ const config = {
         port: 1904,
     },
     fetch: 'local', 
-    database: elastic // function 
+    database: elastic
 }
 ```
 
