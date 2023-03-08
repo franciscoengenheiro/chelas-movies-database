@@ -7,17 +7,37 @@
 
 > Our server provides data access support for data stored in internal memory or in a elastic search database. 
 
-> Our website lacks cross-browser compatibility and was not built to be screen responsive, therefore there may be some inconsistencies.
+> Our website lacks cross-browser compatibility and was not built to be screen responsive, therefore there may be some inconsistencies. The website supports pagination.
 
-> The main goal of this project is to build our first website while incorporating new technologies and techniques covered in lectures.
+> The whole project was a key evaluation point of the *Introduction to Web Development* course in the [CSE](https://www.isel.pt/en/curso/bsc-degree/computer-science-and-computer-engineering) undergraduate program of [ISEL](https://www.isel.pt/en).
 
 # Table of Contents
 
+- [Website pages preview](#Website-pages-preview)
 - [Application structure](#application-structure)
 - [Data storage design](#data-storage-design)
 - [Mappings description between Elastic Search and Internal Data Structure Design](#mappings-description-between-elastic-search-and-internal-data-structure)
 - [Server API documentation](#server-api-documentation)
 - [Run Instructions](#run-instructions)
+
+# Website pages preview
+
+| ![Popular movies page](/docs/images/popular-movies.png) |
+|:-:| 
+| *Popular movies page* |
+
+
+| ![Groups page](/docs/images/groups.png) |
+|:-:| 
+| *Groups page* |
+
+| ![Movies page](/docs/images/movies.png) |
+|:-:| 
+| *Movies page* |
+
+| ![Movie details page](/docs/images/movie.png) |
+|:-:| 
+| *Movie details page* |
 
 # Application Structure
 The application is divided in two major components. 
@@ -236,5 +256,5 @@ For more information and examples consult the online API documentation that can 
 ---
 
 Instituto Superior de Engenharia de Lisboa<br>
-Introduction to Web Programing<br>
+Introduction to Web Development<br>
 Winter Semester of 2022/2023
