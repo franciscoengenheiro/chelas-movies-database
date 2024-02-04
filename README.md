@@ -11,16 +11,33 @@
 
 > The whole project was a key evaluation point of the *Introduction to Web Development* course in the [CSE](https://www.isel.pt/en/curso/bsc-degree/computer-science-and-computer-engineering) undergraduate program of [ISEL](https://www.isel.pt/en).
 
-# Table of Contents
+## Table of Contents
 
 - [Website pages preview](#Website-pages-preview)
 - [Application structure](#application-structure)
+    - [Data Access](#data-access)
+    - [Data Local](#data-local)
+    - [Data Manipulation](#data-manipulation)
+    - [Errors](#errors)
+    - [Services](#services)
+    - [Web](#web)
+    - [Server](#server)
+    - [Config](#config)
+    - [Launch](#launch)
+    - [Tests](#tests)
+    - [Docs](#docs)
 - [Data storage design](#data-storage-design)
+    - [User](#user)
+    - [Group](#group)
 - [Mappings description between Elastic Search and Internal Data Structure Design](#mappings-description-between-elastic-search-and-internal-data-structure)
 - [Server API documentation](#server-api-documentation)
 - [Run Instructions](#run-instructions)
+    - [New Project Setup](#new-project-setup)
+    - [Insert Test Data](#insert-test-data)
+    - [Launch Server](#launch-server)
+    - [Run Tests](#run-tests)
 
-# Website pages preview
+## Website pages preview
 
 | ![Popular movies page](/docs/images/popular-movies.png) |
 |:-:| 
@@ -39,12 +56,12 @@
 |:-:| 
 | *Movie details page* |
 
-# Application Structure
+## Application Structure
 The application is divided in two major components. 
 - The server component is responsible for implementing most of the application, such as data access, manipulation and storage, the management of the HTTP requests and responses, and internal error translation. 
 - The client component is responsible for all the logic surrounding a client interaction, namely logging in or registering a new user.
 
-## Data Access
+### Data Access
 - **Elastic Search** - Provides data access to a [Elastic Search](https://www.elastic.co/) database. Consists of several sub-modules that know Elastic Search HTTP API.
 
 - **Internal Memory** - Provides data access to internal memory stored data in the [local data](#data-local) package files.
@@ -57,13 +74,13 @@ The application is divided in two major components.
 
 - **IMDb Movies** - Provides access to the [IMDb API](https://imdb-api.com/api).
 
-## Data Local
+### Data Local
 This module stores data regarding groups, users and IMDb queries output in a local environment as JSON files.
 
-## Data Manipulation
+### Data Manipulation
 This module is responsible to map the received data with the CMDB internal data structure by providing functions and classes for this purpose. The functions that allows for pagination can also be found within.
 
-## Errors  
+### Errors  
 Implements all internal errors that the application may have, each of which is indicated by a unique identifier.
 - The following image presents the mentioned errors:
     ```js
@@ -77,13 +94,13 @@ Implements all internal errors that the application may have, each of which is i
     }
     ```
 
-## Services 
+### Services 
 This module serves as a *bridge* between the [Web](#web) and the [Data Access](#data-access) modules. The services provided by the application are divided in two modules:
 - **General** - Contains all the logic of each of the application's functionalities. This module also verifies if the user has a valid token before allowing access to services functions and subsequent data management.
 
 - **Users** - Manages application users services, namely requesting user creation and retrieving user data.
 
-## Web
+### Web
 - These next two modules handle the HTTP requests and invoke the operations on the corresponding [Services](#services) modules.
     - **API** - Provides a Web API that follows the [REST](https://developer.mozilla.org/en-US/docs/Glossary/REST) principles. The response format is in JSON.
 
@@ -97,13 +114,13 @@ This module serves as a *bridge* between the [Web](#web) and the [Data Access](#
 
 - **HTTP Error Responses** - This module is responsible for the application internal [errors](#errors) translation into HTTP error responses.
 
-## Server
+### Server
 This module creates an [Express](https://expressjs.com/) node application, initializes all of its modules, including data access, services and web, and registers [middlewares](https://developer.mozilla.org/en-US/docs/Glossary/Middleware) used within the application's sub-modules routes.
 
-## Config
+### Config
 This module provides the ability to dynamic import other modules conditionally, according to the received configuration object values.
 
-## Launch
+### Launch
 The entry point of the Application, this module is responsible for the application launch settings where a config object is used. An example can be seen below.
 
 ```js
@@ -119,15 +136,15 @@ const config = {
 
 To launch the server, see [Run Server commands](#launch-server).
 
-## Tests
+### Tests
 This module includes all of the unit and integration tests. It was also added the [PostMan API](https://www.postman.com/) workspace that was used to perform client testing for our API and Elastic Search's.
 To run the test scripts, see [Run Tests commands](#run-tests). 
 
-## Docs
+### Docs
 This module combines all of the server documentation, including [OpenAPI specification](https://swagger.io/specification/) in yaml format and resources used in other documents, including this report.
 
-# Data storage design 
-## User
+## Data storage design 
+### User
 >Each CMDB user consists of:
 - **id** - user internal identifier (*provided by the server*).
 - **username** - registration identifier.
@@ -135,7 +152,7 @@ This module combines all of the server documentation, including [OpenAPI specifi
 - **email** - identification of an electronic mailbox.
 - **token** - a random [UUID](https://developer.mozilla.org/en-US/docs/Glossary/UUID) (*provided by the server*).
 
-## Group
+### Group
 >Each CMDB group consists of:
 - **id** - group internal identifier (*provided by the server*).
 - **name** - group name.
@@ -147,7 +164,7 @@ For a visual representation and example of usage of these data storage designs, 
 
 > The data storage and managment in the Elastic Search database is different from the internal storage, in several ways. Each different type of data, in this case groups and users, are present in different indexes, these being the *container* of all the data of that type. Each of the indexes is composed of documents in which each of them represents new information from the CMDB application, that is, each document is either a group or a different user, depending on the index it belongs to.
 
-# Mappings description between Elastic Search and Internal Data Structure
+## Mappings description between Elastic Search and Internal Data Structure
 
 > Although elastic search gives users the option to establish their own document identifiers, it was determined to let elastic search produce them automatically for each group and user that is created, being those the indexes of this database. 
 
@@ -155,7 +172,7 @@ For a visual representation and example of usage of these data storage designs, 
 
 ![Elastic Mapping](/docs/images/elastic-mapping.png)
 
-# Server API Documentation
+## Server API Documentation
 
 The **CMDB API** has the following routes:
 
@@ -179,9 +196,9 @@ receive a query string parameter *limit* to limit the search result and a *page*
 
 For more information and examples consult the online API documentation that can be found in the **about** section of the website.
 
-# Run Instructions
+## Run Instructions
 
-## New Project Setup
+### New Project Setup
 - Use this commands before adding any files to a new project.
 	- <code>npm init -y</code>
     - <code>npm install express</code>
@@ -229,7 +246,7 @@ For more information and examples consult the online API documentation that can 
             "#root/*": "./*"
         }
         ```
-## Insert Test Data
+### Insert Test Data
 - Using internal memory data access:
     - There's already data store internally and can be viewed in ***data/local***.
 - Using Elastic search data access:
@@ -239,11 +256,11 @@ For more information and examples consult the online API documentation that can 
     - Do not change the run configurations, *Run manually* radio button should be selected along with only 1 iteration.
     - Click *Run Elastic Search* and the test data will be added to the Elastic Search database.
 
-## Launch Server
+### Launch Server
 - **Deployment** - <code>node cmdb-launch.mjs</code>
 - **Development** - <code>nodemon cmdb-launch.mjs -e mjs, hbs</code>
 
-## Run Tests
+### Run Tests
 - Commands:
     - **Integration** - <code>npm test tests/integration</code>
     - **Unit** - <code>npm test tests/unit</code>	
@@ -256,5 +273,6 @@ For more information and examples consult the online API documentation that can 
 ---
 
 Instituto Superior de Engenharia de Lisboa<br>
+BSc in Computer Science and Engineering<br>
 Introduction to Web Development<br>
 Winter Semester of 2022/2023
